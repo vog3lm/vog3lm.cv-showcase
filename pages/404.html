@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset='utf-8'/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<title>404 ERROR</title>
+	<link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+	<script type="text/javascript" src="js/jq.min.js"></script>
+	<script type="text/javascript">
+
+
+	// http://swingfm.ice.infomaniak.ch/swingfm-128.mp3 // nicht so geil
+	// http://broadcast.infomaniak.ch/jazz-wr04-128.mp3
+	// http://broadcast.infomaniak.ch/jazzradio-high.mp3
+
+
+		function GramophonPlaylist(){}
+		function GewerkschaftPlaylist(){}
+
+
+		function V13wEv3ntsConfiguration(){
+			var events = {
+				 'media-prev':function test(){console.log('view event test!')}
+				,'media-play':function test(){console.log('view event test!')}
+				,'media-pause':function test(){console.log('view event test!')}
+				,'media-toggle':function test(){console.log('view event test!')}
+				,'media-stop':function test(){console.log('view event test!')}
+				,'media-next':function test(){console.log('view event test!')}
+			}
+			this.getEvents = function(){
+				return {'events':Object.keys(events),'issues':Object.values(events)}
+			}
+		}
+
+
+		$(document).ready(function(){
+			var video = './images/player.a.mp4'
+			var radio = 'http://broadcast.infomaniak.ch/jazz-wr04-128.mp3'
+
+
+
+			$('header video').attr('src',video)
+			$('header audio').attr('src',radio)
+		});
+		$(window).load(function() {
+			var dispatcher = new Ev3ntV13wD1spatch3r(new V13wEv3ntsConfiguration().getEvents())
+			dispatcher.onRegister()
+			dispatcher.onUnleash()
+		});
+
+
+
+
+
+		function MediaPlayer(){
+			this.play = function(){}
+			this.pause = function(){}
+		}
+
+
+		function Ev3ntV13wD1spatch3r(holder){
+		    var events = holder.events
+		    var issues = holder.issues
+		    this.onRegister = function(){
+		        for (var i=0; i<events.length; i++) {
+		            $('body').on(events[i],selfDispatch);
+		        };
+		    }
+		    this.onUnleash = function(){
+		        $("a").each(function(){
+		            var element = $(this)
+		            if(element.attr('call')){
+		                element.on('click',function(){
+		                    var tmp = $(this)
+		                    $('body').trigger(tmp.attr('call'),[{call:tmp.attr('call'),id:tmp.attr('id')}]);
+		                });
+		            }
+		        });
+		        $('form').keypress(function(e) {
+		            if (e.which == 13) {
+		                e.preventDefault();
+		                var element = $(this)               
+		                if(element.attr('call')){
+		                    $('body').trigger(element.attr('call'),[{call:element.attr('call'),id:element.attr('id')}]);
+		                }
+		            }
+		        });
+		    }
+		    function selfDispatch(evt,data){
+		        try {
+		            index = events.indexOf(data.call)
+		            if(index < 0){
+		                throw 'view event Intel not Found!'
+		            }
+		            issues[index](data)
+		        } catch(error) {
+		            console.error(error)
+		        }
+		    }
+		}
+
+
+	</script>
+	<style type="text/css">
+		/* Font and Color */
+		body                { background:#101010; color:#111; text-decoration:none; font-family:'Monospace', serif; }
+		a, h1, h2, h3,
+		h4, h5, h6          { color:#111; text-decoration:none; font-family:'Monospace', serif; }
+
+		input           { color:#FFF; background:transparent; border:none; box-shadow:none; font-family:'Monospace', serif; }
+		input:focus     { border:none; outline:none !important; box-shadow:none; }
+
+		* {margin: 0px;padding: 0px;}
+		/* Geometry */
+		html,body { position:absolute; height:100%; width:100%; padding:0px; margin:0px; overflow:hidden; }
+
+		body header {
+			position:relative;
+			width:100%;
+			height:100%;
+		}
+		body footer {
+			position:relative;
+			width:100%;
+		}
+		header video,
+		header section,
+		header div#blur {
+			position:absolute;
+			object-fit:cover;
+			width: 100%;
+			height: 100%;
+		}
+		header div#blur {
+			background-color:rgba(150,150,150,0.4)
+		}
+
+		div#player{
+			position: absolute;
+			width:10%;
+			height:10%;
+		}
+
+		div#powerband{
+			position: absolute;
+			bottom:0px;
+		}
+		div.powered{height:21px;}
+		div.powered img,
+		div.powered span {
+			height:21px;
+			line-height:21px;
+			vertical-align: middle;
+			font-size:1.5em;
+		}
+
+	</style>
+</head>
+<body>
+	<header>
+		<video class="" loop autoplay>
+		  	<source src="" type="video/mp4">
+		</video>
+		<audio class="" loop autoplay>
+			<source src="" type="audio/mpeg">
+		</audio>
+		<div id="blur"></div>
+		<section>
+			<div id="player">
+				<a href="#" class="fa fa-backward" call="media-previous"></a>
+				<a href="#" class="fa fa-stop" call="media-stop"></a>
+				<a href="#" class="fa fa-play" call="media-toggle"></a>
+				<a href="#" class="fa fa-forward" call="media-next"></a>
+			</div>
+
+			<div id="powerband">
+				<div class="powered">
+					<img src="./images/howler.png"><span> Powered by howler.js</span>
+				</div>
+				<div class="powered">
+					<img src="./images/firebase.png"><span> Powered by Firebase</span>
+				</div>
+			</div>
+		</section>
+	</header>
+	<footer></footer>
+</body>
+</html>

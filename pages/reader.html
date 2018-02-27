@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset='utf-8'/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<title>vog3lm.cv.reader</title>
+	<link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/landing.white.css">
+
+	<script src="https://www.gstatic.com/firebasejs/4.9.1/firebase.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/4.9.1/firebase-auth.js"></script>
+
+	<script type="text/javascript" src="js/jq.min.js"></script>
+	<script type="text/javascript" src="js/backend.js"></script>
+	<script type="text/javascript" src="js/animate.dotNet.js"></script>
+	<script type="text/javascript">
+
+		var animations = {}
+		var dispatcher = null
+		var cssStyle = 'white';
+
+		function V13wEv3ntsConfiguration(){
+			var style = new St1l3F1l3Operator4p1()
+			var authenicate = new F1rebas3Auth4p1Operator(firebase);
+			var storage = new F1rebas3Storage4p1Operator(firebase);
+			var scroll = new scroller().create();
+			var events = {
+				'footer-toggle':(data) => {
+					var element = $("body")
+					if(!element.hasClass('scroll-flag')){element.scrollTop($(document).height());}
+					else{element.scrollTop(0);}
+					element.toggleClass('scroll-flag')
+					var clicker = $("a#footer-toggle")
+					clicker.toggleClass('fa-chevron-down')
+					clicker.toggleClass('fa-chevron-up')
+				}
+				,'help-toggle':(data) => {
+					var popup = $('popup');
+					popup.find('span#message').html('');
+					popup.css({'left':(window.innerWidth-popup.outerWidth())/2,'top':(window.innerHeight-popup.outerHeight())/2});
+					popup.toggleClass('hide');
+				}
+				,'token-toggle':(data) => {
+					var popup = $('popup');
+					popup.find('span#message').html(authenicate.getToken());
+					popup.css({'left':(window.innerWidth-popup.outerWidth())/2,'top':(window.innerHeight-popup.outerHeight())/2});
+					popup.toggleClass('hide');
+				}
+				,'cfg-toggle':(data) => {
+					$('header nav#cfg-navigation').toggleClass('hide');
+					$('header nav#doc-controls').toggleClass('hide');
+				}
+				,'log-in':(data) => {authenicate.logIn({'mail':'test@user.de','pass':'44920420'});}
+				,'logged-in':(data) => {
+					$('user a.fa-user').attr('call','log-out');
+					$('user span#mail').html(data.mail);
+				}
+				,'log-out':(data) => {authenicate.logOut();}
+			    ,'logged-out':(data) => {
+			    	$('user span#mail').html('');
+			    	$('user a.fa-user').attr('call','log-in');
+			    }
+				,'click-animation':(data) => {console.log('animationClick',data)}
+				,'animation-pause':(data) => {
+					$('nav a.fa-pause').each(function(){
+						var element = $(this)
+						element.attr('call','animation-play')
+						element.removeClass('fa-pause')
+						element.addClass('fa-play')
+					})
+					jQuery.each(animations,(key,value) => {
+					  	value.pause()
+					});
+				}
+				,'animation-play':(data) => {
+					$('nav a.fa-play').each(function(){
+						var element = $(this)
+						element.attr('call','animation-pause')
+						element.removeClass('fa-play')
+						element.addClass('fa-pause')
+					})
+					jQuery.each(animations,(key,value) => {
+					  	value.pause()
+					});
+				}
+				,'animation-colors':(data) => {
+					var colors = ['#fb1','#67f','#b0f','#2F2','#6be','#e5f','#ff1','#777']
+					jQuery.each(animations,(key,value) => {
+					  	value.decorate({'lineColor':colors[Math.floor(Math.random()*(colors.length-1))]})
+					});
+				}
+				,'style-toggle':(data) => {
+					style.remove('css/landing.'+cssStyle+'.css')
+					if('white' == cssStyle){cssStyle = 'dark'}
+					else if('dark' == cssStyle){cssStyle = 'white'}
+					style.add('css/landing.'+cssStyle+'.css')
+				}
+				,'scroll-up':() => {
+					scroll.delta(-400);
+				}
+				,'scroll-down':() => {
+					scroll.delta(400);
+				}
+			}
+			this.getEvents = function(){
+				return {'events':Object.keys(events),'issues':Object.values(events)}
+			}
+
+
+			
+		}
+
+		function scroller(){
+			var content = null;
+			var scroller = 0;
+			var args = {'scale':0.5,'node':'header section#content'}
+			var height = 0;
+			this.decorate = function(opts){
+				for (var key in opts){
+					if(args.hasOwnProperty(key)){
+						args[key] = opts[key];
+					}
+				}
+				return this;
+			}
+			this.create = function(){
+				content = $(args.node);
+				content.find('span').each(function(){
+				    height += $(this).outerHeight()
+				});
+				content.find('div.head').each(function(){
+				    height += $(this).outerHeight()
+				});
+
+				content.on('wheel', function(e){scrollDelta(e.originalEvent.deltaY);});
+				return this;
+			}
+
+			this.delta = function(delta){scrollDelta(delta);}
+			function scrollDelta(delta){
+				if(scroller <= height && scroller >= 0){
+					scroller+=Math.floor((delta*args.scale))
+					if(scroller < 0){scroller = 0;}
+					else if(scroller > height){scroller = height;}
+				}
+				afterJobHasBeenDone(content);
+			}
+			function scrollSection(sec){
+				afterJobHasBeenDone(content);
+			}
+
+			function afterJobHasBeenDone(content){
+				content.find('nav').css({'top':scroller})
+	        	content.scrollTop(scroller);
+	        	if(scroller > 0){
+	        		$('nav#doc-navigation a.fa-chevron-circle-up').removeClass('hide')
+	        	} else {
+	        		$('nav#doc-navigation a.fa-chevron-circle-up').addClass('hide')
+	        	}
+	        	if(scroller >= height){
+	        		$('nav#doc-navigation a.fa-chevron-circle-down').addClass('hide')
+	        	} else {
+	        		$('nav#doc-navigation a.fa-chevron-circle-down').removeClass('hide')
+	        	}
+			}
+
+		}
+
+		var app = null;
+
+		$(document).ready(function(){
+			// Initialize Firebase
+			var config = {
+			    apiKey: "AIzaSyDmXSkwOam-aQ37z8-3d5aH-X257lIVS34",
+			    authDomain: "vog3lm-0x1.firebaseapp.com",
+			    databaseURL: "https://vog3lm-0x1.firebaseio.com",
+			    projectId: "vog3lm-0x1",
+			    storageBucket: "vog3lm-0x1.appspot.com",
+			    messagingSenderId: "729625884802"
+			};
+			firebase.initializeApp(config);
+
+			app = new V13wEv3ntsConfiguration();
+
+		});
+		$(window).load(function() {
+			dispatcher = new V13wEv3ntD1spatch3r(app.getEvents())
+			dispatcher.onRegister()
+			dispatcher.onUnleash()
+
+			var anima = {'lineColor':'#777','lineWidth':'1px'
+						,'paneParent':'zone','paneId':'one'}
+			var pane = new dotNetAnimation()
+			pane.decorate(anima)
+			animations[anima.paneId] = pane;
+			anima.lineColor = '#777'
+			anima.paneId = 'two'
+			pane = new dotNetAnimation()
+			pane.decorate(anima)
+			animations[anima.paneId] = pane;
+			jQuery.each(animations,(key,value) => {
+			  	value.create();
+			  	value.start();
+			});
+		});
+
+
+		function St1l3F1l3Operator4p1(){
+			this.remove = function(filename) {
+				var linkNode = document.querySelector('link[href*="'+filename+'"]');
+				linkNode.parentNode.removeChild(linkNode)
+			}
+			this.add = function(filename){
+			    var fileref=document.createElement("link")
+			    fileref.setAttribute("rel", "stylesheet")
+			    fileref.setAttribute("type", "text/css")
+			    fileref.setAttribute("href",filename)
+			    if (typeof fileref!="undefined")
+			        document.getElementsByTagName("head")[0].appendChild(fileref)
+			}
+		}
+		function Ev3ntV13wD1spatch3r(holder){
+		    var events = holder.events
+		    var issues = holder.issues
+		    this.onRegister = function(){
+		        for (var i=0; i<events.length; i++) {
+		            $('body').on(events[i],selfDispatch);
+		        };
+		    }
+		    this.onUnleash = function(){
+		        $("a").each(function(){
+		            var element = $(this)
+		            if(element.attr('call')){
+		                element.on('click',function(){
+		                    var tmp = $(this)
+		                    $('body').trigger(tmp.attr('call'),[{call:tmp.attr('call'),id:tmp.attr('id')}]);
+		                });
+		            }
+		        });
+		        $('form').keypress(function(e) {
+		            if (e.which == 13) {
+		                e.preventDefault();
+		                var element = $(this)               
+		                if(element.attr('call')){
+		                    $('body').trigger(element.attr('call'),[{call:element.attr('call'),id:element.attr('id')}]);
+		                }
+		            }
+		        });
+		    }
+		    function selfDispatch(evt,data){
+		        try {
+		            index = events.indexOf(evt.type)
+		            if(index < 0){
+		                throw 'view event Intel not Found!'
+		            }
+		            issues[index](data)
+		        } catch(error) {
+		            console.error(error)
+		        }
+		    }
+		}
+
+
+	</script>
+	<style type="text/css">
+		/* Font and Color */
+		* {margin: 0px;padding: 0px;}
+		/* Geometry */
+		html,body { position:absolute; height:100%; width:100%; padding:0px; margin:0px; overflow:hidden; }
+
+
+		.hide{
+			display:none;
+		}
+		.fa-1-5x{
+			font-size:1.5em;
+		}
+		a.fa{
+			width: 32px;
+			height: 32px;
+			line-height: 32px;
+			vertical-align: middle;
+			text-align: center;
+		}
+
+		body header {
+			overflow:hidden;
+			position:relative;
+			width:100%;
+			height:100%;
+		}
+		header img#background {
+			position: absolute;
+			width:100%;
+			height:100%;
+		}
+		header canvas {
+			position: absolute;
+		}
+		canvas#one{
+			transform:rotateY(30deg) scaleX(1.15);
+		}
+		canvas#two{
+			transform:rotateY(-20deg) scaleX(1.15);
+		}
+
+		header section#content{
+			color:darkgray;
+			font-size:1.5em;
+			background:rgba(27,27,27,0.9)
+		}
+		header section#content{
+			position: absolute;
+			left:8em;
+			top:3em;
+			width:calc(100% - 16em - 0em);
+			min-height:32px;
+			max-height:calc(100% - 3em - 0em);
+			overflow:hidden;
+		}
+		section#content span{
+			display:inline-block;
+			height:calc(100% - 3em);
+			width:calc(100% - 3em);
+			margin:1.5em;
+		}
+		section#content nav#doc-navigation{
+			position:absolute;
+			top:0px;
+			right:0px;
+			width:32px;
+			min-height:100%;
+		}
+		div.head{
+			width: calc(100%);
+		    height: calc(200px);
+		    float: left;
+		}
+		div.head h1,
+		div.head h5,
+		div.head nav{
+			padding-left: 24px;
+			width:calc(100% - 200px - 24px);
+			float:left;
+		}
+		div.head nav{
+			padding-top:32px;
+		}
+		div.head h1{
+			padding-top: 24px;
+		}
+
+		section#content div.head span{
+			margin:0px;
+		}
+		nav#doc-navigation a.fa-chevron-circle-down{
+			position:absolute;
+			bottom:0px;
+		}
+
+
+		header a.fa-question-circle,
+		header a.fa-question-circle-o{
+			position: absolute;
+			right:0px;
+		}
+		header a.fa-cog,
+		header nav#cfg-navigation,
+		header nav#doc-controls{
+			position: absolute;
+			right:0px;
+			bottom:0px;
+		}
+		header nav#cfg-navigation,
+		header nav#doc-controls{
+			bottom:32px;
+			width:32px;
+		}
+		header nav#doc-controls{
+			right:32px;
+		}
+		header a.fa-chevron-up,
+		header a.fa-chevron-down{
+			position: absolute;
+			width: calc(100% - 32px - 10%);
+			height: 14px;
+			bottom: 0px;
+			line-height: 14px;
+			vertical-align: middle;
+			text-align: center;
+		}
+		header user{
+			position: absolute;
+			bottom: 0px;
+			max-width:10%;
+			overflow: hidden;
+		}
+		user span,
+		user a.fa{
+			height:18px;
+			line-height: 18px;
+			vertical-align: middle;
+		}
+		user span.fa,
+		user a.fa{
+			width:18px;
+			text-align: center;
+		}
+
+		body popup {
+			padding:0.75em;
+			font-size:2em;
+			color:white;
+			position: fixed;
+			min-width: 32px;
+		    max-width: calc(66%);
+		    min-height: 32px;
+		    max-height: calc(66%);
+		    background: rgba(34,34,34,1);
+	        word-wrap: break-word;
+		}
+
+		body footer {
+			position:relative;
+			width:100%;
+			height:25%;
+		}
+	</style>
+</head>
+<body>
+	<header id="zone">
+		<a href="#" class="fa fa-question-circle-o fa-1-5x" call="help-toggle"></a>
+		<a href="#" class="fa fa-cog fa-1-5x" call="cfg-toggle"></a>
+		<nav id="cfg-navigation" class="hide">
+			<a href="#" class="fa fa-pause" call="animation-pause"></a>
+			<a href="#" class="fa"></a>
+			<a href="#" class="fa fa-eyedropper fa-1-5x" call="animation-colors"></a>
+			<a href="#" class="fa fa-eye-slash fa-1-5x" call="style-toggle"></a>
+			<a href="#" class="fa fa-tachometer fa-1-5x" call="animation-velocity"></a>
+			<a href="#" class="fa fa-wrench fa-1-5x" call="animation-refresh"></a>
+		</nav>
+		<nav id="doc-controls" class="hide">
+			<a href="#" class="fa fa-plus fa-1-5x" call="background-darker"></a>
+			<a href="#" class="fa fa-minus fa-1-5x" call="background-lighter"></a>
+			<a href="#" class="fa"></a>
+			<a href="#" class="fa fa-plus fa-1-5x" call="text-increase"></a>
+			<a href="#" class="fa fa-minus fa-1-5x" call="text-decrease"></a>
+		</nav>
+		<section id="content">
+			<nav id="doc-navigation">
+				<a href="#" class="fa fa-chevron-circle-up hide" call="scroll-up"></a>
+				<a href="#" class="fa fa-chevron-circle-down" call="scroll-down"></a>
+			</nav>
+
+			<div class='head'>
+				<h1>Technische Hochschule Weingarten<br>Weingarten im Allgäu</h1>
+				<h5>1991 - 1995</h5>
+				<nav>
+					<a href="#" class="fa fa-1-5x fa-id-badge" call=""></a>
+					<a href="#" class="fa fa-1-5x fa-eye" call=""></a>
+				</nav>
+				<img src="./images/logo.fh_simple.png">
+			</div>
+			<div class='head'>
+				<h1>Pädagogische Hochschule Weingarten<br>Weingarten im Allgäu</h1>
+				<h5>1991 - 1995</h5>
+				<nav>
+					<a href="#" class="fa fa-1-5x fa-reply" call=""></a>
+					<a href="#" class="fa fa-1-5x fa-user-secret" call=""></a>
+				</nav>
+				<img src="./images/logo.ph_simple.png">
+			</div>
+			<div class='head'>
+				<h1>Universität Konstanz<br>Konstanz</h1>
+				<h5>1991 - 1995</h5>
+				<nav>
+					<a href="#" class="fa fa-1-5x fa-link" call=""></a>
+					<a href="#" class="fa fa-1-5x fa-unlink" call=""></a>
+				</nav>
+				<img src="./images/logo.uni_simple.png">
+			</div>
+
+			<div class='head'>
+				<h1>Wirtschaftsgymnasium<br>Wangen im Allgäu</h1>
+				<h5>1991 - 1995</h5>
+				<nav>
+					<a href="#" class="fa fa-1-5x fa-link" call=""></a>
+					<a href="#" class="fa fa-1-5x fa-unlink" call=""></a>
+				</nav>
+				<img src="./images/logo.wg_simple.png">
+			</div>
+
+			<div class='head'>
+				<h1>Realschule Leutkirch<br>Leutkirch im Allgäu</h1>
+				<h5>1991 - 1995</h5>
+				<nav>
+					<a href="#" class="fa fa-1-5x fa-link" call=""></a>
+					<a href="#" class="fa fa-1-5x fa-unlink" call=""></a>
+				</nav>
+				<img src="./images/logo.ltk_simple.png">
+			</div>
+
+			<div class='head'>
+				<h1>Grundschule Oberer Graben<br>Leutkirch im Allgäu</h1>
+				<h5>1991 - 1995</h5>
+				<nav>
+					<a href="#" class="fa fa-1-5x fa-link" call=""></a>
+					<a href="#" class="fa fa-1-5x fa-unlink" call=""></a>
+				</nav>
+				<img src="./images/logo.gs_simple.png">
+			</div>
+
+
+
+
+		</section>
+		<a href="#" id="footer-toggle" class="fa fa-chevron-up" call="footer-toggle"></a>
+		<user>
+			<a href="#" class="fa fa-lock" call="token-toggle"></a>
+			<a href="#" class="fa fa-user" call="log-in"></a>
+			<span id="mail"></span>
+		</user>
+		<popup class="hide">
+			<span id="message"></span>
+		</popup>
+	</header>
+	<footer></footer>
+</body>
+</html>

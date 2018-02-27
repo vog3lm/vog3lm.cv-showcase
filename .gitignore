@@ -1,0 +1,6 @@
+functions/etc
+functions/node_modules
+functions/.*
+functions/package-lock.json
+
+storage

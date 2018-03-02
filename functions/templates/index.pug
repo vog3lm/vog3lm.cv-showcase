@@ -1,0 +1,30 @@
+//- root layout.pug 0-lvl
+doctype html
+html(lang="de")
+    head
+        meta(charset='utf-8')
+        meta(name='viewport' content="width=device-width, initial-scale=1.0")
+
+        if null != hat
+            if null != hat.title
+                title #{hat.title}
+            if null != hat.manifest
+                link(rel="manifest" href=hat.manifest)
+            if null != hat.fav
+                link(rel="shortcut icon" href=hat.fav type="image/x-icon")
+                link(rel="icon"          href=hat.fav type="image/x-icon")
+
+        if null != css
+            each url in css
+                link(rel='stylesheet' href=url)
+
+        block style
+
+        if null != js
+            each url in js
+                script(type='text/javascript' src=url)
+
+        block script
+
+    body
+        block root

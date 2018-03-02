@@ -7,10 +7,7 @@
       "**/node_modules/**"
     ],
     "rewrites": [
-      {
-        "source": "/hello",
-        "function": "helloWorld"
-      }
+      {"source":"/qr","function":"qr"}
     ],
     "cleanUrls": true
   },

@@ -51,7 +51,7 @@
 					$('header nav#cfg-navigation').toggleClass('hide');
 					$('header nav#doc-controls').toggleClass('hide');
 				}
-				,'log-in':(data) => {authenicate.logIn({'mail':'test@user.de','pass':'44920420'});}
+				,'log-in':(data) => {authenicate.logIn({'mail':'','pass':''});}
 				,'logged-in':(data) => {
 					$('user a.fa-user').attr('call','log-out');
 					$('user span#mail').html(data.mail);
@@ -144,6 +144,8 @@
 					if(scroller < 0){scroller = 0;}
 					else if(scroller > height){scroller = height;}
 				}
+				content.find('nav').css({'top':scroller})
+	        	content.scrollTop(scroller);
 				afterJobHasBeenDone(content);
 			}
 			function scrollSection(sec){
@@ -151,8 +153,7 @@
 			}
 
 			function afterJobHasBeenDone(content){
-				content.find('nav').css({'top':scroller})
-	        	content.scrollTop(scroller);
+
 	        	if(scroller > 0){
 	        		$('nav#doc-navigation a.fa-chevron-circle-up').removeClass('hide')
 	        	} else {

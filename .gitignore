@@ -1,6 +1,14 @@
+node_modules
+.gitignore
+.firebaserc
+*.log
+
 functions/etc
 functions/node_modules
 functions/.*
 functions/package-lock.json
+functions/vog3lm-*.json
+
+pages/*.log
 
 storage

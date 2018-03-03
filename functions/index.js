@@ -94,11 +94,12 @@ const getQrRequestTokenFromHeader = (req, res, next) => {
 	return next();
 }
 *//* 	vog3lm smart cv mobile qr code login backend api */
-var db = {'PXHTajCVg':{'mail':'test@user.de','pass':'44920420'}
-		 ,'1w9cBiU7Q':{'mail':'test@user.de','pass':'44920420'}
-		 ,'PT5VTsF8R':{'mail':'test@user.de','pass':'44920420'}
-		 ,'6PW2gsYzD':{'mail':'test@user.de','pass':'44920420'}
-		 ,'O2FNkkqqE':{'mail':'test@user.de','pass':'44920420'}}
+var db = {'PXHTajCVg':{'mail':'adm1n@smart.cv.de','pass':'44920420$Dollar'  ,'tag':''}
+		 ,'1w9cBiU7Q':{'mail':'card@smart.cv.de' ,'pass':'c4rd@$m4r1.cv.d3' ,'tag':'2018FEB'}
+		 ,'PT5VTsF8R':{'mail':'flyer@smart.cv.de','pass':'fly3r@$m4r1.cv.d3','tag':'2018FEB'}
+		 /* custom cv users */
+		 ,'6PW2gsYzD':{'mail':'unset','pass':'unset','tag':''}
+		 ,'O2FNkkqqE':{'mail':'unset','pass':'unset','tag':''}}
 
 const qr = express();
 qr.set('view engine', 'pug')

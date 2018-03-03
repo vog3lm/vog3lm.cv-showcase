@@ -5,8 +5,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 	<title>vog3lm.cv.reader</title>
 	<link rel="manifest" href="/manifest.json">
-    <link rel="stylesheet" href="css/font-awesome.min.css">
-    <link rel="stylesheet" href="css/landing.white.css">
+    <link rel="stylesheet" href="css/font.awesome.min.css">
+    <link rel="stylesheet" href="css/design.white.css">
 
 	<script src="https://www.gstatic.com/firebasejs/4.9.1/firebase.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/4.9.1/firebase-auth.js"></script>
@@ -278,6 +278,7 @@
 			font-size:1.5em;
 		}
 		a.fa{
+			float:left;
 			width: 32px;
 			height: 32px;
 			line-height: 32px;
@@ -384,29 +385,41 @@
 		header a.fa-chevron-up,
 		header a.fa-chevron-down{
 			position: absolute;
-			width: calc(100% - 32px - 10%);
+			width: calc(100% - 32px - 25%);
 			height: 14px;
+			left:25%;
 			bottom: 0px;
 			line-height: 14px;
 			vertical-align: middle;
 			text-align: center;
 		}
+
 		header user{
-			position: absolute;
-			bottom: 0px;
-			max-width:10%;
+			position:absolute;
+			height:32px;
+			width:25%;
 			overflow: hidden;
 		}
-		user span,
-		user a.fa{
-			height:18px;
-			line-height: 18px;
-			vertical-align: middle;
+		user form,
+		user card{
+			width:100%;
+			height:100%;
+			padding:0px;
 		}
-		user span.fa,
-		user a.fa{
-			width:18px;
-			text-align: center;
+		user form input{
+			height:32px;
+			width:50%;
+			line-height:32px;
+			vertical-align:middle;
+			float:left;
+		}
+		user card id{
+			height:32px;
+			width:calc(100% - 2*32px);
+			line-height:32px;
+			vertical-align:middle;
+			float:right;
+			overflow:hidden;
 		}
 
 		body popup {
@@ -454,78 +467,32 @@
 				<a href="#" class="fa fa-chevron-circle-down" call="scroll-down"></a>
 			</nav>
 
-			<div class='head'>
-				<h1>Technische Hochschule Weingarten<br>Weingarten im Allgäu</h1>
-				<h5>1991 - 1995</h5>
-				<nav>
-					<a href="#" class="fa fa-1-5x fa-id-badge" call=""></a>
-					<a href="#" class="fa fa-1-5x fa-eye" call=""></a>
-				</nav>
-				<img src="./images/logo.fh_simple.png">
-			</div>
-			<div class='head'>
-				<h1>Pädagogische Hochschule Weingarten<br>Weingarten im Allgäu</h1>
-				<h5>1991 - 1995</h5>
-				<nav>
-					<a href="#" class="fa fa-1-5x fa-reply" call=""></a>
-					<a href="#" class="fa fa-1-5x fa-user-secret" call=""></a>
-				</nav>
-				<img src="./images/logo.ph_simple.png">
-			</div>
-			<div class='head'>
-				<h1>Universität Konstanz<br>Konstanz</h1>
-				<h5>1991 - 1995</h5>
-				<nav>
-					<a href="#" class="fa fa-1-5x fa-link" call=""></a>
-					<a href="#" class="fa fa-1-5x fa-unlink" call=""></a>
-				</nav>
-				<img src="./images/logo.uni_simple.png">
-			</div>
-
-			<div class='head'>
-				<h1>Wirtschaftsgymnasium<br>Wangen im Allgäu</h1>
-				<h5>1991 - 1995</h5>
-				<nav>
-					<a href="#" class="fa fa-1-5x fa-link" call=""></a>
-					<a href="#" class="fa fa-1-5x fa-unlink" call=""></a>
-				</nav>
-				<img src="./images/logo.wg_simple.png">
-			</div>
-
-			<div class='head'>
-				<h1>Realschule Leutkirch<br>Leutkirch im Allgäu</h1>
-				<h5>1991 - 1995</h5>
-				<nav>
-					<a href="#" class="fa fa-1-5x fa-link" call=""></a>
-					<a href="#" class="fa fa-1-5x fa-unlink" call=""></a>
-				</nav>
-				<img src="./images/logo.ltk_simple.png">
-			</div>
-
-			<div class='head'>
-				<h1>Grundschule Oberer Graben<br>Leutkirch im Allgäu</h1>
-				<h5>1991 - 1995</h5>
-				<nav>
-					<a href="#" class="fa fa-1-5x fa-link" call=""></a>
-					<a href="#" class="fa fa-1-5x fa-unlink" call=""></a>
-				</nav>
-				<img src="./images/logo.gs_simple.png">
-			</div>
-
-
-
-
 		</section>
 		<a href="#" id="footer-toggle" class="fa fa-chevron-up" call="footer-toggle"></a>
 		<user>
-			<a href="#" class="fa fa-lock" call="token-toggle"></a>
-			<a href="#" class="fa fa-user" call="log-in"></a>
-			<span id="mail"></span>
+			<card class="">
+				<a href="#" class="fa fa-lock" call="log-out"></a>
+				<a href="#" class="fa fa-user" call="token-toggle"></a>	
+				<id>user@mail.de</id>
+			</card>
+			<form class="hide">
+				<input type="text" id="mail" name="mail" placeholder="mail" value="">
+				<input type="text" id="pass" name="pass" placeholder="pass" value="">				
+			</form>
+			<a href="#" class="fa fa-hashtag" call="login-toggle"></a>
 		</user>
 		<popup class="hide">
 			<span id="message"></span>
 		</popup>
 	</header>
-	<footer></footer>
+	<footer>
+		<form></form>
+		<form class="half"></form>
+		<form>
+			<a href="#" >Impressum</a>
+			<a href="#" >License</a>
+			<a href="#" >Impressum</a>
+		</form>	
+	</footer>
 </body>
 </html>

@@ -5,8 +5,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 	<title>vog3lm.cv</title>
 	<link rel="manifest" href="/manifest.json">
-    <link rel="stylesheet" href="css/font-awesome.min.css">
-    <link rel="stylesheet" href="css/landing.white.css">
+    <link rel="stylesheet" href="css/font.awesome.min.css">
+    <link rel="stylesheet" href="css/design.white.css">
 
 	<link rel="shortcut icon" href="images/favicon.coyote.poly_white.b.png" type="image/x-icon" />
 	<link rel="icon" 		  href="images/favicon.coyote.poly_white.b.png" type="image/x-icon" />
@@ -248,6 +248,7 @@
 			font-size:1.5em;
 		}
 		a.fa{
+			float: left;
 			width: 32px;
 			height: 32px;
 			line-height: 32px;
@@ -295,30 +296,41 @@
 		header a.fa-chevron-up,
 		header a.fa-chevron-down{
 			position: absolute;
-			width: calc(100% - 32px - 10%);
+			width: calc(100% - 32px - 25%);
 			height: 14px;
-			left:10%;
+			left:25%;
 			bottom: 0px;
 			line-height: 14px;
 			vertical-align: middle;
 			text-align: center;
 		}
 		header user{
-			position: absolute;
-			bottom: 0px;
-			max-width:10%;
+			position:absolute;
+			height:32px;
+			width:25%;
+			bottom:0px;
 			overflow: hidden;
 		}
-		user span,
-		user a.fa{
-			height:18px;
-			line-height: 18px;
-			vertical-align: middle;
+		user form,
+		user card{
+			width:100%;
+			height:100%;
+			padding:0px;
 		}
-		user span.fa,
-		user a.fa{
-			width:18px;
-			text-align: center;
+		user form input{
+			height:32px;
+			width:50%;
+			line-height:32px;
+			vertical-align:middle;
+			float:left;
+		}
+		user card id{
+			height:32px;
+			width:calc(100% - 2*32px);
+			line-height:32px;
+			vertical-align:middle;
+			float:right;
+			overflow:hidden;
 		}
 
 		body footer {
@@ -326,17 +338,21 @@
 			width:100%;
 			height:35%;
 		}
-
-
 		footer form{
-			width: calc(25% - 2*4em);
-		    height: calc(100% - 2*4em);
-		    padding: 4em;
+			position: relative;
+			width: calc(25% - 2*2em);
+		    height: calc(100% - 2*2em);
+		    padding: 2em;
 		    float:left;
 		}
-		footer form.half{
-			width: calc(50% - 2*4em);
-		}
+		footer form:nth-child(3){width: calc(50% - 2*2em);}
+
+
+
+
+
+
+
 
 		form input,
 		form a,
@@ -374,115 +390,14 @@
 
 
 
-		/* index specific code...story line... */
-		div#story{
-		    height: 100%;
-		    width: 100%;
-		    overflow: hidden;
-		    white-space: nowrap;
-		}
 
-		div#story div.page{
-			width: 100%;
-			height: 100%;
-			display: inline-block;
-			overflow: hidden;
-			position: relative;
-		}
 
-		div#story div.page div{
-			width: 66%;
-			height: 75%;
-			left: 17%;
-			top: 12.5%;
-			position: absolute;
-			background-color:rgba(34,34,34,1); 
-			color:red;
-		}
-		div#story div.page a.fa{
-			color:red;
-		}
 	</style>
 </head>
 <body>
 	<header id="zone">
 		<img class="after-effect" src="" alt="">
-		<section id="content">
-			<div id="story">
-					<div class="page">
-						<div>
-
-							<a href="#" class="fa fa-user" call="content-header-request"></a>
-							<a href="#" class="fa fa-user-circle" call="content-cookie-request"></a>
-
-							<a href="#" class="fa fa-qrcode" call="qr-parameter-request"></a>
-
-							<br>
-							<br>
-
-							Betreff (Bei Blindbewerbungen reicht "Bewerbung", ansonsten ist hier der konkrete Bezug zur Stellenanzeige Pflicht: "Bewerbung als ..., Ihre <br>Stellenanzeige vom 24. Juli 2015 in der Lokalzeitung XY")<br>
-							Anrede (Immer persönlich, nie: "Sehr geehrte Damen und Herren" - Ansprechpartner recherchieren!)<br>
-							Einstieg und Einleitungssatz<br>
-							Kurzdarstellung des Profils (Stärken und Soft Skills - mit Beispiel)<br>
-							Bezug zum Unternehmen<br>
-							Eventuell Hinweis auf sonstige Kenntnisse (etwa Fremdsprachen)<br>
-							Eventuell Hinweis auf Referenzen (Ansprechpartner von früheren Jobs)<br>
-							Eventuell Hinweis auf Kündigungsfristen und möglichen Eintrittstermin<br>
-							Falls verlangt: Gehaltsvorstellungen (Spanne ist besser als exakter Betrag)<br>
-							Abschlusssatz und Grußformel<br>
-							Unterschrift (folgt direkt nach der Grußformel am Ende des Schreibens)<br>
-							Anlagen (Lebenslauf, Zeugnisse, Zertifikate)<br>
-						</div>
-					</div>
-					<div class="page">
-						<div>
-							Sehr geehrte Frau Personaler,<br>
-							Ihr Unternehmen genießt im Bereich der ... einen ausgezeichneten Ruf. Da es sich dabei um den Schwerpunkt meines Studiums und meiner bisherigen Projekte handelt und mir Ihr Unternehmen von Bekannten empfohlen wurde, bewerbe ich mich für eine Praktikum bei Ihnen.<br>
-							Neben meinem Fachwissen in den Bereichen Thema 1 und Thema 2 konnte ich bei verschiedenen Projekten schon erste Praxiserfahrungen sammeln. Im Rahmen des Studienprojektes „NAME“ arbeitete ich zudem zusammen mit einem Team aus Studenten für Unternehmen wie X, Y und Z. Dort waren wir unter anderem verantwortlich für...<br>
-							•	Aufgabe 1<br>
-							•	Aufgabe 2<br>
-							Dabei habe ich große Teile des Projektes selbst verantwortet und dabei meine fachlichen und sozialen Fähigkeiten ausbauen können. Diese Kompetenzen sowie meine hohe Motivation möchte ich gerne bei Ihnen einbringen und weiter trainieren.<br>
-							Gerne überzeuge ich Sie in einem persönlichen Gespräch davon, dass Sie mit mir einen ebenso engagierten wie erfahrenen Praktikanten gewinnen.
-							Mit besten Grüßen nach Musterhausen<br>
-							Max Muster<br>
-						</div>
-					</div>
-					<div class="page">
-						<div>
-							Sehr geehrte Frau Personaler,<br>
-							seit Jahren interessiere ich mich für die Arbeit mit Elektronik und lebe dieses Interesse unter anderem im Bereich des elektronischen Modellbaus aus.Die Konstruktion von Schaltungen, die Lösung elektronischer Probleme und Aufgaben faszinieren mich. Dieses Interesse zeigt sich auch in meinen Noten, da ich sowohl in Mathematik als auch in Physik jeweils eine Eins vorweisen kann.<br>
-							Im Rahmen meines Praktikums zur Berufsorientierung habe ich zwei Wochen bei der Werkmeister GmbH in Weinhausen die IT-System-Elektroniker des Unternehmens begleitet. Das Praktikum hat mir so viel Freude bereitet, dass ich dort freiwillig weitere drei Wochen Praktikum in den Sommerferien absolviert habe. Das Unternehmen war – wie Sie den Zeugnissen entnehmen können – mit meiner Leistung sehr zufrieden.<br>
-							Die Ausbildung zum IT-System-Elektroniker würde ich aber gerne bei Ihnen machen. Das liegt vor allem an dem hervorragenden Ruf Ihres Unternehmens und den positiven Erfahrungsberichten, die ich von Mitarbeitern Ihres Unternehmens im Internet recherchieren konnte.Da Sie zahlreiche Produkte herstellen und anbieten, sehe ich in der Ausbildung die Chance, Erfahrungen in verschiedenen Bereichen zu sammeln und diese später bei Ihnen einzusetzen.<br>
-							Ich freue mich sehr, schon bald mit Leidenschaft und Engagement zum Erfolg Ihres Unternehmens beizutragen und freue mich über eine Einladung zum Vorstellungsgespräch.<br>
-							Mit besten Grüßen nach Musterhausen<br>
-							Max Muster<br>
-						</div>
-					</div>
-					<div class="page">
-						<div>
-							Bewerbung als Leiter der Qualitätssicherung<br>
-							Sehr geehrter Herr Personalleiter,<br>
-							schon in meiner aktuellen Position verantworte ich die kontinuierliche Verbesserung in der Fertigung. Hierdurch konnten die Produktivität bereits um 30 Prozent gesteigert und die Kosten um 20 Millionen Euro gesenkt werden. Dabei unterstützt mich ein 8-köpfiges Team, das ich seit fünf Jahren verantwortlich führe. <br>
-							Ich sehe mich dabei in erster Linie als Moderator und professioneller Störenfried, der unsere Prozesse immer wieder hinterfragt und so Optimierungspotenziale aufdeckt. Meine Vorgesetzten beschreiben mich als loyalen Mitarbeiter, der flexibel auf verschiedenste Anforderungen reagiert, stets den Überblick behält und Menschen gut motivieren kann.<br>
-							Nachdem ich bei meinem aktuellen Arbeitgeber fünf Jahre lang Führungserfahrung sammeln konnte, reizt mich jetzt die Aufgabe, beim Marktführer für Fluxkompensatoren meine Erfahrung einzubringen und mithelfen zu können, den Marktvorsprung durch konsequentes Steigern der Rentabilität und Qualität weiter auszubauen. Ich weiß, dass ich bei Ihnen dazu zusätzlich auf ein exzellentes Team treffen werde - was mich zusätzlich motiviert. <br>
-							Da Sie danach gefragt haben: Ich stelle mir ein Jahresgehalt von 60.000 Euro vor, kann mir aber auch ein etwas geringeres Fixum in Kombination mit einer dafür höheren Erfolgsbeteiligung vorstellen. Die Details dazu sollten wir allerdings bei einem persönlichen Treffen besprechen. Ich freue mich auf Ihre Einladung!<br>
-							Mit den besten Grüßen<br>
-							Dietrich Kowalski<br>
-						</div>
-					</div>
-					<div class="page">
-						<div>
-							Bewerbung als Online-Marketing-Managerin<br>
-							Sehr geehrter Herr Personaler,<br>
-							schon seit Jahren verfolge ich Ihre Arbeit in Print und im Web – es ist in der Tat erstaunlich, was Sie in kurzer Zeit auf die Beine gestellt haben. Und daher hat es mich besonders gefreut, zu erfahren, dass Sie demnächst eine zusätzliche Fachkraft für Ihr Marketing-Team suchen – diese Chance, Sie von meinen Fähigkeiten zu überzeugen, muss ich einfach nutzen.<br>
-							Langjährige Erfahrung im Schreiben und in der Fotografie habe ich durch die Ausbildung als Medienkauffrau und die anschließende Arbeit bei dem Beispielverlag erworben. Danach habe ich die Chance genutzt, eine Fortbildung in den Bereichen des Online-Marketing und des Social-Media-Managements zu absolvieren. Dort habe ich gelernt die Kampagnen für SEO, SEM und Adwords zu erstellen und die Steigerung der Conversionrate durch die Onpage-Optimierung zu erreichen – genau die Kenntnisse, die Sie bei dem neuen Teammitglied suchen. <br>
-							Als ich von Ihrer Stellenausschreibung erfuhr, habe ich mir die Freiheit genommen, einige konzeptionelle Vorschläge zu erstellen – einerseits um die neuen Zielgruppenpotentiale für Ihr Unternehmen zu erschließen und andererseits um die E-Commerce Infrastruktur Ihrer Kunden zu optimieren. Gerne präsentiere ich Ihnen und Ihrem Team meine Ideen und freue mich auf Ihr Feedback. Passt es Ihnen am nächsten Dienstag um zehn Uhr?<br>
-							Mit freundlichen Grüßen<br>
-							Maria Mustermann<br>
-						</div>
-					</div>
-			</div>
-		</section>
+		<section id="content"></section>
 		<a href="#" class="fa fa-question-circle-o fa-1-5x" call="help-toggle"></a>
 		<a href="#" class="fa fa-cog fa-1-5x" call="cfg-toggle"></a>
 		<nav id="cfg-navigation" class="hide">
@@ -493,28 +408,30 @@
 			<a href="#" class="fa fa-tachometer fa-1-5x" call="animation-velocity"></a>
 			<a href="#" class="fa fa-wrench fa-1-5x" call="animation-refresh"></a>
 		</nav>
-		<a href="#" id="footer-toggle" class="fa fa-chevron-up" call="footer-toggle"></a>
 		<user>
-			<a href="#" class="fa fa-lock" call="token-toggle"></a>
-			<a href="#" class="fa fa-user" call="token-toggle"></a>
-			<span id="mail"></span>
+			<card class='hide'>
+				<a href="#" class="fa fa-lock" call="log-out"></a>
+				<a href="#" class="fa fa-user" call="token-toggle"></a>	
+				<id>user@mail.de</id>
+			</card>
+			<form class="hide">
+				<input type="text" id="mail" name="mail" placeholder="mail" value="">
+				<input type="text" id="pass" name="pass" placeholder="pass" value="">				
+			</form>
+			<a href="#" class="fa fa-hashtag" call="login-toggle"></a>
 		</user>
+		<a href="#" id="footer-toggle" class="fa fa-chevron-up" call="footer-toggle"></a>
 		<popup class="hide"></popup>
 		<overlay class="hide"></overlay>
 	</header>
 	<footer>
-		<form call="log-in">
-			<input type="password" id="mail" name="mail" placeholder="mail" value="">
-			<input type="password" id="pass" name="pass" placeholder="pass" value="">
-		</form>
-		<form class="half">
-
-		</form>
+		<form></form>
+		<form class="half"></form>
 		<form>
 			<a href="#" >Impressum</a>
 			<a href="#" >License</a>
 			<a href="#" >Impressum</a>
-		</form>
+		</form>			
 	</footer>
 </body>
 </html>

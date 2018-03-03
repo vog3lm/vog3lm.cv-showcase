@@ -1,0 +1,37 @@
+/* Font and Color */
+body, a, h1, h2, h3, h4, h5, h6,
+input { font-family:'Monospace', serif; }
+
+
+
+.fa-1-5x {font-size:1.5em;}
+
+
+
+/* PORTRAIT SCREEN */
+@media screen and (min-width:2560) and (orientation:portrait){}
+@media screen and (min-width:1920) and (max-device-width:2559) and (orientation:portrait){}
+@media screen and (min-width:1440) and (max-device-width:1919) and (orientation:portrait){}
+@media screen and (min-width:1280) and (max-device-width:1439) and (orientation:portrait){}
+@media screen and (min-width:1024) and (max-device-width:1279) and (orientation:portrait){}
+@media screen and (min-width:768)  and (max-device-width:1023) and (orientation:portrait){}
+/* ? more breakpoints ? */
+@media screen and (min-width:0)    and (max-device-width:768)  and (orientation:portrait){}
+
+
+/* LANDSCAPE SCREEN */
+@media screen and (min-width:2560) and (orientation:landscape){}
+@media screen and (min-width:1920) and (max-device-width:2559) and (orientation:landscape){}
+@media screen and (min-width:1440) and (max-device-width:1919) and (orientation:landscape){}
+@media screen and (min-width:1280) and (max-device-width:1439) and (orientation:landscape){}
+@media screen and (min-width:1024) and (max-device-width:1279) and (orientation:landscape){}
+@media screen and (min-width:768)  and (max-device-width:1023) and (orientation:landscape){}
+/* ? more breakpoints ? */
+@media screen and (min-width:0)    and (max-device-width:768)  and (orientation:landscape){}
+
+
+
+
+/* PRINT CSS */
+
+@media print {}

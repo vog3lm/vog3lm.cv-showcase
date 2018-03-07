@@ -1,0 +1,89 @@
+/* Geometry */
+* {margin: 0px;padding: 0px;}
+/* Geometry */
+html,body { position:absolute; height:100%; width:100%; padding:0px; margin:0px; overflow:hidden; }
+
+a.fa{
+	width: 32px;
+	height: 32px;
+	line-height:32px;
+	text-align: center;
+}
+
+.hide {display:none;}
+
+
+body header {
+	overflow:hidden;
+	position:relative;
+	width:100%;
+	height:100%;
+}
+header section#content{
+    position: absolute;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+}
+header a.fa-chevron-up,
+header a.fa-chevron-down{
+	position: absolute;
+	width: calc(100% - 32px - 10%);
+	height: 14px;
+	left:10%;
+	bottom: 0px;
+	line-height:14px;
+	text-align:center;
+}
+body footer {
+	position:relative;
+	width:100%;
+	height:35%;
+}
+/* auto size modal to content demands */
+body popup {
+/*	font-size:2rem;
+	color:white; */
+	position: fixed;
+	min-width: 32px;
+    max-width: calc(100%);
+    min-height: 32px;
+    max-height: calc(100%);
+    word-wrap: break-word;
+}
+/*  ui locking full screen modal
+	optional background transparency */
+body overlay {
+	position: absolute;
+	width: 100%;
+    height: 100%;
+}
+
+/* :: PRIVATE CONTENT VISUALS */
+header user{
+	position:absolute;
+	height:32px;
+	width:25%;
+	overflow: hidden;
+}
+user form,
+user card{
+	width:calc(100% - 32px);
+	height:100%;
+	padding:0px;
+	float:right;
+}
+user form input{
+	height:32px;
+	width:calc(50%);
+	line-height:32px;
+	float:left;
+}
+user card id{
+	height:32px;
+	width:calc(100% - 32px);
+	line-height:32px;
+	float:right;
+	overflow:hidden;
+}
+

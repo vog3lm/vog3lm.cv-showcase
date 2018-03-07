@@ -7,7 +7,9 @@
       "**/node_modules/**"
     ],
     "rewrites": [
-      {"source":"/qr","function":"qr"}
+      {"source":"/qr" ,"function":"qr"}
+     ,{"source":"/mvp","function":"mvp"}
+     ,{"source":"/mvc","function":"mvc"}
     ],
     "cleanUrls":true
   },

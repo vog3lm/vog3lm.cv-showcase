@@ -67,7 +67,7 @@
 			//	var storage = new F1rebas3Storage4p1Operator(firebase);
 			var scroller = new Scro113r4p1Operator().create();
 			var events = {
-				 'footer-toggle':(data) => {
+				'footer-toggle':(data) => {
 					var element = $("body")
 					if(!element.hasClass('scroll-flag')){element.scrollTop($(document).height());}
 					else{element.scrollTop(0);}
@@ -114,25 +114,40 @@
 					overlay.html('');
 					overlay.addClass('hide')
 				}
-				,'log-in':(data) => {
-					$('body').trigger('loading-start',{'call':'loading-start','id':'log-in'});
-					console.log($('input#mail').val())
-					authenicate.logIn({'mail':$('input#mail').val(),'pass':$('input#pass').val()});
+				,'login-show':(data) => {
+					var tag = $('user')
+					tag.find('form').removeClass('hide');
+					tag.find('a.fa-hashtag').attr('call','login-hide');
+				}
+				,'login-hide':(data) => {
+					var tag = $('user')
+					tag.find('form').addClass('hide');
+					tag.find('a.fa-hashtag').attr('call','login-show');
+				}
+				,'login-validate':(data) => {
+					$('body').trigger('loading-start',{'call':'loading-start','id':'login-validate'});
+					$('body').trigger('log-in',[{'mail':$('input#mail').val(),'pass':$('input#pass').val(),'call':'log-in','id':'login-validate'}]);
 				}
 				,'logged-in':(data) => {
-					$('input#mail').val('');
-					$('input#pass').val('');
-					$('user a.fa-user').attr('call','log-out');
-					$('user span#mail').html(data.mail);
+					var tag = $('user')
+					tag.find('input#mail').val('');
+					tag.find('input#pass').val('');
+					tag.find('card').removeClass('hide')
+					tag.find('a.fa-hashtag').attr('call','log-out');
+					tag.find('id').html(data.mail);
 					$('body').trigger('loading-stop',{'call':'loading-stop','id':'logged-in'});
 				}
 				,'log-out':(data) => {
 					$('body').trigger('loading-start',{'call':'loading-starts','id':'logged-out'});
-					authenicate.logOut();
 				}
-			    ,'logged-out':(data) => {
-			    	$('user span#mail').html('');
-			    //	$('user a.fa-user').attr('call','log-in');
+				,'logged-out':(data) => {
+					var tag = $('user')
+					tag.find('card').addClass('hide')
+					tag.find('input#mail').val('');
+					tag.find('input#pass').val('');
+
+			    	tag.find('user span#mail').html('');
+			    	//	$('user a.fa-user').attr('call','log-in');
 			    	$('body').trigger('loading-stop',{'call':'loading-stop','id':'logged-out'});
 			    }
 				,'click-animation':(data) => {console.log('animationClick',data);}
@@ -165,10 +180,10 @@
 					});
 				}
 				,'style-toggle':(data) => {
-					style.remove('css/landing.'+cssStyle+'.css')
+					style.remove('css/design.'+cssStyle+'.css')
 					if('white' == cssStyle){cssStyle = 'dark'}
 					else if('dark' == cssStyle){cssStyle = 'white'}
-					style.add('css/landing.'+cssStyle+'.css')
+					style.add('css/design.'+cssStyle+'.css')
 				}
 				,'content-header-request':(data) => {
 					authenicate.reqHeader('https://us-central1-vog3lm-0x1.cloudfunctions.net/mvc/');
@@ -313,7 +328,7 @@
 		}
 		user form,
 		user card{
-			width:100%;
+			width:calc(100% - 32px);
 			height:100%;
 			padding:0px;
 		}
@@ -410,15 +425,14 @@
 		</nav>
 		<user>
 			<card class='hide'>
-				<a href="#" class="fa fa-lock" call="log-out"></a>
-				<a href="#" class="fa fa-user" call="token-toggle"></a>	
-				<id>user@mail.de</id>
+				<a href="#" class="fa fa-user" call="log-out"></a>
+				<id></id>
 			</card>
-			<form class="hide">
+			<form class="hide" call="login-validate">
 				<input type="text" id="mail" name="mail" placeholder="mail" value="">
 				<input type="text" id="pass" name="pass" placeholder="pass" value="">				
 			</form>
-			<a href="#" class="fa fa-hashtag" call="login-toggle"></a>
+			<a href="#" class="fa fa-hashtag" call="login-show"></a>
 		</user>
 		<a href="#" id="footer-toggle" class="fa fa-chevron-up" call="footer-toggle"></a>
 		<popup class="hide"></popup>

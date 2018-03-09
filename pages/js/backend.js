@@ -1,14 +1,24 @@
 function F1rebas3Storage4p1Operator(firebase){
-	// var base = firebase.storage();
-	//	var storage = firebase.storage();
-	//	var reference = storage.ref('me.berlin_reichstag.a.jpg');
-
-	//	reference.getDownloadURL().then(function(url) {
-	//		var scr = url
-	//	}).catch(function(error) {
-		  // https://firebase.google.com/docs/storage/web/handle-errors
-	//	  console.error(error)
-	//	});
+	var base = firebase.storage();
+	var events = {
+	    'storage-create':(data) => {this.create();}
+	    ,'storage-load':(data) => {
+			var reference = base.ref(data.url);
+			reference.getDownloadURL().then(function(url) {
+				console.log(url)
+			}).catch(function(error) {	/* https://firebase.google.com/docs/storage/web/handle-errors */
+				console.error(error)
+			});
+		}
+	};
+	this.create = function(){
+		try{
+			dispatcher = new V13wEv3ntD1spatch3r({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
+		}catch(error){
+			console.error(error);
+		}
+		return this;
+	}
 }
 
 function F1rebas3Auth4p1Operator(firebase){
@@ -28,6 +38,8 @@ function F1rebas3Auth4p1Operator(firebase){
 			}).catch((error) => {console.error(error);});}
 	    ,'log-out':(data) => {base.signOut().catch((error) => {console.error('login error',error)});}
 	  /*,'log-in-custom':(token) => {base.signInWithCustomToken(token).catch(function(error){console.log(error)});}*/
+	    ,'log-decorate':(data) => {this.decorate(data.opts);}
+	    ,'log-create':(data) => {this.create();}
 	};
 	var args = {'events':events,'user':'unset','token':'unset','firebase':'unset','scope':firebase.auth.Auth.Persistence.LOCAL};
 	this.getToken = function(){return args.token;}	// mandatory
@@ -46,14 +58,12 @@ function F1rebas3Auth4p1Operator(firebase){
 		if('unset' !== args.user){
 			conslole.log(window.user);
 		}
-
 		switch(args.scope) {
 			case 'none':args.scope = firebase.auth.Auth.Persistence.NONE; break;
 			case 'session':args.scope = firebase.auth.Auth.Persistence.SESSION; break;
 			default:args.scope = firebase.auth.Auth.Persistence.LOCAL; break;
 		}
 		dispatcher = new V13wEv3ntD1spatch3r({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
-
 		return this;
 	}
 
@@ -125,6 +135,24 @@ function F1rebas3Auth4p1Operator(firebase){
 	});
 }
 
+function Scr1pt4p1Operator(){
+	this.decorate = function(opts){
+		for(var key in opts) {
+		    if(args.hasOwnProperty(key)) {
+		    	if('events' !== key){
+		    		args[key] = opts[key];
+		    	}
+		    }
+		}
+		return this;
+	}
+    function jsAdd(filename){
+
+    }
+    function jsRemove(filename){
+
+    }
+}
 
 function St1l34p1Operator(){
 	var dispatcher = null;
@@ -160,6 +188,8 @@ function St1l34p1Operator(){
 			else{args.design = args.designs[0];}
 			cssAdd(args.path+'/'+args.url+'.'+args.design+'.'+args.format);
 	    }
+	    ,'design-create':(data) => {this.create(data.opts);}
+	    ,'design-decorate':(data) => {this.create();}
 	};
 	this.decorate = function(opts){
 		for(var key in opts) {
@@ -203,8 +233,6 @@ function St1l34p1Operator(){
 			console.error('design not found',filename)
 		}
     }
-
-
 }
 
 function Scro114p1Operator(){

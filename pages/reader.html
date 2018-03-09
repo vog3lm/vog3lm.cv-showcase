@@ -14,8 +14,9 @@
 	<link rel="shortcut icon" href="images/favicon.coyote.poly_white.b.png" type="image/x-icon" />
 	<link rel="icon" 		  href="images/favicon.coyote.poly_white.b.png" type="image/x-icon" />
 
-	<script src="https://www.gstatic.com/firebasejs/4.9.1/firebase.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/4.9.1/firebase-app.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/4.9.1/firebase-auth.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/4.9.1/firebase-storage.js"></script>
 
 	<script type="text/javascript" src="js/jq.min.js"></script>
 	<script type="text/javascript" src="js/backend.js"></script>
@@ -24,12 +25,11 @@
 
 		var animations = {}
 		var dispatcher = null
-		var cssStyle = 'white';
 
 		function V13wEv3ntsConfiguration(){
 			var style = new St1l34p1Operator().create();
-			var authenicate = new F1rebas3Auth4p1Operator(firebase);
-			var storage = new F1rebas3Storage4p1Operator(firebase);
+			var authenicate = new F1rebas3Auth4p1Operator(firebase).create();
+			var storage = new F1rebas3Storage4p1Operator(firebase).create();
 			var scroller = new Scro114p1Operator().decorate({'node':'section#content'}).create();
 			var events = {
 				'help-toggle':(data) => {
@@ -134,14 +134,13 @@
 			var config = {
 			    apiKey: "AIzaSyDmXSkwOam-aQ37z8-3d5aH-X257lIVS34",
 			    authDomain: "vog3lm-0x1.firebaseapp.com",
-			    databaseURL: "https://vog3lm-0x1.firebaseio.com",
 			    projectId: "vog3lm-0x1",
 			    storageBucket: "vog3lm-0x1.appspot.com",
-			    messagingSenderId: "729625884802"
 			};
 			firebase.initializeApp(config);
 
 			app = new V13wEv3ntsConfiguration();
+			$('body').trigger('storage-test')
 
 		});
 		$(window).load(function() {

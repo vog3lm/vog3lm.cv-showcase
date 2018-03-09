@@ -27,21 +27,12 @@
 		var cssStyle = 'white';
 
 		function V13wEv3ntsConfiguration(){
-			var style = new St1l3F1l3Operator4p1()
+			var style = new St1l34p1Operator().create();
 			var authenicate = new F1rebas3Auth4p1Operator(firebase);
 			var storage = new F1rebas3Storage4p1Operator(firebase);
-			var scroll = new scroller().create();
+			var scroller = new Scro114p1Operator().decorate({'node':'section#content'}).create();
 			var events = {
-				'footer-toggle':(data) => {
-					var element = $("body")
-					if(!element.hasClass('scroll-flag')){element.scrollTop($(document).height());}
-					else{element.scrollTop(0);}
-					element.toggleClass('scroll-flag')
-					var clicker = $("a#footer-toggle")
-					clicker.toggleClass('fa-chevron-down')
-					clicker.toggleClass('fa-chevron-up')
-				}
-				,'help-toggle':(data) => {
+				'help-toggle':(data) => {
 					var popup = $('popup');
 					popup.find('span#message').html('');
 					popup.css({'left':(window.innerWidth-popup.outerWidth())/2,'top':(window.innerHeight-popup.outerHeight())/2});
@@ -57,17 +48,44 @@
 					$('header nav#cfg-navigation').toggleClass('hide');
 					$('header nav#doc-controls').toggleClass('hide');
 				}
-				,'log-in':(data) => {authenicate.logIn({'mail':'','pass':''});}
-				,'logged-in':(data) => {
-					$('user a.fa-user').attr('call','log-out');
-					$('user span#mail').html(data.mail);
+				,'login-show':(data) => {
+					var tag = $('user')
+					tag.find('form').removeClass('hide');
+					tag.find('a.fa-hashtag').attr('call','login-hide');
 				}
-				,'log-out':(data) => {authenicate.logOut();}
-			    ,'logged-out':(data) => {
-			    	$('user span#mail').html('');
-			    	$('user a.fa-user').attr('call','log-in');
+				,'login-hide':(data) => {
+					var tag = $('user')
+					tag.find('form').addClass('hide');
+					tag.find('a.fa-hashtag').attr('call','login-show');
+				}
+				,'login-validate':(data) => {
+					$('body').trigger('loading-start',{'call':'loading-start','id':'login-validate'});
+					$('body').trigger('log-in',[{'mail':$('input#mail').val(),'pass':$('input#pass').val(),'call':'log-in','id':'login-validate'}]);
+				}
+				,'logged-in':(data) => {
+					var tag = $('user')
+					tag.find('input#mail').val('');
+					tag.find('input#pass').val('');
+					tag.find('card').removeClass('hide')
+					tag.find('a.fa-hashtag').attr('call','log-out');
+					tag.find('id').html(data.mail);
+					$('body').trigger('loading-stop',{'call':'loading-stop','id':'logged-in'});
+				}
+				,'log-out':(data) => {
+					$('body').trigger('loading-start',{'call':'loading-starts','id':'logged-out'});
+				}
+				,'logged-out':(data) => {
+					var tag = $('user')
+					tag.find('card').addClass('hide')
+					tag.find('input#mail').val('');
+					tag.find('input#pass').val('');
+
+			    	tag.find('user span#mail').html('');
+			    	//	$('user a.fa-user').attr('call','log-in');
+			    	$('body').trigger('loading-stop',{'call':'loading-stop','id':'logged-out'});
 			    }
-				,'click-animation':(data) => {console.log('animationClick',data)}
+				,'animation-click':(data) => {console.log('animation-click',data)}
+
 				,'animation-pause':(data) => {
 					$('nav a.fa-pause').each(function(){
 						var element = $(this)
@@ -96,83 +114,18 @@
 					  	value.decorate({'lineColor':colors[Math.floor(Math.random()*(colors.length-1))]})
 					});
 				}
-				,'style-toggle':(data) => {
-					style.remove('css/landing.'+cssStyle+'.css')
-					if('white' == cssStyle){cssStyle = 'dark'}
-					else if('dark' == cssStyle){cssStyle = 'white'}
-					style.add('css/landing.'+cssStyle+'.css')
-				}
 				,'scroll-up':() => {
-					scroll.delta(-400);
+					scroller.delta(-400);
 				}
 				,'scroll-down':() => {
-					scroll.delta(400);
+					scroller.delta(400);
 				}
 			}
 			this.getEvents = function(){
 				return {'events':Object.keys(events),'issues':Object.values(events)}
 			}
-
-
-			
 		}
 
-		function scroller(){
-			var content = null;
-			var scroller = 0;
-			var args = {'scale':0.5,'node':'header section#content'}
-			var height = 0;
-			this.decorate = function(opts){
-				for (var key in opts){
-					if(args.hasOwnProperty(key)){
-						args[key] = opts[key];
-					}
-				}
-				return this;
-			}
-			this.create = function(){
-				content = $(args.node);
-				content.find('span').each(function(){
-				    height += $(this).outerHeight()
-				});
-				content.find('div.head').each(function(){
-				    height += $(this).outerHeight()
-				});
-
-				content.on('wheel', function(e){scrollDelta(e.originalEvent.deltaY);});
-				return this;
-			}
-
-			this.delta = function(delta){scrollDelta(delta);}
-			function scrollDelta(delta){
-				if(scroller <= height && scroller >= 0){
-					scroller+=Math.floor((delta*args.scale))
-					if(scroller < 0){scroller = 0;}
-					else if(scroller > height){scroller = height;}
-				}
-				content.find('nav').css({'top':scroller})
-	        	content.scrollTop(scroller);
-				afterJobHasBeenDone(content);
-			}
-			function scrollSection(sec){
-				afterJobHasBeenDone(content);
-			}
-
-			function afterJobHasBeenDone(content){
-
-	        	if(scroller > 0){
-	        		$('nav#doc-navigation a.fa-chevron-circle-up').removeClass('hide')
-	        	} else {
-	        		$('nav#doc-navigation a.fa-chevron-circle-up').addClass('hide')
-	        	}
-	        	if(scroller >= height){
-	        		$('nav#doc-navigation a.fa-chevron-circle-down').addClass('hide')
-	        	} else {
-	        		$('nav#doc-navigation a.fa-chevron-circle-down').removeClass('hide')
-	        	}
-			}
-
-		}
 
 		var app = null;
 
@@ -213,60 +166,7 @@
 		});
 
 
-		function St1l3F1l3Operator4p1(){
-			this.remove = function(filename) {
-				var linkNode = document.querySelector('link[href*="'+filename+'"]');
-				linkNode.parentNode.removeChild(linkNode)
-			}
-			this.add = function(filename){
-			    var fileref=document.createElement("link")
-			    fileref.setAttribute("rel", "stylesheet")
-			    fileref.setAttribute("type", "text/css")
-			    fileref.setAttribute("href",filename)
-			    if (typeof fileref!="undefined")
-			        document.getElementsByTagName("head")[0].appendChild(fileref)
-			}
-		}
-		function Ev3ntV13wD1spatch3r(holder){
-		    var events = holder.events
-		    var issues = holder.issues
-		    this.onRegister = function(){
-		        for (var i=0; i<events.length; i++) {
-		            $('body').on(events[i],selfDispatch);
-		        };
-		    }
-		    this.onUnleash = function(){
-		        $("a").each(function(){
-		            var element = $(this)
-		            if(element.attr('call')){
-		                element.on('click',function(){
-		                    var tmp = $(this)
-		                    $('body').trigger(tmp.attr('call'),[{call:tmp.attr('call'),id:tmp.attr('id')}]);
-		                });
-		            }
-		        });
-		        $('form').keypress(function(e) {
-		            if (e.which == 13) {
-		                e.preventDefault();
-		                var element = $(this)               
-		                if(element.attr('call')){
-		                    $('body').trigger(element.attr('call'),[{call:element.attr('call'),id:element.attr('id')}]);
-		                }
-		            }
-		        });
-		    }
-		    function selfDispatch(evt,data){
-		        try {
-		            index = events.indexOf(evt.type)
-		            if(index < 0){
-		                throw 'view event Intel not Found!'
-		            }
-		            issues[index](data)
-		        } catch(error) {
-		            console.error(error)
-		        }
-		    }
-		}
+
 
 
 	</script>
@@ -371,7 +271,7 @@
 			<a href="#" class="fa fa-pause" call="animation-pause"></a>
 			<a href="#" class="fa"></a>
 			<a href="#" class="fa fa-eyedropper fa-1-5x" call="animation-colors"></a>
-			<a href="#" class="fa fa-eye-slash fa-1-5x" call="style-toggle"></a>
+			<a href="#" class="fa fa-eye-slash fa-1-5x" call="design-toggle"></a>
 			<a href="#" class="fa fa-tachometer fa-1-5x" call="animation-velocity"></a>
 			<a href="#" class="fa fa-wrench fa-1-5x" call="animation-refresh"></a>
 		</nav>
@@ -387,9 +287,18 @@
 				<a href="#" class="fa fa-chevron-circle-up hide" call="scroll-up"></a>
 				<a href="#" class="fa fa-chevron-circle-down" call="scroll-down"></a>
 			</nav>
-
+			<div style="height:100%;">bla bla </div>
+			<div style="height:100%;">bla bla </div>
+			<footer>
+				<form></form>
+				<form class="half"></form>
+				<form>
+					<a href="#" >Impressum</a>
+					<a href="#" >License</a>
+					<a href="#" >Impressum</a>
+				</form>	
+			</footer>
 		</section>
-		<a href="#" id="footer-toggle" class="fa fa-chevron-up" call="footer-toggle"></a>
 		<user>
 			<card class="hide">
 				<a href="#" class="fa fa-user" call="token-toggle"></a>	
@@ -405,14 +314,5 @@
 			<span id="message"></span>
 		</popup>
 	</header>
-	<footer>
-		<form></form>
-		<form class="half"></form>
-		<form>
-			<a href="#" >Impressum</a>
-			<a href="#" >License</a>
-			<a href="#" >Impressum</a>
-		</form>	
-	</footer>
 </body>
 </html>

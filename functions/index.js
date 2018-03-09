@@ -83,9 +83,6 @@ exports.test = functions.https.onRequest(test);
 
 
 
-
-
-
 /* token from header not available with qr code *//* unused...someday maybe
 const getQrRequestTokenFromHeader = (req, res, next) => {
 	if (!req.headers.authorization || !req.headers.authorization.startsWith('[qR1D]::[')) {
@@ -130,7 +127,7 @@ var db = {'PXHTajCVg':{'mail':'adm1n@smart.cv.de','pass':'44920420$Dollar'  ,'ta
 		 /* custom cv users */
 		 ,'6PW2gsYzD':{'mail':'unset','pass':'unset','tag':''}
 		 ,'O2FNkkqqE':{'mail':'unset','pass':'unset','tag':''}}
-/*	/qr/?qR1D=id	*//*	TODO TODO MOVE TO STORAGE FILE
+/*	/qr/?qR1D=id	*//*	TODO TODO MOVE TO DB FILE 
 	qR client -> https://vog3lm-0x1.firebaseapp.com -> https://us-central1-vog3lm-0x1.cloudfunctions.net/test/?qR1D=id&v=view
 	qR client    									<- login page
 	qR client -> google auth domain
@@ -166,7 +163,7 @@ exports.qr = functions.https.onRequest((req,res)=>{
 			+ 'a.signInWithEmailAndPassword("'+qrCreds.mail+'","'+qrCreds.pass+'").catch(function(error){window.location.replace("'+qrDomain+'/404");});'
 		+ '</script>'));
 });
-/*	/mvp/?q=view	*//*	TODO TODO MOVE TO STORAGE FILE
+/*	/mvp/?q=view	*//*	TODO TODO MOVE TO DB FILE
 	qR client -> https://vog3lm-0x1.firebaseapp.com -> https://us-central1-vog3lm-0x1.cloudfunctions.net/mvc/?q=view
 	qR client    									<- content
 */

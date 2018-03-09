@@ -127,13 +127,64 @@ function F1rebas3Auth4p1Operator(firebase){
 
 
 function St1l34p1Operator(){
-	this.remove = function(filename){wrapRemove(filename);}
-	this.add = function(filename){wrapAdd(filename);}
-
+	var dispatcher = null;
+	var src = 'unset';
 	var args = {'design':'white','designs':['white','dark']
 			   ,'path':'css','url':'design','format':'css'}
+	var events = {
+		'design-call':(data) => {
+			try{}
+			catch(error){console.error(error);}
+			cssRemove(src);
+			src = src.replace(args.design,data.design);
+			args.design = data.design;
+			cssAdd(src);
+		}
+		,'design-toggle':(data) => {
+			cssRemove(src);
+			if('white' == args.design){
+				src = src.replace(args.design,'dark');
+				args.design = 'dark';
+			}
+			else{
+				src = src.replace(args.design,'white');
+				args.design = 'white';
+			}
+			cssAdd(src);
+		}
+	    ,'design-iterate':(data) => {
+			wrapRemove(args.path+'/'+args.url+'.'+args.design+'.'+args.format);
+			var index = args.designs.indexOf(args.design);
+			index++;
+			if(index < args.designs.length){args.design = args.designs[index];}
+			else{args.design = args.designs[0];}
+			cssAdd(args.path+'/'+args.url+'.'+args.design+'.'+args.format);
+	    }
+	};
+	this.decorate = function(opts){
+		for(var key in opts) {
+		    if(args.hasOwnProperty(key)) {
+		    	if('events' !== key){
+		    		args[key] = opts[key];
+		    	}
+		    }
+		}
+		return this;
+	}
+	this.create = function(){
+		try{
+			src = args.path+'/'+args.url+'.'+args.design+'.'+args.format;
+			cssAdd(src);
+			dispatcher = new V13wEv3ntD1spatch3r({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
+		}catch(error){
+			console.error(error);
+		}
+		return this;
+	}
+	this.design = function(){return args.design;}
 
-    function wrapAdd(filename){
+
+    function cssAdd(filename){
 		var fileref=document.createElement("link")
 	    fileref.setAttribute("rel", "stylesheet")
 	    fileref.setAttribute("type", "text/css")
@@ -144,7 +195,7 @@ function St1l34p1Operator(){
 	    	console.error('design not found',filename)
 	    }
     }
-    function wrapRemove(filename){
+    function cssRemove(filename){
 		var linkNode = document.querySelector('link[href*="'+filename+'"]');
 		if(linkNode){
 			linkNode.parentNode.removeChild(linkNode);
@@ -153,37 +204,105 @@ function St1l34p1Operator(){
 		}
     }
 
-	var events = {
-		'design-call':(data) => {
-			wrapRemove(args.path+'/'+args.url+'.'+args.design+'.'+args.format);
-			args.design = data.design
-			wrapAdd(args.path+'/'+args.url+'.'+args.design+'.'+args.format);
-		}
-		,'design-toggle':(data) => {
-			wrapRemove(args.path+'/'+args.url+'.'+args.design+'.'+args.format);
-			if('white' == args.design){args.design = 'dark'}
-			else if('dark' == args.design){args.design = 'white'}
-			wrapAdd(args.path+'/'+args.url+'.'+args.design+'.'+args.format);
-		}
-	    ,'design-iterate':(data) => {
-			wrapRemove(args.path+'/'+args.url+'.'+args.design+'.'+args.format);
-			var index = args.designs.indexOf(args.design);
-			index++;
-			if(index < args.designs.length){args.design = args.designs[index];}
-			else{args.design = args.designs[0];}
-			wrapAdd(args.path+'/'+args.url+'.'+args.design+'.'+args.format);
-	    }
-	};
-	new V13wEv3ntD1spatch3r({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
 
 }
 
+function Scro114p1Operator(){
+	var content = null;
+	var scrolled = 0;
+	var anker = 0;
+	var args = {'scale':1.5
+			   ,'node':'section#content'
+			   ,'wheel':true
+			   ,'keys':true
+			   ,'bars':true
+			   ,'orientation':'vertical'
+	};
+	var distance = 0;
+	this.decorate = function(opts){
+		for (var key in opts){
+			if(args.hasOwnProperty(key)){
+				args[key] = opts[key];
+			}
+		}
+		return this;
+	}
+	this.create = function(){
+		try{
+			if(!args.node || 'unset' === args.node){
+				throw 'parent unknown';
+			}
+			content = $(args.node);
+			var bars = content.find('nav#doc-navigation');
+			if('vertical' === args.orientation){
+				anker = bars.outerHeight();
+				content.find('div').each(function(){distance += $(this).outerHeight();});
+				content.find('footer').each(function(){distance += $(this).outerHeight();});
+				distance = distance - anker;
+				content.on('wheel', function(e){scrollDelta(e.originalEvent.deltaY);});	
+			} else if('horizontal' === args.orientation){
+				anker = bars.outerWidth();
+				content.find('div').each(function(){distance += $(this).outerWidth();});
+				content.find('footer').each(function(){distance += $(this).outerWidth();});
+				distance = distance - anker;
+				content.on('wheel', function(e){scrollDelta(e.originalEvent.deltaX);});
+			} else {
+				throw 'orientation unknown';
+			}
+			if(!args.bars){$(args.node+' nav#doc-navigation').addClass('hide');}
+		} catch(error) {
+			console.error(error);
+			content = null;
+			distance = 0;
+		}
+		return this;
+	}
+
+	this.max = function(){scrollDelta(distance);}
+	this.min = function(){scrollDelta(-(distance-scrolled));}
+	this.delta = function(delta){scrollDelta(delta);}
+	function scrollDelta(delta){
+		if(scrolled <= distance && scrolled >= 0){
+			scrolled+=Math.floor((delta*args.scale))
+			if(scrolled < 0){scrolled = 0;}
+			else if(scrolled > distance){scrolled = distance;}
+		}
+		if('vertical' === args.orientation){content.scrollTop(scrolled);}
+		else if('horizontal' === args.orientation){content.scrollLeft(scrolled);}
+		changeScrollBarUi(content);
+	}
+	function scrollSection(sec){
+		changeScrollBarUi(content);
+	}
+
+	var navView = ''
+	+ '<nav id="doc-navigation">'
+		+ '<a href="#" class="fa fa-chevron-circle-up hide" call="scroll-up"></a>'
+		+ '<a href="#" class="fa fa-chevron-circle-down" call="scroll-down"></a>'
+	+ '</nav>';
+
+
+	function changeScrollBarUi(content){
+		var element = content.find('nav#doc-navigation');
+		element.css({'top':(scrolled)});
+		if(scrolled > 0){
+			element.find('a.fa-chevron-circle-up').removeClass('hide')
+		} else {
+			element.find('a.fa-chevron-circle-up').addClass('hide')
+		}
+		if(scrolled >= distance){
+			element.find('a.fa-chevron-circle-down').addClass('hide')
+		} else {
+			element.find('a.fa-chevron-circle-down').removeClass('hide')
+		}
+	}
+}
 
 function V13wEv3ntD1spatch3r(holder){
     var events = holder.events;
     var issues = holder.issues;
     this.onRegister = function(){
-        for (var i=0; i<events.length; i++) {
+		for (var i=0; i<events.length; i++) {
             $('body').on(events[i],selfDispatch);
         };
         return this;

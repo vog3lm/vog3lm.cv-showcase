@@ -4,12 +4,13 @@
 	<meta charset='utf-8'/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 	<title>vog3lm.cv</title>
-	<link rel="manifest" href="/manifest.json">
-    <link rel="stylesheet" href="css/font.awesome.min.css">
-    <link rel="stylesheet" href="css/design.white.css">
+	<link rel="manifest" href="/manifest.json"/>
+    <link rel="stylesheet" href="css/font.awesome.min.css"/>
+    <link rel="stylesheet" href="css/design.geometry.css"/>
+    <link rel="stylesheet" href="css/design.white.css"/>
 
-	<link rel="shortcut icon" href="images/favicon.coyote.poly_white.b.png" type="image/x-icon" />
-	<link rel="icon" 		  href="images/favicon.coyote.poly_white.b.png" type="image/x-icon" />
+	<link rel="shortcut icon" href="images/favicon.coyote.poly_white.b.png" type="image/x-icon"/>
+	<link rel="icon" 		  href="images/favicon.coyote.poly_white.b.png" type="image/x-icon"/>
 
 	<script src="https://www.gstatic.com/firebasejs/4.9.1/firebase-app.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/4.9.1/firebase-auth.js"></script>
@@ -19,53 +20,14 @@
 	<script type="text/javascript" src="js/animate.dotNet.js"></script>
 	<script type="text/javascript">
 
-		function Scro113r4p1Operator(){
-			var content = null;
-			var scrolled = 0;
-			var args = {'scale':1.5
-					   ,'node':'section#content div#story'
-					   ,'wheel':true
-					   ,'keys':true}
-			var width = 0;
-			this.decorate = function(opts){
-				for (var key in opts){
-					if(args.hasOwnProperty(key)){
-						args[key] = opts[key];
-					}
-				}
-				return this;
-			}
-			this.create = function(){
-				content = $(args.node);
-				content.find('div').each(function(){
-				    width += $(this).outerWidth();
-				});
-				content.on('wheel', function(e){scrollDelta(e.originalEvent.deltaY);});
-				return this;
-			}
-
-			this.delta = function(delta){scrollDelta(delta);}
-			function scrollDelta(delta){
-				if(scrolled <= width && scrolled >= 0){
-					scrolled+=Math.floor((delta*args.scale))
-					if(scrolled < 0){scrolled = 0;}
-					else if(scrolled > width){scrolled = width;}
-				}
-	        	content.scrollLeft(scrolled);
-			}
-			function scrollSection(sec){
-			}
-		}
-
 		var animations = {}
 		var dispatcher = null
-		var cssStyle = 'white';
 
 		function V13wEv3ntsConfiguration(){
-			var style = new St1l34p1Operator()
+			var style = new St1l34p1Operator().create();
 			var authenicate = new F1rebas3Auth4p1Operator(firebase).create();
 			//	var storage = new F1rebas3Storage4p1Operator(firebase);
-			var scroller = new Scro113r4p1Operator().create();
+			var scroller = new Scro114p1Operator().decorate({'node':'section#content div#story','orientation':'horizontal'}).create();
 			var events = {
 				'footer-toggle':(data) => {
 					var element = $("body")
@@ -179,12 +141,6 @@
 					  	value.decorate({'lineColor':colors[Math.floor(Math.random()*(colors.length-1))]})
 					});
 				}
-				,'style-toggle':(data) => {
-					style.remove('css/design.'+cssStyle+'.css')
-					if('white' == cssStyle){cssStyle = 'dark'}
-					else if('dark' == cssStyle){cssStyle = 'white'}
-					style.add('css/design.'+cssStyle+'.css')
-				}
 				,'content-header-request':(data) => {
 					authenicate.reqHeader('https://us-central1-vog3lm-0x1.cloudfunctions.net/mvc/');
 				}
@@ -251,26 +207,6 @@
 
 	</script>
 	<style type="text/css">
-		/* Font and Color */
-		* {margin: 0px;padding: 0px;}
-		/* Geometry */
-		html,body { position:absolute; height:100%; width:100%; padding:0px; margin:0px; overflow:hidden; }
-
-		.hide{
-			display:none;
-		}
-		.fa-1-5x{
-			font-size:1.5em;
-		}
-		a.fa{
-			float: left;
-			width: 32px;
-			height: 32px;
-			line-height: 32px;
-			vertical-align: middle;
-			text-align: center;
-		}
-
 		body header {
 			overflow:hidden;
 			position:relative;
@@ -419,7 +355,7 @@
 			<a href="#" class="fa fa-pause" call="animation-pause"></a>
 			<a href="#" class="fa"></a>
 			<a href="#" class="fa fa-eyedropper fa-1-5x" call="animation-colors"></a>
-			<a href="#" class="fa fa-eye-slash fa-1-5x" call="style-toggle"></a>
+			<a href="#" class="fa fa-eye-slash fa-1-5x" call="design-toggle"></a>
 			<a href="#" class="fa fa-tachometer fa-1-5x" call="animation-velocity"></a>
 			<a href="#" class="fa fa-wrench fa-1-5x" call="animation-refresh"></a>
 		</nav>

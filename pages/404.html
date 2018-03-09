@@ -4,34 +4,67 @@
 	<meta charset='utf-8'/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 	<title>vog3lm.aoa</title>
-    <link rel="stylesheet" href="https://vog3lm-0x1.firebaseapp.com/css/font.awesome.min.css">
-    <link rel="stylesheet" href="https://vog3lm-0x1.firebaseapp.com/css/design.white.css">
+    <link rel="stylesheet" href="/css/font.awesome.min.css"/>
+
+    <link rel="stylesheet" href="https://vog3lm-0x1.firebaseapp.com/css/design.geometry.css"/>
+    <link rel="stylesheet" href="https://vog3lm-0x1.firebaseapp.com/css/design.dark.css"/>
 
 
-	<link rel="shortcut icon" href="https://vog3lm-0x1.firebaseapp.com/images/favicon.coyote.poly_white.b.png" type="image/x-icon" />
-	<link rel="icon" 		  href="https://vog3lm-0x1.firebaseapp.com/images/favicon.coyote.poly_white.b.png" type="image/x-icon" />
+	<link rel="shortcut icon" href="https://vog3lm-0x1.firebaseapp.com/images/favicon.coyote.poly_white.b.png" type="image/x-icon"/>
+	<link rel="icon" 		  href="https://vog3lm-0x1.firebaseapp.com/images/favicon.coyote.poly_white.b.png" type="image/x-icon"/>
 
-	<script type="text/javascript" src="https://vog3lm-0x1.firebaseapp.com/js/jq.min.js"></script>
+	<script type="text/javascript" src="/js/jq.min.js"></script>
+	<script type="text/javascript" src="/js/backend.js"></script>
+
+	<script type="text/javascript" src="/js/animate.dots.js"></script>
 	<script type="text/javascript">
 
+		app = null;
 
-	// http://swingfm.ice.infomaniak.ch/swingfm-128.mp3 // nicht so geil
-	// http://broadcast.infomaniak.ch/jazz-wr04-128.mp3
-	// http://broadcast.infomaniak.ch/jazzradio-high.mp3
-
-
-		function GramophonPlaylist(){}
-		function GewerkschaftPlaylist(){}
-
-
-		function V13wEv3ntsConfiguration(){
+		var animas = [{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'one'}]
+		function DotAn1mationConfiguration(){
+			var style = new St1l34p1Operator().create();
+			var animation = new DotNetHolder().operator.decorate(animas[0]).create().start();
 			var events = {
-				 'media-prev':function test(){console.log('view event test!')}
-				,'media-play':function test(){console.log('view event test!')}
-				,'media-pause':function test(){console.log('view event test!')}
-				,'media-toggle':function test(){console.log('view event test!')}
-				,'media-stop':function test(){console.log('view event test!')}
-				,'media-next':function test(){console.log('view event test!')}
+				'cfg-toggle':(data) => {
+					$('nav#cfg-navigation').toggleClass('hide');
+				}
+			}
+			this.getEvents = function(){
+				return {'events':Object.keys(events),'issues':Object.values(events)}
+			}
+		}
+
+
+		var audios = ['http://broadcast.infomaniak.ch/jazz-wr04-128.mp3','http://sender.eldoradio.de:8000/128.mp3'];
+		var videos = ['https://vog3lm-0x1.firebaseapp.com/images/player.a.mp4']
+		function Vyn1lPlayerConfiguration(){
+			var style = new St1l34p1Operator().create();
+			var audio = new Med1aPlayer().decorate({'tracks':audios,'tag':'header audio','id':'audio'}).create();
+			var video = new Med1aPlayer().decorate({'tracks':videos,'tag':'header video','id':'video'}).create();
+			var events = {
+				'cfg-toggle':(data) => {
+					console.log("hello");
+					$('nav#cfg-navigation').toggleClass('hide');
+				}
+			   ,'audio-play':(data) => {
+			   		var element = $('a#audio-ui');
+			   		element.removeClass('fa-play');
+			   		element.addClass('fa-pause');
+			   		element.attr('call','audio-pause');
+			   	}
+			   ,'audio-pause':(data) => {
+			   		var element = $('a#audio-ui');
+			   		element.removeClass('fa-pause');
+			   		element.addClass('fa-play');
+			   		element.attr('call','audio-play');
+			   	}
+			   	,'audio-stop':(data) => {
+			   		var element = $('a#audio-ui');
+			   		element.removeClass('fa-pause');
+			   		element.addClass('fa-play');
+			   		element.attr('call','audio-play');
+			   	}
 			}
 			this.getEvents = function(){
 				return {'events':Object.keys(events),'issues':Object.values(events)}
@@ -40,106 +73,116 @@
 
 
 		$(document).ready(function(){
-			var video = 'https://vog3lm-0x1.firebaseapp.com/images/player.a.mp4'
-			var radio = 'http://broadcast.infomaniak.ch/jazz-wr04-128.mp3'
+			app = new DotAn1mationConfiguration();
 
-
-
-			$('header video').attr('src',video)
-			$('header audio').attr('src',radio)
 		});
 		$(window).load(function() {
-			var dispatcher = new Ev3ntV13wD1spatch3r(new V13wEv3ntsConfiguration().getEvents())
-			dispatcher.onRegister()
-			dispatcher.onUnleash()
+			var dispatcher = new V13wEv3ntD1spatch3r(app.getEvents());
+			dispatcher.onRegister();
+			dispatcher.onUnleash();
 		});
 
 
 
-
-
-		function MediaPlayer(){
-			this.play = function(){}
-			this.pause = function(){}
+		function Med1aPlayer(){
+			var dispatcher = null;
+			var element = null;
+			var events = {
+				 'media-prev':(data) => {
+				 	args.now--;
+				 	if(args.now <= 0){args.now = args.tracks.length-1;}
+				 	element[0].pause();
+				 	var track = args.tracks[args.now];
+				 	element.find('source').attr('src',track);
+				 	element[0].load();
+				 	element[0].play();
+				 	console.log(args.now,track);
+				 }
+				,'media-play':(data) => {
+					if(!element.find('source').attr('src')){
+						element.find('source').attr('src',args.tracks[args.now])
+						element[0].load();
+					}
+					element[0].play();
+				}
+				,'media-pause':(data) => {element[0].pause();}
+				,'media-toggle':(data) => {
+					if(element[0].paused){element[0].play();}
+					else{element[0].pause();}
+				}
+				,'media-stop':(data) => {
+					element[0].pause();
+					element.find('source').attr('src','')
+				}
+				,'media-next':(data) => {
+					args.now++;
+					if(args.now >= args.tracks.length){args.now = 0;}
+				 	element[0].pause();
+				 	var track = args.tracks[args.now];
+				 	element.find('source').attr('src',track);
+				 	element[0].load();
+				 	element[0].play();
+				 	console.log('next',args.now,track);
+				}
+			}
+			var args = {'tracks':[]
+					   ,'now':0
+					   ,'tag':'unset'
+					   ,'id':'unset'
+					   ,'autoplay':true
+			};
+			this.decorate = function(opts){
+				for(var key in opts){
+					if(args.hasOwnProperty(key)){
+						args[key] = opts[key];
+					}
+				}
+				return this;
+			}
+			this.create = function(){
+				try{
+					if('unset' === args.url){throw 'url unset';}
+					if('unset' === args.tag){throw 'tag unset';}
+					if('unset' === args.id){throw 'id unset';}
+					element = $(args.tag);
+					element.find('source').attr('src',args.tracks[args.now]);
+					var keys = Object.keys(events);
+					for(var i=0; i<keys.length; i++){
+						keys[i] = keys[i].replace('media',args.id);
+					}
+					dispatcher = new V13wEv3ntD1spatch3r({'events':keys,'issues':Object.values(events)}).onRegister();
+				}catch(error){
+					console.error(error);
+				}
+				return this;
+			}
+			this.tag = function(){return args.tag;}
+			this.id = function(){return args.id;}
 		}
-
-
-		function Ev3ntV13wD1spatch3r(holder){
-		    var events = holder.events
-		    var issues = holder.issues
-		    this.onRegister = function(){
-		        for (var i=0; i<events.length; i++) {
-		            $('body').on(events[i],selfDispatch);
-		        };
-		    }
-		    this.onUnleash = function(){
-		        $("a").each(function(){
-		            var element = $(this)
-		            if(element.attr('call')){
-		                element.on('click',function(){
-		                    var tmp = $(this)
-		                    $('body').trigger(tmp.attr('call'),[{call:tmp.attr('call'),id:tmp.attr('id')}]);
-		                });
-		            }
-		        });
-		        $('form').keypress(function(e) {
-		            if (e.which == 13) {
-		                e.preventDefault();
-		                var element = $(this)               
-		                if(element.attr('call')){
-		                    $('body').trigger(element.attr('call'),[{call:element.attr('call'),id:element.attr('id')}]);
-		                }
-		            }
-		        });
-		    }
-		    function selfDispatch(evt,data){
-		        try {
-		            index = events.indexOf(data.call)
-		            if(index < 0){
-		                throw 'view event Intel not Found!'
-		            }
-		            issues[index](data)
-		        } catch(error) {
-		            console.error(error)
-		        }
-		    }
-		}
-
 
 	</script>
 	<style type="text/css">
-		/* Font and Color */
-		body                { background:#101010; color:#111; text-decoration:none; font-family:'Monospace', serif; }
-		a, h1, h2, h3,
-		h4, h5, h6          { color:#111; text-decoration:none; font-family:'Monospace', serif; }
-
-		input           { color:#FFF; background:transparent; border:none; box-shadow:none; font-family:'Monospace', serif; }
-		input:focus     { border:none; outline:none !important; box-shadow:none; }
-
-		* {margin: 0px;padding: 0px;}
-		/* Geometry */
-		html,body { position:absolute; height:100%; width:100%; padding:0px; margin:0px; overflow:hidden; }
-
-		body header {
-			position:relative;
-			width:100%;
-			height:100%;
-		}
-		body footer {
-			position:relative;
-			width:100%;
-		}
 		header video,
 		header section,
-		header div#blur {
+		header canvas {
 			position:absolute;
 			object-fit:cover;
 			width: 100%;
 			height: 100%;
 		}
-		header div#blur {
-			background-color:rgba(150,150,150,0.4)
+		header a.fa-cog,
+		header nav#cfg-navigation{
+			position: absolute;
+			right:0px;
+			bottom:0px;
 		}
+		header nav#cfg-navigation{
+			bottom:32px;
+			width:32px;
+		}
+
+
+
 
 		div#player{
 			position: absolute;
@@ -163,27 +206,34 @@
 	</style>
 </head>
 <body>
-	<header>
+	<header id="zone">
 		<video class="" loop autoplay>
 		  	<source src="" type="video/mp4">
 		</video>
 		<audio class="" loop autoplay>
 			<source src="" type="audio/mpeg">
 		</audio>
-		<div id="blur"></div>
 		<section>
 			<div id="player">
-				<a href="#" class="fa fa-backward" call="media-previous"></a>
-				<a href="#" class="fa fa-stop" call="media-stop"></a>
-				<a href="#" class="fa fa-play" call="media-toggle"></a>
-				<a href="#" class="fa fa-forward" call="media-next"></a>
+				<a href="#" class="fa fa-backward" call="audio-prev"></a>
+				<a href="#" class="fa fa-stop" call="audio-stop"></a>
+				<a href="#" class="fa fa-pause" call="audio-pause" id="audio-ui"></a>
+				<a href="#" class="fa fa-forward" call="audio-next"></a>
 			</div>
 			<div id="powerband">
 				<div class="powered">
-					<img src="https://vog3lm-0x1.firebaseapp.com/images/firebase.png"><span> Powered by Firebase</span>
+					<img src="/images/firebase.png"><span> Powered by Firebase</span>
 				</div>
 			</div>
 			<a href="#" class="fa fa-cog fa-1-5x" call="cfg-toggle"></a>
+			<nav id="cfg-navigation" class="hide">
+				<a href="#" class="fa fa-pause" call="animation-pause"></a>
+				<a href="#" class="fa"></a>
+				<a href="#" class="fa fa-eyedropper fa-1-5x" call="animation-colors"></a>
+				<a href="#" class="fa fa-eye-slash fa-1-5x" call="design-toggle"></a>
+				<a href="#" class="fa fa-tachometer fa-1-5x" call="animation-velocity"></a>
+				<a href="#" class="fa fa-wrench fa-1-5x" call="animation-refresh"></a>
+			</nav>
 			<a href="#" id="footer-toggle" class="fa fa-chevron-up" call="footer-toggle"></a>
 		</section>
 	</header>

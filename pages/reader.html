@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="css/font.awesome.min.css">
     <link rel="stylesheet" href="css/font.geometry.css">
     <link rel="stylesheet" href="css/design.geometry.css">
-    <link rel="stylesheet" href="css/design.white.css">
 
 	<link rel="shortcut icon" href="images/favicon.coyote.poly_white.b.png" type="image/x-icon" />
 	<link rel="icon" 		  href="images/favicon.coyote.poly_white.b.png" type="image/x-icon" />
@@ -20,17 +19,83 @@
 
 	<script type="text/javascript" src="js/jq.min.js"></script>
 	<script type="text/javascript" src="js/backend.js"></script>
+	<script type="text/javascript" src="js/animate.dots.js"></script>
 	<script type="text/javascript" src="js/animate.dotNet.js"></script>
 	<script type="text/javascript">
 
 		var animations = {}
 		var dispatcher = null
 
-		function V13wEv3ntsConfiguration(){
+		function ReaderPresenterLinker(){
+			var presenter = {'content':ReaderContentPresenter
+							,'footer':ReaderFooterPresenter};
+
+			this.link = (id) => {if(presenter.hasOwnProperty(id)){new presenter[id]().show();}}
+		}
+		function ReaderContentPresenter(){
+			var head = ''		
+			+ '<div class="head">'
+				+ '<h1>[TITLE]</h1>'
+				+ '<h5>[TIME]</h5>'
+				+ '<nav>[LINK]</nav>'
+				+ '<img src="[LOGO]">'
+			+ '</div>';
+			var link = '<a href="#" class="fa fa-1-5x [ICON]" call="[CALL]"></a>';
+			var rate = '<div class="rate">[RATE]</div>';
+			this.show = {
+				'replace':(views) => {
+					var home = $('header section#content');
+					if(home.has('div.dummy')){
+						home.find('div.dummy').remove();
+					}
+
+					var cols = views.cols;
+					var idxTitle = cols.indexOf('title');
+					var idxTime = cols.indexOf('time');
+					var idxRate = cols.indexOf('rating');
+					var idxLogo = cols.indexOf('logo');
+					var idxLinks = cols.indexOf('links');
+					var html = ''
+					for(var i=0; i<views.recs.length; i++){
+						var tl = '';
+						var links = views.recs[i][idxLinks]
+						for(var key in links){
+							tl += link.replace('[ICON]',key).replace('[ICON]',links[key]);
+						}
+						html += head.replace('[TITLE]',views.recs[i][idxTitle])
+									.replace('[TIME]',views.recs[i][idxTime])
+									.replace('[LOGO]',views.recs[i][idxLogo])
+									.replace('[LINK]',tl)
+						html += rate.replace('[RATE]',views.recs[i][idxRate])
+					}
+					home.children('div').each(function(){
+						var element = $(this).remove();
+					});
+					home.find('nav#doc-navigation').after($(html));
+				}
+			}
+		}
+		function ReaderFooterPresenter(){
+			this.show = {
+				'left':(views) => {console.log('replace footer left',views)}
+			   ,'angel':(views) => {console.log('remove footer angel',views)}
+			   ,'right':(views) => {console.log('remove footer right',views)}
+			}
+		}
+
+
+		var animations= [{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'one'}
+				  		,{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'two'}];
+		function ReaderEventListener(){
 			var style = new St1l34p1Operator().create();
-			var authenicate = new F1rebas3Auth4p1Operator(firebase).create();
+			var authenticate = new F1rebas3Auth4p1Operator(firebase).create();
 			var storage = new F1rebas3Storage4p1Operator(firebase).create();
 			var scroller = new Scro114p1Operator().decorate({'node':'section#content'}).create();
+			var mvp = new Mvp4p1Operator().create();
+			var content = new ReaderContentPresenter();
+
+			var one = new DotNetHolder().operator.decorate(animations[0]).create().start();
+			var two = new DotNetHolder().operator.decorate(animations[1]).create().start();
 			var events = {
 				'help-toggle':(data) => {
 					var popup = $('popup');
@@ -40,7 +105,7 @@
 				}
 				,'token-toggle':(data) => {
 					var popup = $('popup');
-					popup.find('span#message').html(authenicate.getToken());
+					popup.find('span#message').html(authenticate.getToken());
 					popup.css({'left':(window.innerWidth-popup.outerWidth())/2,'top':(window.innerHeight-popup.outerHeight())/2});
 					popup.toggleClass('hide');
 				}
@@ -84,6 +149,28 @@
 			    	//	$('user a.fa-user').attr('call','log-in');
 			    	$('body').trigger('loading-stop',{'call':'loading-stop','id':'logged-out'});
 			    }
+				,'got-token':(data) => {
+					var url = window.location.href;
+					if(window.history.pushState){
+					   history.pushState(null,null,'/reader');
+					}
+					var query = url.substring(url.indexOf('?')+1,url.length).split('&');
+					var args = {}
+					for(var i=0; i<query.length; i++){
+						var split = query[i].split('=');
+						args[split[0]]=split[1];
+					}
+					if(args.hasOwnProperty('q')){
+						$('body').trigger('call-mvp',{'call':'call-mvp','id':'uiLT6kFBG','q':'uiLT6kFBG'});
+					} else if(window.mvp){
+						$('body').trigger('call-mvp',{'call':'call-mvp','id':'uiLT6kFBG','q':'uiLT6kFBG'});
+						window.mvp = null;
+					}
+				}
+				,'got-mvp':(data) => {
+					content.show.replace(data.view);
+					scroller.refresh();
+				}
 				,'animation-click':(data) => {console.log('animation-click',data)}
 
 				,'animation-pause':(data) => {
@@ -120,15 +207,17 @@
 				,'scroll-down':() => {
 					scroller.delta(400);
 				}
+
+				,'call-mvp-test':() => {
+					$('body').trigger('call-mvp',{'call':'call-mvp','id':'uiLT6kFBG','q':'uiLT6kFBG'});
+				}
 			}
 			this.getEvents = function(){
 				return {'events':Object.keys(events),'issues':Object.values(events)}
 			}
 		}
 
-
 		var app = null;
-
 		$(document).ready(function(){
 			// Initialize Firebase
 			var config = {
@@ -138,39 +227,14 @@
 			    storageBucket: "vog3lm-0x1.appspot.com",
 			};
 			firebase.initializeApp(config);
-
-			app = new V13wEv3ntsConfiguration();
-			$('body').trigger('storage-test')
-
 		});
 		$(window).load(function() {
-			dispatcher = new V13wEv3ntD1spatch3r(app.getEvents())
+			dispatcher = new V13wEv3ntD1spatch3r(new ReaderEventListener().getEvents())
 			dispatcher.onRegister()
 			dispatcher.onUnleash()
-
-			var anima = {'lineColor':'#777','lineWidth':'1px'
-						,'paneParent':'zone','paneId':'one'}
-			var pane = new dotNetAnimation()
-			pane.decorate(anima)
-			animations[anima.paneId] = pane;
-			anima.lineColor = '#777'
-			anima.paneId = 'two'
-			pane = new dotNetAnimation()
-			pane.decorate(anima)
-			animations[anima.paneId] = pane;
-			jQuery.each(animations,(key,value) => {
-			  	value.create();
-			  	value.start();
-			});
 		});
-
-
-
-
-
 	</script>
 	<style type="text/css">
-
 		header canvas {
 			position: absolute;
 		}
@@ -182,7 +246,7 @@
 		}
 
 
-		
+		/* font color*/
 		header section#content{
 			color:darkgray;
 			font-size:1.5em;
@@ -210,28 +274,40 @@
 			width:32px;
 			min-height:100%;
 		}
-		div.head{
+		section#content div.dummy {
+			width:100%;
+			height:100%;
+		}
+
+
+		section#content div.head{
 			width: calc(100%);
 		    height: calc(200px);
 		    float: left;
 		}
-		div.head h1,
-		div.head h5,
-		div.head nav{
+		section#content div.head h1,
+		section#content div.head h5,
+		section#content div.head nav{
 			padding-left: 24px;
 			width:calc(100% - 200px - 24px);
 			float:left;
 		}
-		div.head nav{
+		section#content div.head nav{
 			padding-top:32px;
 		}
-		div.head h1{
+		section#content div.head h1{
 			padding-top: 24px;
 		}
-
 		section#content div.head span{
 			margin:0px;
 		}
+		section#content div.rate {
+			min-height: calc(100% - 200px);
+			float:left;
+		}
+
+
+
 		nav#doc-navigation a.fa-chevron-circle-down{
 			position:absolute;
 			bottom:0px;
@@ -260,6 +336,22 @@
 		}
 
 
+
+		footer form{
+			float:left;
+		}
+		footer form img{
+			width:150px;
+			height:150px;
+		    position:relative;
+		    left:calc(50% - 75px);
+		    top:calc(50% - 75px);
+		}
+		footer form a{
+			width:calc(100%);
+			height:32px;
+			line-height:32px;
+		}
 	</style>
 </head>
 <body>
@@ -286,15 +378,16 @@
 				<a href="#" class="fa fa-chevron-circle-up hide" call="scroll-up"></a>
 				<a href="#" class="fa fa-chevron-circle-down" call="scroll-down"></a>
 			</nav>
-			<div style="height:100%;">bla bla </div>
-			<div style="height:100%;">bla bla </div>
+			<div class="dummy"></div>
 			<footer>
-				<form></form>
-				<form class="half"></form>
-				<form>
-					<a href="#" >Impressum</a>
-					<a href="#" >License</a>
-					<a href="#" >Impressum</a>
+				<form class="c-1 r-1-4"></form>
+				<form class="c-1 r-2-4">
+					<img src="images/favicon.coyote.poly_white.b.png">
+				</form>
+				<form class="r-1-4">
+					<a href="#" call="call-mvp-test">Impressum</a>
+					<a href="#">License</a>
+					<a href="#">Impressum</a>
 				</form>	
 			</footer>
 		</section>
@@ -303,11 +396,11 @@
 				<a href="#" class="fa fa-user" call="token-toggle"></a>	
 				<id>user@mail.de</id>
 			</card>
-			<form class="hide">
+			<form class="hide" call="login-validate">
 				<input type="text" id="mail" name="mail" placeholder="mail" value="">
 				<input type="text" id="pass" name="pass" placeholder="pass" value="">				
 			</form>
-			<a href="#" class="fa fa-hashtag" call="login-toggle"></a>
+			<a href="#" class="fa fa-hashtag" call="login-show"></a>
 		</user>
 		<popup class="hide">
 			<span id="message"></span>

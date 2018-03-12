@@ -6,8 +6,8 @@
 	<title>vog3lm.cv</title>
 	<link rel="manifest" href="/manifest.json"/>
     <link rel="stylesheet" href="css/font.awesome.min.css"/>
+    <link rel="stylesheet" href="css/font.geometry.css"/>
     <link rel="stylesheet" href="css/design.geometry.css"/>
-    <link rel="stylesheet" href="css/design.white.css"/>
 
 	<link rel="shortcut icon" href="images/favicon.coyote.poly_white.b.png" type="image/x-icon"/>
 	<link rel="icon" 		  href="images/favicon.coyote.poly_white.b.png" type="image/x-icon"/>
@@ -23,7 +23,15 @@
 		var animations = {}
 		var dispatcher = null
 
-		function V13wEv3ntsConfiguration(){
+		function PageContentPresenter(){
+			var head = '<div class="head"></div>';
+			this.show = {
+				'replace':(views) => {
+
+				}
+			}
+		}
+		function PageEventListener(){
 			var style = new St1l34p1Operator().create();
 			var authenicate = new F1rebas3Auth4p1Operator(firebase).create();
 			//	var storage = new F1rebas3Storage4p1Operator(firebase);
@@ -112,6 +120,9 @@
 			    	//	$('user a.fa-user').attr('call','log-in');
 			    	$('body').trigger('loading-stop',{'call':'loading-stop','id':'logged-out'});
 			    }
+				,'got-token':(data) => {
+					console.log('got token. user is logged in.');
+				}
 				,'click-animation':(data) => {console.log('animationClick',data);}
 				,'animation-pause':(data) => {
 					$('nav a.fa-pause').each(function(){
@@ -182,7 +193,7 @@
 			};
 			firebase.initializeApp(config);
 
-			app = new V13wEv3ntsConfiguration();
+			app = new PageEventListener();
 		});
 		$(window).load(function() {
 			dispatcher = new V13wEv3ntD1spatch3r(app.getEvents())

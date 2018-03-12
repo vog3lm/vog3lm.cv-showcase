@@ -66,10 +66,88 @@ function F1rebas3Auth4p1Operator(firebase){
 		dispatcher = new V13wEv3ntD1spatch3r({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
 		return this;
 	}
+	base.onAuthStateChanged((u) => {
+	//	console.info(u,'User authentication state change!')
+		if(u){
+			args.user = u;
+			u.getIdToken(/* forceRefresh */true).then((userToken) => {
+				args.token = userToken;
+				$('body').trigger('got-token',{'call':'got-token','id':'auth-change','token':args.token})
+			}).catch((error) => {console.error(error);});
+			$('body').trigger('logged-in',{
+				 'call':'logged-in'
+				,'id':'auth-state-listener'
+				,'name':u.displayName
+				,'mail':u.email
+				,'verified':u.emailVerified
+				,'anonym':u.isAnonymous
+			});
+		} else {
+			args.user = 'unset';
+			args.token = 'unset';
+			$('body').trigger('logged-out',{'call':'logged-out','id':'auth-state-listener'})
+		}
+	});
+}
 
+function Mvp4p1Operator(){
+	var dispatcher = null;
+	/*  'https://us-central1-vog3lm-0x1.cloudfunctions.net/mvp/?q=query');  */
+	/*  'https://us-central1-vog3lm-0x1.cloudfunctions.net/mvp/?q=query');  */
+	var args = {'url':'https://us-central1-vog3lm-0x1.cloudfunctions.net/mvp/?q=','token':'unset'};
+	var events = {
+		'call-mvp':(data) => {
+			try{
+				console.info('call mvp.',data);
+				var errors = [];
+				if('unset' !== args.token){
+					$.ajax({
+					  	url:args.url+data.q,
+					  	crossDomain: true,
+					  	headers:{'Authorization':'CONTENT_ID_TOKEN::'+args.token},
+					  	context: document.body,
+			  	  		statusCode: {
+						    404:() => {alert( "page not found" );}
+						}
+					}).done(function(data){
+						if(data.hasOwnProperty('promise')){
+							data.promise(data);
+						} else {
+							data['call'] = 'got-mvp';
+							data['id'] = data.q;
+							$('body').trigger('got-mvp',data);	
+						}
+					});
+				}else{
+					errors.push('no token found.');
+				}
+				if(0 < errors.length){throw errors}
+			}catch(error){
+				console.error(error);
+				$('body').trigger('got-mvp',{'recs':error,'cols':['error'],'meta':{'state':'error'}});
+			}
+		}
+		,'got-token':(data) => {args.token = data.token;}
+	    ,'decorate-mvp':(data) => {this.decorate(data.opts);}
+	    ,'create-mvp':(data) => {this.create();}
+	};
+	this.decorate = function(opts){
+		for(var key in opts) {
+		    if(args.hasOwnProperty(key)) {
+		    	if('events' !== key){
+		    		args[key] = opts[key];
+		    	}
+		    }
+		}
+		return this;
+	}
+	this.create = function(){
+		dispatcher = new V13wEv3ntD1spatch3r({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
+		return this;
+	}
 
 	/* move to content request js... */
-	this.reqHeader = function(url,type="GET"){
+	this.header = function(url,type="GET"){
 		if('unset' !== args.token){
 			console.log('Sending request to', url, 'with ID token in Authorization header.');
 			var req = new XMLHttpRequest();
@@ -89,7 +167,7 @@ function F1rebas3Auth4p1Operator(firebase){
 		}
 		// firebase.auth().currentUser.getIdToken().then(function(token){/* call token each request */});
 	}
-	this.reqCookie = function(url,type="GET"){
+	this.cookie = function(url,type="GET"){
 		if('unset' !== args.token){
 			// set the __session cookie
 			document.cookie = '__session=' + args.token + ';max-age=3600';
@@ -110,29 +188,6 @@ function F1rebas3Auth4p1Operator(firebase){
 	}
 	/* move to content request js... */
 
-
-	base.onAuthStateChanged((u) => {
-	//	console.info(u,'User authentication state change!')
-		if(u){
-			args.user = u;
-			u.getIdToken(/* forceRefresh */true).then((userToken) => {
-				args.token = userToken;
-				$('body').trigger('got-token',{'call':'got-token','id':'','token':args.token})
-			}).catch((error) => {console.error(error);});
-			$('body').trigger('logged-in',{
-				 'call':'logged-in'
-				,'id':'auth-state-listener'
-				,'name':u.displayName
-				,'mail':u.email
-				,'verified':u.emailVerified
-				,'anonym':u.isAnonymous
-			});
-		} else {
-			args.user = 'unset';
-			args.token = 'unset';
-			$('body').trigger('logged-out',{'call':'logged-out','id':'auth-state-listener'})
-		}
-	});
 }
 
 function Scr1pt4p1Operator(){
@@ -257,33 +312,56 @@ function Scro114p1Operator(){
 	}
 	this.create = function(){
 		try{
+			var errors = [];
 			if(!args.node || 'unset' === args.node){
-				throw 'parent unknown';
+				errors.push('parent unknown');
 			}
 			content = $(args.node);
 			var bars = content.find('nav#doc-navigation');
+			content.scrollTop(0);
+			scrolled = 0;
+			distance = 0;
 			if('vertical' === args.orientation){
 				anker = bars.outerHeight();
 				content.find('div').each(function(){distance += $(this).outerHeight();});
 				content.find('footer').each(function(){distance += $(this).outerHeight();});
 				distance = distance - anker;
-				content.on('wheel', function(e){scrollDelta(e.originalEvent.deltaY);});	
+				content.on('wheel', function(e){scrollDelta(e.originalEvent.deltaY);});
 			} else if('horizontal' === args.orientation){
 				anker = bars.outerWidth();
 				content.find('div').each(function(){distance += $(this).outerWidth();});
 				content.find('footer').each(function(){distance += $(this).outerWidth();});
-				distance = distance - anker;
 				content.on('wheel', function(e){scrollDelta(e.originalEvent.deltaX);});
 			} else {
-				throw 'orientation unknown';
+				errors.push('orientation unknown');
 			}
 			if(!args.bars){$(args.node+' nav#doc-navigation').addClass('hide');}
+
+
+			if(0 > errors.length){throw errors;}
 		} catch(error) {
 			console.error(error);
 			content = null;
 			distance = 0;
 		}
 		return this;
+	}
+	this.refresh = function(){
+		content.scrollTop(0);
+		scrolled = 0;
+		distance = 0;
+		var bars = content.find('nav#doc-navigation');
+		if('vertical' === args.orientation){
+			anker = bars.outerHeight();
+			content.find('div').each(function(){distance += $(this).outerHeight();});
+			content.find('footer').each(function(){distance += $(this).outerHeight();});
+			distance = distance - anker;
+		} else if('horizontal' === args.orientation){
+			anker = bars.outerWidth();
+			content.find('div').each(function(){distance += $(this).outerWidth();});
+			content.find('footer').each(function(){distance += $(this).outerWidth();});
+			distance = distance - anker;
+		}
 	}
 
 	this.max = function(){scrollDelta(distance);}
@@ -341,7 +419,7 @@ function V13wEv3ntD1spatch3r(holder){
             if(element.attr('call')){
                 element.on('click',function(){
                     var tmp = $(this)
-                    $('body').trigger(tmp.attr('call'),[{call:element.attr('call'),id:element.attr('id'),url:tmp.attr('url')}]);
+                    $('body').trigger(tmp.attr('call'),{call:element.attr('call'),id:element.attr('id'),url:tmp.attr('url')});
                 });
             }
         });
@@ -350,7 +428,7 @@ function V13wEv3ntD1spatch3r(holder){
                 e.preventDefault();
                 var element = $(this)               
                 if(element.attr('call')){
-                    $('body').trigger(element.attr('call'),[{call:element.attr('call'),id:element.attr('id'),url:element.attr('url')}]);
+                    $('body').trigger(element.attr('call'),{call:element.attr('call'),id:element.attr('id'),url:element.attr('url')});
                 }
             }
         });

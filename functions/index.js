@@ -59,7 +59,6 @@ const validateFirebaseIdToken = (req, res, next) => {
 };
 
 
-
 const test = express();
 test.use(cors);
 test.use(cookieParser);
@@ -81,6 +80,9 @@ test.get('/', (req, res) => {
 	res.send(`Hello ${req.user.email} on ${req.user.aud}`);
 });
 exports.test = functions.https.onRequest(test);
+
+
+
 
 var bucketUrl = 'vog3lm-0x1.appspot.com';
 var localsUrl = path.join(os.tmpdir(),'store.secret.js')
@@ -153,7 +155,7 @@ exports.qr = functions.https.onRequest((req,res)=>{
 	}
 	if(!db.hasOwnProperty(req.query.qR1D)){
 		console.error('No user was found for this qR ID token.', 'Make sure you pass existing qR ID tokens as parameter pair: qR1D=token');
-		return res.redirect(404).end();
+		return res.redirect(404);
 	}
 	var qrCreds = db[req.query.qR1D]
 	var qrRedirect = qrDomain+'/reader'+'?q='+req.query.qR1D;
@@ -176,25 +178,53 @@ exports.qr = functions.https.onRequest((req,res)=>{
 var dto = {"cols":[],"recs":[],"meta":{"state":"success","type":"dto","id":"","tag":""}};
 var vto = {"view":"unset","meta":{"state":"success","type":"vto","id":"test","tag":"test"}};
 
-exports.mvp = functions.https.onRequest((req,res)=>{
-	if(0 === Object.keys(vb)){
-		console.error('No view ID database was found. Make sure you preload view content database!');
-		return res.redirect(404);
-	}
-	if(!req.query.q){
-		console.error('No query parameter q was passed as a content ID token in the request parameters.',
-			'Make sure you authorize your request by providing the following parameter pair: q=view');
-		return res.redirect(404);
-	}
-	if(!vb.hasOwnProperty(req.query.q)){
-		console.error('No view was found for this query parameter.', 'Make sure you pass existing view tokens as parameter pair: q=view');
-		return res.redirect(404);
-	}
-	var testData = vb[req.query.q];
+exports.mvp = functions.https.onRequest((req,res) => {
+	if((!req.headers.authorization || !req.headers.authorization.startsWith('CONTENT_ID_TOKEN::')) /*&& !req.cookies.__session*/) {
+		console.error('No Firebase ID token was passed as a content id token in the Authorization header.',
+			'Make sure you authorize your request by providing the following HTTP header:',
+			'Authorization: CONTENT_ID_TOKEN::<firebase-id-token> or by passing a "__session" cookie.');
+		res.status(404).send('Invalid user authorization.');
+	} 
+	let idToken;
+	if(req.headers.authorization && req.headers.authorization.startsWith('CONTENT_ID_TOKEN::')) {
+		idToken = req.headers.authorization.split('CONTENT_ID_TOKEN::')[1];
+	}/* else {
+		console.log('Found "__session" cookie');
+		idToken = req.cookies.__session;
+	}*/
+	admin.auth().verifyIdToken(tokenId).then((user) => {
+		if(0 === Object.keys(vb)){
+			console.error('No view ID database was found. Make sure you preload view content database!');
+			return res.redirect(404);
+		}
+		if(!req.query.q){
+			console.error('No query parameter q was passed as a content ID token in the request parameters.',
+				'Make sure you authorize your request by providing the following parameter pair: q=view');
+			return res.redirect(404);
+		}
+		if(!vb.hasOwnProperty(req.query.q)){
+			console.error('No view was found for this query parameter.', 'Make sure you pass existing view tokens as parameter pair: q=view');
+			return res.redirect(404);
+		}
+		var vbRecord = vb[req.query.q];
+		var data = JSON.parse(JSON.stringify(vto));
+		data.meta['uid'] = user.user_id;
+		for(var key in vbRecord){
+			data.meta[key] = vbRecord.key;		
+		}
 
-	var data = JSON.parse(JSON.stringify(vto));
-	data.view = testData;
-	return res.status(200).send(data);
+		var tmp = JSON.parse(JSON.stringify(dto));
+		tmp.cols = ['title','rating','time','logo','links'];
+		tmp.recs.push(['Title 1','Ay papi..','','/images/logo.fh_simple.png',{'fa-link':'#','fa-user':'#','fa-map':'#'}]);
+		tmp.recs.push(['Title 2','Ay papii.','','/images/logo.ph_simple.png',{'fa-link':'#'}]);
+		tmp.recs.push(['Title 3','Ay papiii','','/images/logo.ksk_simple.png',{'fa-link':'#'}]);
+
+		data.view = tmp;
+		return res.status(200).send(data);
+	}).catch((error) => {
+		console.error(error);
+		res.status(401).send(error);
+	});
 });
 
 

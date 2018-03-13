@@ -289,7 +289,7 @@ function DotNetAnimation(animation){
         return this;
     }
     this.validate = function(){
-
+        return this;
     }
     this.start = function(mode='any'){
         holder.engine.start();

@@ -209,7 +209,7 @@ function Scr1pt4p1Operator(){
     }
 }
 
-function St1l34p1Operator(){
+function D3s1gn4p1Operator(){
 	var dispatcher = null;
 	var src = 'unset';
 	var args = {'design':'white','designs':['white','dark']
@@ -442,7 +442,7 @@ function V13wEv3ntD1spatch3r(holder){
             }
             issues[index](data)
         } catch(error) {
-        	$('body').trigger('loading-stop')
+        	$('body').trigger('loading-stop');
             console.error(error)
         }
     }

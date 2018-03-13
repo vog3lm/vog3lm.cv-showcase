@@ -17,7 +17,10 @@
 
 	<script type="text/javascript" src="js/jq.min.js"></script>
 	<script type="text/javascript" src="js/backend.js"></script>
-	<script type="text/javascript" src="js/animate.dotNet.js"></script>
+	<script type="text/javascript" src="js/animate.fox.js"></script>
+	<script type="text/javascript" src="js/animate.dots.js"></script>
+
+
 	<script type="text/javascript">
 
 		var animations = {}
@@ -31,11 +34,23 @@
 				}
 			}
 		}
+
+
+		var animations= [{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'fox'}
+				  		,{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'one'}
+				  		,{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'two'}];
 		function PageEventListener(){
-			var style = new St1l34p1Operator().create();
+			var style = new D3s1gn4p1Operator().create();
 			var authenicate = new F1rebas3Auth4p1Operator(firebase).create();
 			//	var storage = new F1rebas3Storage4p1Operator(firebase);
 			var scroller = new Scro114p1Operator().decorate({'node':'section#content div#story','orientation':'horizontal'}).create();
+			var one = new DotNetHolder()
+		//	one.operator.decorate(animations[1]).create().start();
+			var dotsOne = one.objects.dots;
+			var two = new DotNetHolder()
+			two.operator.decorate(animations[2]).create().start();
+			var dotsTwo = two.objects.dots;
+			var fox = new FoxNetHolder().operator.decorate(animations[0]).interlink(dotsTwo).create().start();
 			var events = {
 				'footer-toggle':(data) => {
 					var element = $("body")
@@ -199,21 +214,6 @@
 			dispatcher = new V13wEv3ntD1spatch3r(app.getEvents())
 			dispatcher.onRegister()
 			dispatcher.onUnleash()
-
-			var anima = {'lineColor':'#777','lineWidth':'1px'
-						,'paneParent':'zone','paneId':'one'}
-			var pane = new dotNetAnimation()
-			pane.decorate(anima)
-			animations[anima.paneId] = pane;
-			anima.lineColor = '#777'
-			anima.paneId = 'two'
-			pane = new dotNetAnimation()
-			pane.decorate(anima)
-			animations[anima.paneId] = pane;
-			jQuery.each(animations,(key,value) => {
-			  	value.create();
-			  	value.start();
-			});
 		});
 
 	</script>
@@ -227,6 +227,7 @@
 		header canvas {
 			position: absolute;
 		}
+
 		header canvas#one{
 			transform:rotateY(30deg) scaleX(1.15);
 		}

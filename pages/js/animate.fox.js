@@ -94,22 +94,27 @@ function FoxScout(animation,dot){
     var holder = animation;
     this.connector = dot
     this.push = function(){
-        context = holder.objects.pane;
+        context = holder.objects.ctxt;
         dots = holder.objects.link;
+        dotOffset = holder.setting.args.dotOffset;
+        lineColor = holder.setting.args.lineColor;
+        lineWidth = holder.setting.args.lineWidth;
     };
     var context = null;
     var dots = [];
     var dotOffset = 0;
+    var lineColor = 0;
+    var lineWidth = 0;
     this.update = function() {
         context.beginPath();
         for(var j=0; j<dots.length; j++){
             var b = dots[j];
-            var d = Math.hypot(connector.loc.x-b.loc.x, connector.loc.y-b.loc.y);
-            if(d<500){
-                context.strokeStyle = lineColor;
-                context.globalAlpha = 1 - (d > 50 ? .8 : d / 150);
+            var d = Math.hypot(this.connector.loc.x-b.loc.x, this.connector.loc.y-b.loc.y);
+            if(d<75){
+                context.strokeStyle = 'red';
+                context.globalAlpha = 1 - (d > 75 ? .8 : d / 150);
                 context.lineWidth = lineWidth;
-                context.moveTo((dotOffset+connector.loc.x) | 0, (dotOffset+connector.loc.y) | 0);
+                context.moveTo((dotOffset+this.connector.loc.x) | 0, (dotOffset+this.connector.loc.y) | 0);
                 context.lineTo((dotOffset+b.loc.x) | 0, (dotOffset+b.loc.y) | 0);
             }
         }
@@ -157,7 +162,7 @@ function FoxNetEngine(animation){
     var context = null;
     var context = null;
     var dots = [];
-    var link = [];
+    var scts = [];
     var cons = [];
     var move = null;
     var size = 0;
@@ -170,7 +175,7 @@ function FoxNetEngine(animation){
     var showDots = false;
     var showLines = false;
     var showMove = false;
-    var showLinks = true;
+    var showLinks = false;
     var playDrunken = false;
     var playCounter = 0;
     var playModul = 250;
@@ -181,7 +186,7 @@ function FoxNetEngine(animation){
         size = move.length;
         dots = holder.objects.dots;
         cons = holder.objects.cons;
-        link = holder.objects.link;
+        scts = holder.objects.scouts;
         var tmpArg = holder.setting.args;
         paneFrames = tmpArg.paneFrames;
         paneColor = tmpArg.paneColor;
@@ -198,7 +203,7 @@ function FoxNetEngine(animation){
         for(var i=0; i<dots.length; i++){
             dots[i].push();
             cons[i].push();
-            link[i].push();
+            scts[i].push();
         }
         for(var i=0; i<move.length; i++){move[i].push();}
         update();
@@ -232,7 +237,7 @@ function FoxNetEngine(animation){
         for(var i=0; i<dots.length; i++){
             if(showDots){dots[i].update();}
             if(showLines){cons[i].update();}
-            if(showLinks){link[i].update();}
+            if(showLinks){scts[i].update();}
         }
         if(!stopped){
             requestAnimationFrame(update);
@@ -299,7 +304,7 @@ function FoxNetSetting(){
        ,'dotMoves':0.1
        ,'drunken':true
        ,'drinker':0.1
-       ,'effects':['dots','lines','moves','drunken']    // glow,dots,lines,moves
+       ,'effects':['dots','lines','drunken','links']    // glow,dots,lines,moves
     }
     this.decorate = function(opts){
         for(var key in opts){
@@ -347,7 +352,7 @@ function FoxNetAnimation(animation){
             var tmp = new FoxConnector(holder,logs[key].pos[0],logs[key].pos[1]);
             dots.push(tmp);
             cons.push(new FoxCon(holder,tmp,logs[key].con));
-            scouts.push(new FoxCon(holder,tmp,logs[key].con));
+            scouts.push(new FoxScout(holder,tmp));
         }
         if(args.effects.indexOf('moves') > -1){
             var move = holder.objects.move;
@@ -361,6 +366,8 @@ function FoxNetAnimation(animation){
 
         console.log('Animate Dots Created\n',holder.objects.dots.length,'connectors created.\n'
             ,holder.objects.cons.length,'connections created.\n'
+            ,holder.objects.link.length,'linkable externals injected.\n'
+            ,holder.objects.scouts.length,'link scouts created.\n'
             ,holder.objects.move.length,'movements created.\n'
             ,args.drinker,'percent drunken.\n'
             ,args.effects.length,'effects involved.\n'

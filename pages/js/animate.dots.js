@@ -122,7 +122,6 @@ function DotNetEngine(animation){
     var holder = animation;
     var canvas = null;
     var context = null;
-    var context = null;
     var dots = null;
     var move = null;
     var size = 0;
@@ -142,6 +141,15 @@ function DotNetEngine(animation){
         move = holder.objects.move;
         size = move.length;
         dots = holder.objects.dots;
+
+        var tmpArg = holder.setting.args;
+        if(tmpArg.effects.indexOf('dots') > -1){showDots = true;}
+        if(tmpArg.effects.indexOf('lines') > -1){showLines = true;}
+        if(tmpArg.effects.indexOf('moves') > -1){showMove = true;}
+        this.push();
+        update();
+    }
+    this.push = function(){
         var tmpArg = holder.setting.args;
         paneFrames = tmpArg.paneFrames;
         paneColor = tmpArg.paneColor;
@@ -149,14 +157,9 @@ function DotNetEngine(animation){
         lineWidth = tmpArg.lineWidth;        
         dotDistance = tmpArg.dotDistance;
         dotOffset = tmpArg.dotOffset;
-        
-        if(tmpArg.effects.indexOf('dots') > -1){showDots = true;}
-        if(tmpArg.effects.indexOf('lines') > -1){showLines = true;}
-        if(tmpArg.effects.indexOf('moves') > -1){showMove = true;}
 
         for(var i=0; i<dots.length; i++){dots[i].push();}
         for(var i=0; i<move.length; i++){move[i].push();}
-        update();
     }
 
     var paused = false;
@@ -295,7 +298,13 @@ function DotNetAnimation(animation){
         holder.engine.start();
         return this;
     }
-
+    this.pause = function(){console.error('Not implemented!')}
+    this.refresh = function(){
+        holder.engine.push();
+        return this;
+    }
+    this.lock = function(){console.error('Not implemented!')}
+    this.stop = function(){console.error('Not implemented!')}
 
     function canvasParse(id){
         return document.getElementById(id);

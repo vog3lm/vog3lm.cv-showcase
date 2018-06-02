@@ -59,6 +59,10 @@ const validateFirebaseIdToken = (req, res, next) => {
 };
 
 
+
+/* delete */
+/* delete */
+/* delete */
 const test = express();
 test.use(cors);
 test.use(cookieParser);
@@ -80,6 +84,10 @@ test.get('/', (req, res) => {
 	res.send(`Hello ${req.user.email} on ${req.user.aud}`);
 });
 exports.test = functions.https.onRequest(test);
+/* delete */
+/* delete */
+/* delete */
+
 
 
 

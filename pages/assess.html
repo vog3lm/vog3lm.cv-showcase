@@ -19,76 +19,33 @@
 
 	<script type="text/javascript" src="js/jq.min.js"></script>
 	<script type="text/javascript" src="js/backend.js"></script>
+	<script type="text/javascript" src="js/animate.fox.js"></script>
 	<script type="text/javascript" src="js/animate.dots.js"></script>
 	<script type="text/javascript">
 
-		var animations = {}
 		var dispatcher = null
+		var animations = [{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'fox'}
+						 ,{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'one'}
+			  		     ,{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'two'}];
 
-		function ReaderContentPresenter(){
-			var head = ''		
-			+ '<div class="head">'
-				+ '<h1>[TITLE]</h1>'
-				+ '<h5>[TIME]</h5>'
-				+ '<nav>[LINK]</nav>'
-				+ '<img src="[LOGO]">'
-			+ '</div>';
-			var link = '<a href="#" class="fa fa-1-5x [ICON]" call="[CALL]"></a>';
-			var rate = '<div class="rate">[RATE]</div>';
-			this.show = {
-				'replace':(views) => {
-					var home = $('header section#content');
-					if(home.has('div.dummy')){
-						home.find('div.dummy').remove();
-					}
-
-					var cols = views.cols;
-					var idxTitle = cols.indexOf('title');
-					var idxTime = cols.indexOf('time');
-					var idxRate = cols.indexOf('rating');
-					var idxLogo = cols.indexOf('logo');
-					var idxLinks = cols.indexOf('links');
-					var html = ''
-					for(var i=0; i<views.recs.length; i++){
-						var tl = '';
-						var links = views.recs[i][idxLinks]
-						for(var key in links){
-							tl += link.replace('[ICON]',key).replace('[ICON]',links[key]);
-						}
-						html += head.replace('[TITLE]',views.recs[i][idxTitle])
-									.replace('[TIME]',views.recs[i][idxTime])
-									.replace('[LOGO]',views.recs[i][idxLogo])
-									.replace('[LINK]',tl)
-						html += rate.replace('[RATE]',views.recs[i][idxRate])
-					}
-					home.children('div').each(function(){
-						var element = $(this).remove();
-					});
-					home.find('nav#doc-navigation').after($(html));
-				}
-			}
-		}
-		function ReaderFooterPresenter(){
-			this.show = {
-				'left':(views) => {console.log('replace footer left',views)}
-			   ,'angel':(views) => {console.log('remove footer angel',views)}
-			   ,'right':(views) => {console.log('remove footer right',views)}
-			}
-		}
-
-
-		var animations= [{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'one'}
-				  		,{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'two'}];
-		function ReaderEventListener(){
+		function AssessEventListener(){
 			var style = new D3s1gn4p1Operator().create();
 			var authenticate = new F1rebas3Auth4p1Operator(firebase).create();
-			var storage = new F1rebas3Storage4p1Operator(firebase).create();
-			var scroller = new Scro114p1Operator().decorate({'node':'section#content'}).create();
-			var mvp = new Mvp4p1Operator().create();
-			var content = new ReaderContentPresenter();
+		//	var storage = new F1rebas3Storage4p1Operator(firebase).create();
+		//	var scroller = new Scro114p1Operator().decorate({'node':'scroller','bars':false}).create();
+		//	var mvp = new Mvp4p1Operator().create();
+			var listener = null;
 
-			var one = new DotNetHolder().operator.decorate(animations[0]).create().start();
-			var two = new DotNetHolder().operator.decorate(animations[1]).create().start();
+
+			var one = new DotNetHolder()
+			one.operator.decorate(animations[1]).create().start();
+			var dotsOne = one.objects.dots;
+			var two = new DotNetHolder()
+			two.operator.decorate(animations[2]).create().start();
+			var dotsOne = dotsOne.concat(two.objects.dots);
+			var fox = new FoxNetHolder().operator.decorate(animations[0]).interlink(dotsOne).create().start();	
+
+
 			var events = {
 				'help-toggle':(data) => {
 					var popup = $('popup');
@@ -104,7 +61,6 @@
 				}
 				,'cfg-toggle':(data) => {
 					$('header nav#cfg-navigation').toggleClass('hide');
-					$('header nav#doc-controls').toggleClass('hide');
 				}
 				,'login-show':(data) => {
 					var tag = $('user')
@@ -191,7 +147,7 @@
 				,'animation-colors':(data) => {
 					var colors = ['#fb1','#67f','#b0f','#2F2','#6be','#e5f','#ff1','#777']
 					jQuery.each(animations,(key,value) => {
-					  	value.decorate({'lineColor':colors[Math.floor(Math.random()*(colors.length-1))]})
+					  	value.decorate({'lineColor':colors[Math.floor(Math.random()*(colors.length-1))]}).refresh();
 					});
 				}
 				,'scroll-up':() => {
@@ -205,14 +161,16 @@
 					$('body').trigger('call-mvp',{'call':'call-mvp','id':'uiLT6kFBG','q':'uiLT6kFBG'});
 				}
 			}
-			this.getEvents = function(){
-				return {'events':Object.keys(events),'issues':Object.values(events)}
+			this.create = function(){
+
+			}
+			this.execute = function(){
+				listener = new V13wEv3ntD1spatch3r({'events':Object.keys(events),'issues':Object.values(events)}).onRegister().onUnleash();
 			}
 		}
 
 		var app = null;
 		$(document).ready(function(){
-			// Initialize Firebase
 			var config = {
 			    apiKey: "AIzaSyDmXSkwOam-aQ37z8-3d5aH-X257lIVS34",
 			    authDomain: "vog3lm-0x1.firebaseapp.com",
@@ -220,113 +178,56 @@
 			    storageBucket: "vog3lm-0x1.appspot.com",
 			};
 			firebase.initializeApp(config);
+			app = new AssessEventListener();
 		});
 		$(window).load(function() {
-			dispatcher = new V13wEv3ntD1spatch3r(new ReaderEventListener().getEvents())
-			dispatcher.onRegister()
-			dispatcher.onUnleash()
+			app.execute();
 		});
 	</script>
 	<style type="text/css">
 		header canvas {
 			position: absolute;
 		}
-		canvas#one{
+		header canvas#one{
 			transform:rotateY(30deg) scaleX(1.15);
 		}
-		canvas#two{
+		header canvas#two{
 			transform:rotateY(-20deg) scaleX(1.15);
 		}
-
-
-		/* font color*/
-		header section#content{
-			color:darkgray;
-			font-size:1.5em;
-			background:rgba(27,27,27,0.9)
-		}
-		header section#content{
-			position: absolute;
-			left:8em;
-			top:3em;
-			width:calc(100% - 16em - 0em);
-			min-height:32px;
-			max-height:calc(100% - 3em - 0em);
-			overflow:hidden;
-		}
-		section#content span{
-			display:inline-block;
-			height:calc(100% - 3em);
-			width:calc(100% - 3em);
-			margin:1.5em;
-		}
-		section#content nav#doc-navigation{
-			position:absolute;
-			top:0px;
-			right:0px;
-			width:32px;
-			min-height:100%;
-		}
-		section#content div.dummy {
-			width:100%;
-			height:100%;
-		}
-
-
-		section#content div.head{
-			width: calc(100%);
-		    height: calc(200px);
-		    float: left;
-		}
-		section#content div.head h1,
-		section#content div.head h5,
-		section#content div.head nav{
-			padding-left: 24px;
-			width:calc(100% - 200px - 24px);
-			float:left;
-		}
-		section#content div.head nav{
-			padding-top:32px;
-		}
-		section#content div.head h1{
-			padding-top: 24px;
-		}
-		section#content div.head span{
-			margin:0px;
-		}
-		section#content div.rate {
-			min-height: calc(100% - 200px);
-			float:left;
-		}
-
-
-
-		nav#doc-navigation a.fa-chevron-circle-down{
-			position:absolute;
-			bottom:0px;
-		}
-
 
 		header a.fa-question-circle,
 		header a.fa-question-circle-o{
 			position: absolute;
+			top:0px;
 			right:0px;
 		}
 		header a.fa-cog,
-		header nav#cfg-navigation,
-		header nav#doc-controls{
+		header nav#cfg-navigation{
 			position: absolute;
 			right:0px;
 			bottom:0px;
 		}
-		header nav#cfg-navigation,
-		header nav#doc-controls{
+		header nav#cfg-navigation{
 			bottom:32px;
 			width:32px;
 		}
-		header nav#doc-controls{
-			right:32px;
+		header user {
+			left:0px;
+			top:0px;
 		}
+		header scroller {
+		    width:calc(100% + 16px);
+		    height:100%;
+		    background:rgba(1,1,1,0.2);
+		    display:block;
+		    overflow-y:scroll;
+		}
+		scroller section{
+			position:relative;
+			width:100%;
+			height:100%;
+		}
+
 
 
 
@@ -349,6 +250,60 @@
 </head>
 <body>
 	<header id="zone">
+		<scroller>
+			<section>
+				4. Oktober 2016
+				Notenspiegel
+				Master Wirtschaftsinformatik SPO 9
+
+				Requirements Engeneering und Management 	2.1 	
+				Advanced Software Engeneering				1.7
+				Neuere Entwicklungen im Management			2.5
+				Controlling									2.1
+				International Economics						3.6
+			</section>
+			<section>
+
+				Languages
+
+				German (mother tongue)    
+				English (daily use)     
+				Spanish (puedo sobrevivir) 
+
+
+
+				Skills (three tabs economics, it, math)
+
+				Bootstrap Framework     
+				CSS(3)     
+				HTML(5)     
+				JSON     
+				MySQL     
+				PHP     
+				XML     
+				Builder Pattern     
+				Command line Inteface     
+				JQuery     
+				Java     
+				Javascript     
+				LESS     
+				Laravel Framework     
+				MVC Pattern     
+				Method Factory Pattern     
+				Object Orientated Programming     
+				SASS / SCSS     
+				SEO     
+				Scrum     
+				Singleton Pattern     
+				UML     
+				Wordpress     
+				BEM     
+				AngularJS     
+				ElasticSearch     
+				Ruby   
+
+			</section>
+		</scroller>
 		<a href="#" class="fa fa-question-circle-o fa-1-5x" call="help-toggle"></a>
 		<a href="#" class="fa fa-cog fa-1-5x" call="cfg-toggle"></a>
 		<nav id="cfg-navigation" class="hide">
@@ -359,31 +314,6 @@
 			<a href="#" class="fa fa-tachometer fa-1-5x" call="animation-velocity"></a>
 			<a href="#" class="fa fa-wrench fa-1-5x" call="animation-refresh"></a>
 		</nav>
-		<nav id="doc-controls" class="hide">
-			<a href="#" class="fa fa-plus fa-1-5x" call="background-darker"></a>
-			<a href="#" class="fa fa-minus fa-1-5x" call="background-lighter"></a>
-			<a href="#" class="fa"></a>
-			<a href="#" class="fa fa-plus fa-1-5x" call="text-increase"></a>
-			<a href="#" class="fa fa-minus fa-1-5x" call="text-decrease"></a>
-		</nav>
-		<section id="content">
-			<nav id="doc-navigation">
-				<a href="#" class="fa fa-chevron-circle-up hide" call="scroll-up"></a>
-				<a href="#" class="fa fa-chevron-circle-down" call="scroll-down"></a>
-			</nav>
-			<div class="dummy"></div>
-			<footer>
-				<form class="c-1 r-1-4"></form>
-				<form class="c-1 r-2-4">
-					<img src="images/favicon.coyote.poly_white.b.png">
-				</form>
-				<form class="r-1-4">
-					<a href="#" call="call-mvp-test"></a>
-					<a href="#" call="call-mvp-test"></a>
-					<a href="#" call="call-mvp-test"></a>
-				</form>	
-			</footer>
-		</section>
 		<user>
 			<card class="hide">
 				<a href="#" class="fa fa-user" call="token-toggle"></a>	
@@ -399,5 +329,16 @@
 			<span id="message"></span>
 		</popup>
 	</header>
+	<footer>
+		<form class="c-1 r-1-4"></form>
+		<form class="c-1 r-2-4">
+			<img src="images/favicon.coyote.poly_white.b.png">
+		</form>
+		<form class="r-1-4">
+			<a href="#" call="call-mvp-test"></a>
+			<a href="#" call="call-mvp-test"></a>
+			<a href="#" call="call-mvp-test"></a>
+		</form>	
+	</footer>
 </body>
 </html>

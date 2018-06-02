@@ -30,10 +30,11 @@ function F1rebas3Auth4p1Operator(firebase){
 				/* Note: Firebase Auth web sessions are single host origin 
 						 and will be persisted for a single domain only.  */
 				base.signInWithEmailAndPassword(user.mail,user.pass).catch((error) => {
-				  	consoles.error('login error',error);
+				  	console.error('login error',error);
 					args.user = 'unset';
 					args.token = 'unset';
-					$('body').trigger('logged-out',{'call':'logged-out','id':'auth-log-in'})
+					$('body').trigger('logged-err',{'call':'logged-err','id':'auth-log-in','code':error.code,'message':error.message})
+				//	$('body').trigger('logged-out',{'call':'logged-out','id':'auth-log-in'})
 				});
 			}).catch((error) => {console.error(error);});}
 	    ,'log-out':(data) => {base.signOut().catch((error) => {console.error('login error',error)});}
@@ -89,6 +90,8 @@ function F1rebas3Auth4p1Operator(firebase){
 		}
 	});
 }
+
+
 
 function Mvp4p1Operator(){
 	var dispatcher = null;
@@ -212,7 +215,7 @@ function Scr1pt4p1Operator(){
 function D3s1gn4p1Operator(){
 	var dispatcher = null;
 	var src = 'unset';
-	var args = {'design':'white','designs':['white','dark']
+	var args = {'design':'dark','designs':['white','dark']
 			   ,'path':'css','url':'design','format':'css'}
 	var events = {
 		'design-call':(data) => {
@@ -402,6 +405,19 @@ function Scro114p1Operator(){
 			element.find('a.fa-chevron-circle-down').removeClass('hide')
 		}
 	}
+}
+
+function BrowserHistorD1spatcher(){
+	this.push = (state) => {
+		window.history.pushState(state,0,location.href);
+	}
+	$(window).bind('popstate',(e) => {
+	    if(null != e.originalEvent.state){ // forward/back has been hit
+	    	var state = e.originalEvent.state;
+	    	state.history = true;
+			$('body').trigger(state.call,state)
+	    }
+	});
 }
 
 function V13wEv3ntD1spatch3r(holder){

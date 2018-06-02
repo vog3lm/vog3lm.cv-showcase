@@ -111,7 +111,7 @@ function FoxScout(animation,dot){
             var b = dots[j];
             var d = Math.hypot(this.connector.loc.x-b.loc.x, this.connector.loc.y-b.loc.y);
             if(d<75){
-                context.strokeStyle = 'red';
+            //    context.strokeStyle = 'red';
                 context.globalAlpha = 1 - (d > 75 ? .8 : d / 150);
                 context.lineWidth = lineWidth;
                 context.moveTo((dotOffset+this.connector.loc.x) | 0, (dotOffset+this.connector.loc.y) | 0);
@@ -256,8 +256,9 @@ function FoxNetSetting(){
        ,'paneUi':[]      // click, move 665 1140
        ,'scaleWidth':665
        ,'scaleHeight':1140
-       ,'paneWidth':window.innerWidth/4
-       ,'paneHeight':window.innerHeight/4
+       ,'scaleFactor':1
+       ,'paneWidth':window.innerWidth
+       ,'paneHeight':window.innerHeight
        ,'paneBorder':150
        ,'dots':true
        ,'dotOffset':0            // def 0
@@ -339,16 +340,21 @@ function FoxNetAnimation(animation){
         holder.objects.pane = canvas;
         holder.objects.ctxt = canvas.getContext("2d");
 
-        canvas.setAttribute('style',"left:calc(50% - "+canvas.width/2+"px);top:calc(50% - "+canvas.height/2+"px)");
+    //    canvas.setAttribute('style',"left:calc(50% - "+canvas.width/2+"px);top:calc(50% - "+canvas.height/2+"px)");
 
         // squares = A_screen / A_square = A_screen / (a_square,exponent)
         var dots = holder.objects.dots;
         var cons = holder.objects.cons;
         var scouts = holder.objects.scouts;
         var logs = args.dotLogs;
+        var width = args.scaleWidth;
+        var height = args.scaleHeight;
+        var factor = args.scaleFactor;
+        var left = 100;
+        var top = canvas.height-250;
         for(var key in logs){
-            logs[key].pos[0] = logs[key].pos[0] * canvas.width / 665;
-            logs[key].pos[1] = logs[key].pos[1] * canvas.height / 1140;
+            logs[key].pos[0] = logs[key].pos[0] * canvas.width / width / factor + left;
+            logs[key].pos[1] = logs[key].pos[1] * canvas.height / height / factor + top;
             var tmp = new FoxConnector(holder,logs[key].pos[0],logs[key].pos[1]);
             dots.push(tmp);
             cons.push(new FoxCon(holder,tmp,logs[key].con));
@@ -363,6 +369,8 @@ function FoxNetAnimation(animation){
             }
         }
 
+        canvas.width = args.paneWidth;
+        canvas.height = args.paneHeight;
 
         console.log('Animate Dots Created\n',holder.objects.dots.length,'connectors created.\n'
             ,holder.objects.cons.length,'connections created.\n'

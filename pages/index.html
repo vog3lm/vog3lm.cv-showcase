@@ -3,7 +3,7 @@
 <head>
 	<meta charset='utf-8'/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-	<title>vog3lm.cv</title>
+	<title>smart.cv.og3lm</title>
 	<link rel="manifest" href="/manifest.json"/>
     <link rel="stylesheet" href="css/font.awesome.min.css"/>
     <link rel="stylesheet" href="css/font.geometry.css"/>
@@ -18,6 +18,7 @@
 	<script type="text/javascript" src="js/jq.min.js"></script>
 	<script type="text/javascript" src="js/backend.js"></script>
 	<script type="text/javascript" src="js/animate.fox.js"></script>
+	<script type="text/javascript" src="js/animate.cv.js"></script>
 	<script type="text/javascript" src="js/animate.dots.js"></script>
 
 
@@ -26,119 +27,364 @@
 		var animations = {}
 		var dispatcher = null
 
-		function PageContentPresenter(){
-			var head = '<div class="head"></div>';
-			this.show = {
-				'replace':(views) => {
-
+		function PagePagePresenter(){
+			this.popup = {
+				'show':(data) => {
+					var popup = $('popup');
+					popup.html('<div style="background-color:rgba(34,34,34,1);padding:0.75em">'+data.content+'</div>');
+					popup.css({'left':(window.innerWidth-popup.outerWidth())/2,'top':(window.innerHeight-popup.outerHeight())/2});
+					popup.removeClass('hide');
+					// bind hide listener, do only mouse down
+					// open click will close immedialtly else
+					var ops = $(':not(popup)')
+					ops.on("mousedown",function(e){
+						popup.addClass('hide');
+						ops.off("mousedown")
+					});
+					// bind hide timer
+					setTimeout(function(){
+						popup.addClass('hide');
+						ops.off("mousedown")
+					},5000);
+				}
+				,'hide':() => {
+					$('popup').addClass('hide');
+					$(':not(popup)').off("mousedown")
+				}
+				,'toggle':(data) => {
+					var popup = $('popup');
+					var ops = $(':not(popup)')
+					if(!popup.hasClass('hide')){ // hide
+						popup.html('');
+						popup.addClass('hide');
+						// unbind hide listener
+						// unbind hide timer
+					} else {
+						popup.css({'left':(window.innerWidth-popup.outerWidth())/2,'top':(window.innerHeight-popup.outerHeight())/2});
+						popup.html('<div style="background-color:rgba(34,34,34,1);padding:0.75em">'+data.content+'</div>');
+						popup.removeClass('hide');
+						// bind hide listener, do only mouse down
+						// open click will close immedialtly else
+						ops.on("mousedown",function(e){
+							popup.addClass('hide');
+							ops.off("mousedown")
+						});
+					}
 				}
 			}
-		}
-
-
-		var animations= [{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'fox'}
-				  		,{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'one'}
-				  		,{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'two'}];
-		function PageEventListener(){
-			var style = new D3s1gn4p1Operator().create();
-			var authenicate = new F1rebas3Auth4p1Operator(firebase).create();
-			//	var storage = new F1rebas3Storage4p1Operator(firebase);
-			var scroller = new Scro114p1Operator().decorate({'node':'section#content div#story','orientation':'horizontal'}).create();
-			var one = new DotNetHolder()
-		//	one.operator.decorate(animations[1]).create().start();
-			var dotsOne = one.objects.dots;
-			var two = new DotNetHolder()
-			two.operator.decorate(animations[2]).create().start();
-			var dotsTwo = two.objects.dots;
-			var fox = new FoxNetHolder().operator.decorate(animations[0]).interlink(dotsTwo).create().start();
-			var events = {
-				'footer-toggle':(data) => {
+			this.cfg = {
+				'toggle':(views) => {
+					$('nav#cfg-navigation').toggleClass('hide');
+				}
+			}
+			this.footer = {
+				'toggle':() => {
 					var element = $("body")
-					if(!element.hasClass('scroll-flag')){element.scrollTop($(document).height());}
-					else{element.scrollTop(0);}
-					element.toggleClass('scroll-flag')
-					var clicker = $("a#footer-toggle")
-					clicker.toggleClass('fa-chevron-down')
-					clicker.toggleClass('fa-chevron-up')
-				 }
-				,'help-toggle':(data) => {
-					var popup = $('popup');
-					// view factory
-					// view factory
-					popup.html('<div style="background-color:rgba(34,34,34,1);padding:0.75em">'+' geture help overlay'+'</div>');
-					popup.css({'left':(window.innerWidth-popup.outerWidth())/2,'top':(window.innerHeight-popup.outerHeight())/2});
-					if(!popup.hasClass('hide')){
-						popup.html('');
+					if(!element.hasClass('scroll-flag')){
+						element.scrollTop($(document).height());
+						$("a#get-next").css({'top':'80%'});
+						$("a#get-prev").css({'top':'80%'});
+					}else{
+						element.scrollTop(0);
+						$("a#get-next").css({'top':'50%'});
+						$("a#get-prev").css({'top':'50%'});
 					}
-					popup.toggleClass('hide');
+					element.toggleClass('scroll-flag');
+					var clicker = $("a#footer-toggle");
+					clicker.toggleClass('fa-chevron-down');
+					clicker.toggleClass('fa-chevron-up');
+					
 				}
-				,'token-toggle':(data) => {
-					var popup = $('popup');
-					// view factory
-					// view factory
-					popup.html('<div style="background-color:rgba(34,34,34,1);padding:0.75em">'+authenicate.getToken()+'</div>');
-					popup.css({'left':(window.innerWidth-popup.outerWidth())/2,'top':(window.innerHeight-popup.outerHeight())/2});
-					if(!popup.hasClass('hide')){
-						popup.html('');
+				,'replace':(views) => {
+					console.log('replace footer left',views);
+				}
+			}
+			this.login = {
+				'show':(views) => {
+					var tag = $('user')
+					tag.find('form').removeClass('hide');
+					tag.find('a.fa-hashtag').attr('call','login-hide');
+				}
+				,'hide':() => {
+					var tag = $('user')
+					tag.find('form').addClass('hide');
+					tag.find('a.fa-hashtag').attr('call','login-show');
+				}
+				,'toggle':(views) => {
+					var tag = $('user')
+					if(tag.find('form').hasClass('hide')){
+						tag.find('form').removeClass('hide');
+						tag.find('a.fa-hashtag').attr('call','login-hide');
+					} else { // show
+						tag.find('form').addClass('hide');
+						tag.find('a.fa-hashtag').attr('call','login-show');
 					}
-					popup.toggleClass('hide');
 				}
-				,'cfg-toggle':(data) => {$('nav#cfg-navigation').toggleClass('hide');}
-				,'loading-start':(data) => {
+				,'clear':() => {
+					var tag = $('user')
+					tag.find('card').addClass('hide')
+					tag.find('input#mail').val('');
+					tag.find('input#pass').val('');
+					tag.find('id').html('');
+				}
+				,'user':(data) => {
+					var tag = $('user')
+					tag.find('card').removeClass('hide')
+					tag.find('a.fa-hashtag').attr('call','log-out');
+					tag.find('id').html(data.mail);
+				}
+			}
+			this.load = {
+				'show':(data) => {
 					var overlay = $('overlay');
-					// view factory
-					// view factory
 					overlay.html('<div style="height:100%;width:100%;color:black;background-color:rgba(255,255,255,0.75);">'
 							+'<span">'+data.id+'</span>'
 							+'<a style="line-height:96px;position:absolute;top:calc(50% - 48px);left:calc(50% - 48px); width:96px;height:96px;font-size:7em;" class="fa fa-spinner fa-spin"></a>'
 							+'</div>');
 					overlay.removeClass('hide')
 				}
-				,'loading-stop':(data) => {
+				,'hide':() => {
 					var overlay = $('overlay');
 					overlay.html('');
 					overlay.addClass('hide')
 				}
-				,'login-show':(data) => {
-					var tag = $('user')
-					tag.find('form').removeClass('hide');
-					tag.find('a.fa-hashtag').attr('call','login-hide');
+				,'toggle':(data) => {
+					var overlay = $('overlay');
+					if(overlay.hasClass('hide')){
+						overlay.html('<div style="height:100%;width:100%;color:black;background-color:rgba(255,255,255,0.75);">'
+								+'<span">'+data.id+'</span>'
+								+'<a style="line-height:96px;position:absolute;top:calc(50% - 48px);left:calc(50% - 48px); width:96px;height:96px;font-size:7em;" class="fa fa-spinner fa-spin"></a>'
+								+'</div>');
+						overlay.removeClass('hide');
+					}else{
+						overlay.html('');
+						overlay.addClass('hide');
+					}
 				}
-				,'login-hide':(data) => {
-					var tag = $('user')
-					tag.find('form').addClass('hide');
-					tag.find('a.fa-hashtag').attr('call','login-show');
+			}
+			this.swipe = {
+				'index':() => {return parseInt($('header section#content').attr('index'));}
+				,'next':() => {
+					var header = $('header section#content');
+					var index = parseInt(header.attr('index'));
+					if(index == 5){
+						return index;
+					}
+					index = index+1;
+					if(index == 5){
+						$('a.fa-chevron-right').addClass('hide');
+					} else if(index == 1){
+						$('a.fa-chevron-left').removeClass('hide');
+					}
+					header.attr('index',index);
+					var footer = $('footer section#content');
+					footer.attr('index',index);
+					return index;
 				}
+				,'prev':() => {
+					var header = $('header section#content');
+					var index = parseInt(header.attr('index'));
+					if(index == 0){
+						return index;
+					} 
+					index = index-1;
+					if(index == 0){
+						$('a.fa-chevron-left').addClass('hide');
+					} else if(index == 4){
+						$('a.fa-chevron-right').removeClass('hide');
+					}					
+					header.attr('index',index);
+					var footer = $('footer section#content');
+					footer.attr('index',index);
+					return index;
+				}
+				,'show':(data) => {
+					var header = $('header section#content');
+					var index = data.index;
+					if(0 > index || 5 < index){
+						return index;
+					} 
+					if(index == 0){
+						$('a.fa-chevron-left').addClass('hide');
+					} else {
+						$('a.fa-chevron-left').removeClass('hide');
+					}
+					if(index == 5){
+						$('a.fa-chevron-right').addClass('hide');
+					} else {
+						$('a.fa-chevron-right').removeClass('hide');
+					}
+					header.attr('index',index);
+					var footer = $('footer section#content');
+					footer.attr('index',index);
+					return index;
+				}
+			}
+			this.page = {
+				'show':(data) => {
+					document.title = data.title;
+					var header = $('header section#content');
+					header.html(data.header);
+					var holder = $('header');
+					var footer = $('footer section#content');
+					footer.html(data.footer);
+					// center
+					holder = $('footer');
+					footer.css({'top':(holder.outerHeight()-footer.outerHeight())/2})
+					footer.css({'left':(holder.outerWidth()-footer.outerWidth())/2})
+
+				}
+				,'clear':() => {
+					document.title = 'smart.cv.og3lm';
+					var header = $('header section#content');
+					header.html('')
+					var footer = $('footer section#content');
+					footer.html('')
+				}
+			}
+		}
+		function PagePresentationAdapter(){
+			this.test = (data) => {
+				var title = 'unset';
+				var footer = 'unset';
+				var header = 'unset';
+				if(0 == data.index){
+					title = 'smart.cv.og3lm'
+					header = '<p>0</p>'+'<p>hello lead ...</p>'
+					footer = '<p>Dear Sir or Madam ...</p>'
+							+'<p>I am glad you ract on my application. Already read a lot about your Company. Would love to be part of something great.</p>'
+							+'<p>I am glad you react on my vcard</p>'
+				} else if(1 == data.index){
+					title = 'about.me'
+					header = '<p>1</p>'+'<p>about me ...</p>'
+					footer = '<p>location information ...</p>'
+							+'<p>interessen math, coden, it, exchange markets, art, graphic design, </p>'
+							+'<p></p>'
+				} else if(2 == data.index){
+					title = 'education.stuff'
+					header = '<p>2</p>'+'<p>hard skills ...</p>'
+					footer = '<p>09.2016 - 01.2018 | Studieren bei Pädagogische Hochschule Weingarten</p>'
+							+'<p>09.2016 - 08.2016 | Studieren bei Technische Hochschule Weingarten</p>'
+							+'<p>09.2009 - 08.2010 | Studieren bei Universität Konstanz</p>'
+							+'<p>09.2006 - 08.2009 | Wirtschaftsgymnasium Wangen</p>'
+							+'<p>09.2001 - 01.2004 | Kaufmännische Schulen Wangen</p>'
+							+'<p>09.1995 - 08.2001 | Realschule Leutkich</p>'
+							+'<p>09.1991 - 08.1995 | Grundschule Oberer Graben</p>'
+				} else if(3 == data.index){
+					title = 'job.stuff'
+					header = '<p>3</p>'+'<p>soft skills ...</p>'
+					footer = '<p>2013 - 2018 | arbeiten bei Shülerhilfe Weingarten</p>'
+							+'<p>2013 - 2014 | arbeiten bei ZF Friedrichshafen AG</p>'
+							+'<p>2010 - 2014 | arbeiten bei Hochschule Ravensburg</p>'
+							+'<p>2004 - 2012 | arbeiten bei Rheumaklinik Bad Wurzach</p>'
+							+'<p>2001 - 2004 | arbeiten bei Kreissparkasse Ravensburg</p>'
+				} else if(4 == data.index){
+					title = '4'
+					header = '<p>4</p>'
+					footer = '<p>4</p>'
+				} else if(5 == data.index){
+					title = 'get.connected'
+					header = '<p>5</p>'+'<p>get connected ... </p>'
+					footer = '<p>leave a message/request testimonials + send button</p>'
+							+'<p>link to git</p>'
+							+'<p>download "offline" version</p>'
+				}
+				return {'title':title,'header':header,'footer':footer}
+			}
+		}
+
+		var animations= [{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'fox','scaleFactor':5.5}
+				  		,{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'cv'}
+				  		,{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'one'}
+				  	//	,{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'two'}
+				  	//	,{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'tre'}
+				  		];
+
+		function PageEventListener(){
+			var style = new D3s1gn4p1Operator().create();
+			var authenicate = new F1rebas3Auth4p1Operator(firebase).create();
+			//	var storage = new F1rebas3Storage4p1Operator(firebase);
+			var scroller = new Scro114p1Operator().decorate({'node':'section#content div#story','orientation':'horizontal'}).create();
+			var history = new BrowserHistorD1spatcher();
+
+			var one = new DotNetHolder()
+			one.operator.decorate(animations[2]).create().start();
+			var dotsOne = one.objects.dots;
+		//	var two = new DotNetHolder()
+		//	two.operator.decorate(animations[2]).create().start();
+		//	var dotsOne = dotsOne.concat(two.objects.dots);
+		//	var tre = new DotNetHolder()
+		//	tre.operator.decorate(animations[3]).create().start();
+		//	var dotsOne = dotsOne.concat(tre.objects.dots);
+
+			var fox = new FoxNetHolder().operator.decorate(animations[0]).interlink(dotsOne).create().start();
+			var cv = new CvHolder().operator.decorate(animations[1]).create();
+
+			var presenter = new PagePagePresenter();
+			var adapter = new PagePresentationAdapter();
+
+			var events = {
+				'footer-toggle':(data) => {presenter.footer.toggle();}
+				,'cfg-toggle':(data) => {presenter.cfg.toggle();}
+				// popups
+				,'help-toggle':(data) => {presenter.popup.show({'content':'help popup'});}
+				,'token-toggle':(data) => {presenter.popup.show({'content':authenicate.getToken()});}
+				,'popup-toggle':(data) => {presenter.popup.hide();}
+
+
+				,'login-show':(data) => {presenter.login.show(data)}
+				,'login-hide':(data) => {presenter.login.hide()}
+				,'login-toggle':(data) => {presenter.login.toggle()}
 				,'login-validate':(data) => {
-					$('body').trigger('loading-start',{'call':'loading-start','id':'login-validate'});
+					presenter.load.show(data);
 					$('body').trigger('log-in',[{'mail':$('input#mail').val(),'pass':$('input#pass').val(),'call':'log-in','id':'login-validate'}]);
 				}
 				,'logged-in':(data) => {
-					var tag = $('user')
-					tag.find('input#mail').val('');
-					tag.find('input#pass').val('');
-					tag.find('card').removeClass('hide')
-					tag.find('a.fa-hashtag').attr('call','log-out');
-					tag.find('id').html(data.mail);
-					$('body').trigger('loading-stop',{'call':'loading-stop','id':'logged-in'});
+					presenter.login.clear()
+					presenter.login.user(data)
+					presenter.load.hide();
 				}
-				,'log-out':(data) => {
-					$('body').trigger('loading-start',{'call':'loading-starts','id':'logged-out'});
+				,'logged-err':(data) => {
+					presenter.load.hide();
+					presenter.popup.show({'content':'Login Fail. '+data.message});
 				}
+				,'log-out':(data) => {presenter.load.show(data);}
 				,'logged-out':(data) => {
-					var tag = $('user')
-					tag.find('card').addClass('hide')
-					tag.find('input#mail').val('');
-					tag.find('input#pass').val('');
-
-			    	tag.find('user span#mail').html('');
-			    	//	$('user a.fa-user').attr('call','log-in');
-			    	$('body').trigger('loading-stop',{'call':'loading-stop','id':'logged-out'});
+					presenter.login.clear()
+			    	presenter.load.hide();
 			    }
-				,'got-token':(data) => {
-					console.log('got token. user is logged in.');
+
+
+				,'get-index':(data) => {
+					var index = presenter.swipe.show(data);
+					$('body').trigger('got-mvp',{'call':'got-mvp','id':'get-index'});
+					cv.show(index)
 				}
-				,'click-animation':(data) => {console.log('animationClick',data);}
+				,'get-next':(data) => {
+					var index = presenter.swipe.next();
+					history.push({'call':'get-index','id':'pushState','index':index})
+				//	window.history.pushState({'call':'get-index','id':'pushState','index':index},index,"");
+					$('body').trigger('got-mvp',{'call':'got-mvp','id':'get-next'});
+					cv.show(index)
+				}
+				,'get-prev':(data) => {
+					var index = presenter.swipe.prev();
+					history.push({'call':'get-index','id':'pushState','index':index})
+				//	window.history.pushState({'call':'get-index','id':'pushState','index':index},index,"");
+					$('body').trigger('got-mvp',{'call':'got-mvp','id':'get-prev'});
+					cv.show(index)
+				}
+				,'got-token':(data) => {console.log('got token. user is logged in.');}
+				,'got-mvp':(data) => {
+					data.index = presenter.swipe.index();
+					data = adapter.test(data);
+					presenter.page.show(data);
+				}
+
+
+				,'click-animation':(data) => {
+					console.log('animationClick',data);
+				}
 				,'animation-pause':(data) => {
 					$('nav a.fa-pause').each(function(){
 						var element = $(this)
@@ -147,7 +393,7 @@
 						element.addClass('fa-play')
 					})
 					jQuery.each(animations,(key,value) => {
-					  	value.pause()
+					  	console.log('animation pause not found')
 					});
 				}
 				,'animation-play':(data) => {
@@ -158,15 +404,19 @@
 						element.addClass('fa-pause')
 					})
 					jQuery.each(animations,(key,value) => {
-					  	value.pause()
+					  	console.log('animation pause not found')
 					});
 				}
 				,'animation-colors':(data) => {
 					var colors = ['#fb1','#67f','#b0f','#2F2','#6be','#e5f','#ff1','#777']
-					jQuery.each(animations,(key,value) => {
-					  	value.decorate({'lineColor':colors[Math.floor(Math.random()*(colors.length-1))]})
-					});
+				  	one.operator.decorate({'lineColor':colors[Math.floor(Math.random()*(colors.length-1))]})
+				  	two.operator.decorate({'lineColor':colors[Math.floor(Math.random()*(colors.length-1))]})
 				}
+
+
+
+
+
 				,'content-header-request':(data) => {
 					authenicate.reqHeader('https://us-central1-vog3lm-0x1.cloudfunctions.net/mvc/');
 				}
@@ -200,20 +450,21 @@
 		var app = null;
 
 		$(document).ready(function(){
-			// Initialize Firebase
 			var config = {
 			    apiKey: "AIzaSyDmXSkwOam-aQ37z8-3d5aH-X257lIVS34",
 			    authDomain: "vog3lm-0x1.firebaseapp.com",
 			    projectId: "vog3lm-0x1",
 			};
 			firebase.initializeApp(config);
-
 			app = new PageEventListener();
 		});
 		$(window).load(function() {
 			dispatcher = new V13wEv3ntD1spatch3r(app.getEvents())
 			dispatcher.onRegister()
 			dispatcher.onUnleash()
+			window.location.replace("#");
+			$('body').trigger('get-index',{'call':'get-index','id':'onLoad','index':0})
+			history.replaceState({'call':'get-index','id':'replaceState','index':0},0,"");
 		});
 
 	</script>
@@ -256,6 +507,16 @@
 			bottom:32px;
 			width:32px;
 		}
+		header a.fa-chevron-right,
+		header a.fa-chevron-left{
+			position:absolute;
+			left:0.5em;
+			top:50%;
+		}
+		header a.fa-chevron-right{
+			left:initial;
+			right:0.5em;
+		}
 		header a.fa-chevron-up,
 		header a.fa-chevron-down{
 			position: absolute;
@@ -296,54 +557,7 @@
 			overflow:hidden;
 		}
 
-		body footer {
-			position:relative;
-			width:100%;
-			height:35%;
-		}
-		footer form{
-			position: relative;
-			width: calc(25% - 2*2em);
-		    height: calc(100% - 2*2em);
-		    padding: 2em;
-		    float:left;
-		}
-		footer form:nth-child(3){width: calc(50% - 2*2em);}
 
-
-
-
-
-
-
-
-		form input,
-		form a,
-		form span {
-			display:block;
-			width: 100%;
-		    height: 32px;
-		    font-size: 1.25em;
-		    line-height: 32px;
-		    vertical-align: middle;	
-		}
-		body popup {
-			font-size:2em;
-			color:white;
-			position: fixed;
-			min-width: 32px;
-		    max-width: calc(100%);
-		    min-height: 32px;
-		    max-height: calc(100%);
-	        word-wrap: break-word;
-		}
-
-		body overlay {
-			position: absolute;
-			width: 100%;
-		    height: 100%;
-		    background: rgba(255,255,255,0.7);
-		}
 		header section#content{
 		    position: absolute;
 		    top: 0px;
@@ -354,13 +568,56 @@
 
 
 
+		body popup {
+			font-size:1.5em;
+			color:white;
+			position: fixed;
+			min-width: 32px;
+		    max-width: calc(100%);
+		    min-height: 32px;
+		    max-height: calc(100%);
+	        word-wrap: break-word;
+		}
+		body overlay {
+			position: absolute;
+			width: 100%;
+		    height: 100%;
+		    background: rgba(255,255,255,0.7);
+		}
+
+
+		body footer {
+			position:relative;
+			width:100%;
+			height:60%;
+		}
+		footer section {
+			position:absolute;
+			top:25%;
+			left:calc(100%/8);
+			width:75%
+		}
+		footer section p {
+			font-size:1.5em;
+			margin-bottom:2em;
+		}
+		footer section p:last-child {
+			margin-bottom:0em;
+		}
 
 	</style>
 </head>
 <body>
 	<header id="zone">
 		<img class="after-effect" src="" alt="">
-		<section id="content"></section>
+		<!-- hidden -->
+		<img id="img-circle-0" src='/images/code.png' class="hide" width="0" height="0">
+		<img id="img-circle-1" src='/images/code.png' class="hide" width="0" height="0">
+		<img id="img-circle-2" src='/images/code.png' class="hide" width="0" height="0">
+		<img id="img-circle-3" src='/images/code.png' class="hide" width="0" height="0">
+		<img id="img-circle-4" src='/images/code.png' class="hide" width="0" height="0">
+		<!-- hidden -->
+		<section id="content" index="0"></section>
 		<a href="#" class="fa fa-question-circle-o fa-1-5x" call="help-toggle"></a>
 		<a href="#" class="fa fa-cog fa-1-5x" call="cfg-toggle"></a>
 		<nav id="cfg-navigation" class="hide">
@@ -382,18 +639,14 @@
 			</form>
 			<a href="#" class="fa fa-hashtag" call="login-show"></a>
 		</user>
+		<a href="#" id="get-next" class="fa fa-chevron-right fa-2x" call="get-next"></a>
+		<a href="#" id="get-prev" class="fa fa-chevron-left fa-2x hide" call="get-prev"></a>
 		<a href="#" id="footer-toggle" class="fa fa-chevron-up" call="footer-toggle"></a>
 		<popup class="hide"></popup>
 		<overlay class="hide"></overlay>
 	</header>
 	<footer>
-		<form></form>
-		<form class="half"></form>
-		<form>
-			<a href="#" >Impressum</a>
-			<a href="#" >License</a>
-			<a href="#" >Impressum</a>
-		</form>			
+		<section id="content" index="0"></section>		
 	</footer>
 </body>
 </html>

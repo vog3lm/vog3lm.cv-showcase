@@ -408,6 +408,9 @@ function Scro114p1Operator(){
 }
 
 function BrowserHistorD1spatcher(){
+	this.replace = (state) => {
+		window.history.replaceState(state,0,location.href);
+	}
 	this.push = (state) => {
 		window.history.pushState(state,0,location.href);
 	}

@@ -17,6 +17,7 @@
 
 	<script type="text/javascript" src="js/jq.min.js"></script>
 	<script type="text/javascript" src="js/backend.js"></script>
+	<script type="text/javascript" src="js/content.js"></script>
 	<script type="text/javascript" src="js/animate.fox.js"></script>
 	<script type="text/javascript" src="js/animate.cv.js"></script>
 	<script type="text/javascript" src="js/animate.dots.js"></script>
@@ -223,16 +224,52 @@
 			this.page = {
 				'show':(data) => {
 					document.title = data.title;
+					var topic = $('topic').html(data.topic);
 					var header = $('header section#content');
 					header.html(data.header);
 					var holder = $('header');
 					var footer = $('footer section#content');
 					footer.html(data.footer);
-					// center
 					holder = $('footer');
-					footer.css({'top':(holder.outerHeight()-footer.outerHeight())/2})
-					footer.css({'left':(holder.outerWidth()-footer.outerWidth())/2})
+					footer.css({'top':(holder.outerHeight()-footer.outerHeight())/2}) // center vertical
+					footer.css({'left':(holder.outerWidth()-footer.outerWidth())/2}) // center horizontal
 
+					$('footer section img.lico').each(function(){ // pos left icon
+						var element = $(this);
+						var source = element.attr('src')
+						if(source.indexOf('ico.study.png') > -1){
+							element.css({'left':'-4.5em'})
+						} else if(source.indexOf('ico.graduate.png') > -1){
+							element.css({'left':'-8em'})
+						} else if(source.indexOf('logo.') > -1 && source.indexOf('.png') > -1){
+							element.css({'left':'-4.5em'})
+						} else if(source.indexOf('ico.award.png') > -1){
+							element.css({'left':'-11.5em'})
+						}
+					});
+
+					$('footer section img.tip').each(function(){ // decorate tooltip
+						var element = $(this);
+						element.on("mouseover",(e) => {
+							var tip = $('tip');
+							var text = element.attr('tip');
+							tip.html('unset');
+							if(null != text){
+								var split = text.split(':')
+								if(2 === split.length){
+									tip.html(data.tips[split[0]][split[1]]);
+								}
+							}
+							var pos = this.getBoundingClientRect();
+							var height = 1*element.outerHeight()-26; // 1*img-padding
+
+							tip.css({'bottom':$(window).height()-pos.top-element.outerHeight()-height/2
+									,'left':pos.left+48,'min-height': height,'visibility':'visible','opacity':1});
+						});
+						element.on("mouseout",(e) => {
+							$('tip').css({'visibility':'invisible','opacity':0});
+						});
+					});
 				}
 				,'clear':() => {
 					document.title = 'smart.cv.og3lm';
@@ -244,61 +281,204 @@
 			}
 		}
 		function PagePresentationAdapter(){
-			this.test = (data) => {
-				var title = 'unset';
-				var footer = 'unset';
-				var header = 'unset';
-				if(0 == data.index){
-					title = 'smart.cv.og3lm'
-					header = '<p>0</p>'+'<p>hello lead ...</p>'
-					footer = '<p>Dear Sir or Madam ...</p>'
-							+'<p>I am glad you ract on my application. Already read a lot about your Company. Would love to be part of something great.</p>'
-							+'<p>I am glad you react on my vcard</p>'
-				} else if(1 == data.index){
-					title = 'about.me'
-					header = '<p>1</p>'+'<p>about me ...</p>'
-					footer = '<p>location information ...</p>'
-							+'<p>interessen math, coden, it, exchange markets, art, graphic design, </p>'
-							+'<p></p>'
-				} else if(2 == data.index){
-					title = 'education.stuff'
-					header = '<p>2</p>'+'<p>hard skills ...</p>'
-					footer = '<p>09.2016 - 01.2018 | Studieren bei Pädagogische Hochschule Weingarten</p>'
-							+'<p>09.2016 - 08.2016 | Studieren bei Technische Hochschule Weingarten</p>'
-							+'<p>09.2009 - 08.2010 | Studieren bei Universität Konstanz</p>'
-							+'<p>09.2006 - 08.2009 | Wirtschaftsgymnasium Wangen</p>'
-							+'<p>09.2001 - 01.2004 | Kaufmännische Schulen Wangen</p>'
-							+'<p>09.1995 - 08.2001 | Realschule Leutkich</p>'
-							+'<p>09.1991 - 08.1995 | Grundschule Oberer Graben</p>'
-				} else if(3 == data.index){
-					title = 'job.stuff'
-					header = '<p>3</p>'+'<p>soft skills ...</p>'
-					footer = '<p>2013 - 2018 | arbeiten bei Shülerhilfe Weingarten</p>'
-							+'<p>2013 - 2014 | arbeiten bei ZF Friedrichshafen AG</p>'
-							+'<p>2010 - 2014 | arbeiten bei Hochschule Ravensburg</p>'
-							+'<p>2004 - 2012 | arbeiten bei Rheumaklinik Bad Wurzach</p>'
-							+'<p>2001 - 2004 | arbeiten bei Kreissparkasse Ravensburg</p>'
-				} else if(4 == data.index){
-					title = '4'
-					header = '<p>4</p>'
-					footer = '<p>4</p>'
-				} else if(5 == data.index){
-					title = 'get.connected'
-					header = '<p>5</p>'+'<p>get connected ... </p>'
-					footer = '<p>leave a message/request testimonials + send button</p>'
-							+'<p>link to git</p>'
-							+'<p>download "offline" version</p>'
+			this.get = (data) => {
+				switch(data.index){
+				    case 0:return landing(data.records);
+				    case 1:return about(data.records);
+				    case 2:return exp_a(data.records);
+				    case 3:return edu_b(data.records);
+				    case 4:return edu_a(data.records);
+				    case 5:return connect(data.records);
+				    default: null;
 				}
-				return {'title':title,'header':header,'footer':footer}
+			};
+
+			function landing(records){
+				var footer = ''
+				if(records.type.indexOf('text') != -1){
+					for(var line in records.data){
+						footer = footer+'<p>'+records.data[line].replace('\n','<br>')+'</p>';
+					}
+				} else {
+					footer = '<p>'+'default welcome text'+'</p>';
+				}
+				return {'title':'smart.cv.og3lm'
+					   ,'header':''
+					   ,'footer':footer
+					   ,'cv':[]
+				};
+			}
+			function about(records){
+				var footer = ''
+				if(records.type.indexOf('text') != -1){
+					for(var line in records.data) {
+						footer = footer+'<p>'+records.data[line].replace('\n','<br>')+'</p>'
+					}
+				} else {
+					footer = '<p>'+'Restricted. Apply for access.'+'</p>';
+				}
+				return {'title':'about.me'
+					   ,'header':'<img class="lang" src="images/lang.map.native.png" tip="Native Speaker"></img>'
+								+'<img class="lang" src="images/lang.map.a.png" tip="A Level Skills"></img>'
+					   			+'<img class="lang" src="images/lang.map.b.png" tip="B Level Skills"></img>'
+					   			+'<img class="lang" src="images/lang.map.not.png"></img>'
+					   ,'footer':footer
+					   ,'cv':[]
+				};
+			}
+			function exp_a(records){
+				var footer = ''
+				var tips = {};
+				if(records.type.indexOf('list') != -1){
+					var tmp = records.data;
+					for(var i=0;i<tmp.length;i++){
+						var id = tmp[i][0];
+						footer = footer+'<img class="lico" alt="'+id+'" src="'+tmp[i][1]+'" tip="'+id+':rate"></img>';
+						footer = footer+'<p>'+tmp[i][2]+' - '+tmp[i][3]+' | '+tmp[i][4]+' ('+tmp[i][5]+')</p>';
+						tips[id] = tmp[i][6];
+					}
+				} else {
+					footer = '<p>'+'Restricted. Apply for access.'+'</p>';
+				}
+				return {'title':'job.xp'
+					   ,'header':'<img class="skill hide" width="96" height="96" tip="0" id="skill-html" src="images/skills/html.png"></img>'
+								+'<img class="skill hide" width="96" height="96" tip="0" id="skill-css" src="images/skills/css.png"></img>'
+								+'<img class="skill hide" width="96" height="96" tip="0" id="skill-js" src="images/skills/js.png"></img>'
+								+'<img class="skill hide" width="96" height="96" tip="0" id="skill-jq" src="images/skills/jq.png"></img>'
+					   ,'footer':footer
+					   ,'tips':tips
+					   ,'cv':[['skill-html',[250,0,150],0]
+					   		 ,['skill-css',[250,0,150],0]
+					   		 ,['skill-js',[250,0,150],0]
+					   		 ,['skill-jq',[250,0,150],0]]
+				};
+			}
+			function edu_b(records){
+				var footer = '';
+				var tips = {};
+				var tmp = records.data;
+				if(records.type.indexOf('list') != -1){
+					for(var i=0;i<tmp.length;i++){
+						var id = tmp[i][0];
+						tips[id] = {};
+						if('' != tmp[i][6] && null != tmp[i][6]){
+							footer = footer+'<img class="lico tip" alt="'+id+'" src="images/ico.graduate.png" tip="'+id+':graduate"></img>';
+							tips[id]['graduate'] = tmp[i][6].replace(/\n/g,'<br>');
+						}
+						if('' != tmp[i][7] && null != tmp[i][7]){
+							footer = footer+'<img class="lico tip" alt="'+id+'" src="images/ico.award.png" tip="'+id+':award"></img>';
+							tips[id]['award'] = tmp[i][7].replace(/\n/g,'<br>');
+						}
+						if('' != tmp[i][8] && null != tmp[i][8]){
+							tips[id]['rate'] = tmp[i][8].replace(/\n/g,'<br>');
+						}
+						footer = footer+'<img class="lico tip" alt="'+id+'" src="images/ico.study.png" tip="'+id+':rate"></img>';
+						footer = footer+'<p>'+tmp[i][1]+' - '+tmp[i][2]+' | '+tmp[i][3]+' ('+tmp[i][4]+' '+tmp[i][5]+')</p>';
+					}
+				} else {
+					footer = '<p>'+'Restricted. Apply for access.'+'</p>';
+				}
+				var grpClrs = [[250,0,150],[62,215,247],[170,255,0],[112,48,160],[250,250,10]]
+				var imgWidth = 96*0.6;
+				var imgHeight = 96*0.6;
+				return {'title':'edu.higher'
+								// web technologies
+					   ,'header':'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-html" src="images/skills/html.png"></img>'
+								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-css" src="images/skills/css.png"></img>'
+								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-js" src="images/skills/js.png"></img>'
+								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-jq" src="images/skills/jq.png"></img>'
+								// office family
+								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-access" src="images/skills/access.png"></img>'
+								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-excel" src="images/skills/excel.png"></img>'
+								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-pp" src="images/skills/pp.png"></img>'
+								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-outlook" src="images/skills/outlook.png"></img>'
+								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-word" src="images/skills/word.png"></img>'
+								// data storage technologies
+								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-sql" src="images/skills/sql.png"></img>'
+								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-csv" src="images/skills/csv.png"></img>'
+								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-xml" src="images/skills/xml.png"></img>'
+								// programming language technologies
+								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-c" src="images/skills/c.png"></img>'
+								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-c++" src="images/skills/c.png"></img>'
+								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-java" src="images/skills/jar.png"></img>'
+								// programming language technologies
+								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-jar" src="images/skills/jar.png"></img>'
+								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-exe" src="images/skills/exe.png"></img>'
+								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-apk" src="images/skills/apk.png"></img>'
+								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-vb" src="images/skills/vb.png"></img>'
+
+					   ,'footer':footer
+					   ,'tips':tips
+					   ,'cv':[['skill-html',grpClrs[0],0,1] // [id,[r,g,b],level,group]
+							 ,['skill-css',grpClrs[0],0,1] // pink
+							 ,['skill-js',grpClrs[0],0,1]
+							 ,['skill-jq',grpClrs[0],0,1]
+							 ,['skill-access',grpClrs[1],0,2] // [id,[r,g,b],level,group]
+							 ,['skill-excel',grpClrs[1],0,2] // lblue
+							 ,['skill-pp',grpClrs[1],0,2]
+							 ,['skill-outlook',grpClrs[1],0,2]
+							 ,['skill-word',grpClrs[1],0,2]
+							 ,['skill-sql',grpClrs[2],0,3] // [id,[r,g,b],level,group]
+							 ,['skill-csv',grpClrs[2],0,3] // green
+							 ,['skill-xml',grpClrs[2],0,3] 
+							 ,['skill-c',grpClrs[3],0,4] // [id,[r,g,b],level,group]
+							 ,['skill-c++',grpClrs[3],0,4] // purple
+							 ,['skill-java',grpClrs[3],0,4]
+							 ,['skill-c',grpClrs[4],0,5] // [id,[r,g,b],level,group]
+							 ,['skill-c++',grpClrs[4],0,5] // yellow
+							 ,['skill-java',grpClrs[4],0,5] 
+
+							 ]
+					};
+			}
+			function edu_a(records){
+				var footer = '';
+				var tips = {};
+				var tmp = records.data;
+				if(records.type.indexOf('list') != -1){
+					for(var i=0;i<tmp.length;i++){
+						var id = tmp[i][0];
+						tips[id] = {};
+						if('' != tmp[i][6] && null != tmp[i][6]){
+							footer = footer+'<img class="lico tip" alt="'+id+'" src="images/ico.graduate.png" tip="'+id+':graduate"></img>';
+							tips[id]['graduate'] = tmp[i][6].replace(/\n/g,'<br>');
+						}
+						if('' != tmp[i][7] && null != tmp[i][7]){
+							footer = footer+'<img class="lico tip" alt="'+id+'" src="images/ico.award.png" tip="'+id+':award"></img>';
+							tips[id]['award'] = tmp[i][7].replace(/\n/g,'<br>');
+						}
+						if('' != tmp[i][8] && null != tmp[i][8]){
+							tips[id]['rate'] = tmp[i][8].replace(/\n/g,'<br>');
+						}
+						footer = footer+'<img class="lico tip" alt="'+id+'" src="images/ico.study.png" tip="'+id+':rate"></img>';
+						footer = footer+'<p>'+tmp[i][1]+' - '+tmp[i][2]+' | '+tmp[i][3]+' ('+tmp[i][4]+')</p>';
+					}
+				} else {
+					footer = '<p>'+'Restricted. Apply for access.'+'</p>';
+				}
+				return {'title':'edu.basic'
+					   ,'header':''
+					   ,'footer':footer
+					   ,'tips':tips
+					   ,'cv':[]
+				};
+			}
+			function connect(records){
+				return {'title':'get.connected'
+					   ,'header':''
+					   ,'footer':'<textarea maxlength="31415" placeholder="leave a message.."></textarea>'
+								+'<p><a href="#" class="fa fa-send" call="msg-send" url="https://github.com"></a></p>'
+					   ,'cv':[]
+				};
 			}
 		}
 
 		var animations= [{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'fox','scaleFactor':5.5}
-				  		,{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'cv'}
-				  		,{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'one'}
-				  	//	,{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'two'}
-				  	//	,{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'tre'}
-				  		];
+						,{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'cv'}
+						,{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'one'}
+					//	,{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'two'}
+					//	,{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'tre'}
+						];
 
 		function PageEventListener(){
 			var style = new D3s1gn4p1Operator().create();
@@ -310,26 +490,29 @@
 			var one = new DotNetHolder()
 			one.operator.decorate(animations[2]).create().start();
 			var dotsOne = one.objects.dots;
-		//	var two = new DotNetHolder()
-		//	two.operator.decorate(animations[2]).create().start();
-		//	var dotsOne = dotsOne.concat(two.objects.dots);
-		//	var tre = new DotNetHolder()
-		//	tre.operator.decorate(animations[3]).create().start();
-		//	var dotsOne = dotsOne.concat(tre.objects.dots);
+			//	var two = new DotNetHolder()
+			//	two.operator.decorate(animations[2]).create().start();
+			//	var dotsOne = dotsOne.concat(two.objects.dots);
+			//	var tre = new DotNetHolder()
+			//	tre.operator.decorate(animations[3]).create().start();
+			//	var dotsOne = dotsOne.concat(tre.objects.dots);
 
 			var fox = new FoxNetHolder().operator.decorate(animations[0]).interlink(dotsOne).create().start();
-			var cv = new CvHolder().operator.decorate(animations[1]).create();
+			var cv = new CvAnimationHolder().operator.decorate(animations[1]).create();
 
 			var presenter = new PagePagePresenter();
 			var adapter = new PagePresentationAdapter();
+
+			var content = new IndexOfflineContent()
 
 			var events = {
 				'footer-toggle':(data) => {presenter.footer.toggle();}
 				,'cfg-toggle':(data) => {presenter.cfg.toggle();}
 				// popups
-				,'help-toggle':(data) => {presenter.popup.show({'content':'help popup'});}
+				,'help-toggle':(data) => {presenter.popup.show({'content':'help popup overlay'});}
 				,'token-toggle':(data) => {presenter.popup.show({'content':authenicate.getToken()});}
 				,'popup-toggle':(data) => {presenter.popup.hide();}
+				,'dox-toggle':(data) => {presenter.popup.show({'content':'swipe to docs (top down)'});}
 
 
 				,'login-show':(data) => {presenter.login.show(data)}
@@ -355,30 +538,45 @@
 			    }
 
 
+			    ,'get-start':(data) => {
+					window.location.replace("#");
+					if(true){
+					//	presenter.load.show({'content':'loading..'});
+						console.log('loading ...');
+					}
+
+					$('body').trigger('get-index',{'call':'get-index','id':'onLoad','index':0});
+					history.replace({'call':'get-index','id':'replaceState','index':0});
+			    }
 				,'get-index':(data) => {
+					// start loading
 					var index = presenter.swipe.show(data);
 					$('body').trigger('got-mvp',{'call':'got-mvp','id':'get-index'});
-					cv.show(index)
 				}
 				,'get-next':(data) => {
 					var index = presenter.swipe.next();
 					history.push({'call':'get-index','id':'pushState','index':index})
 				//	window.history.pushState({'call':'get-index','id':'pushState','index':index},index,"");
 					$('body').trigger('got-mvp',{'call':'got-mvp','id':'get-next'});
-					cv.show(index)
 				}
 				,'get-prev':(data) => {
 					var index = presenter.swipe.prev();
 					history.push({'call':'get-index','id':'pushState','index':index})
 				//	window.history.pushState({'call':'get-index','id':'pushState','index':index},index,"");
 					$('body').trigger('got-mvp',{'call':'got-mvp','id':'get-prev'});
-					cv.show(index)
 				}
 				,'got-token':(data) => {console.log('got token. user is logged in.');}
 				,'got-mvp':(data) => {
 					data.index = presenter.swipe.index();
-					data = adapter.test(data);
-					presenter.page.show(data);
+					data.records = content.get(data.index);
+					data = adapter.get(data);
+					data.index = presenter.swipe.index();
+					presenter.page.show(data); 		// show elements
+					setTimeout(function(){
+    					cv.show(data) 				// show animation
+						presenter.load.hide() 		// hide loading
+					}, 75);
+
 				}
 
 
@@ -451,9 +649,9 @@
 
 		$(document).ready(function(){
 			var config = {
-			    apiKey: "AIzaSyDmXSkwOam-aQ37z8-3d5aH-X257lIVS34",
-			    authDomain: "vog3lm-0x1.firebaseapp.com",
-			    projectId: "vog3lm-0x1",
+			    apiKey:"AIzaSyDmXSkwOam-aQ37z8-3d5aH-X257lIVS34",
+			    authDomain:"vog3lm-0x1.firebaseapp.com",
+			    projectId:"vog3lm-0x1",
 			};
 			firebase.initializeApp(config);
 			app = new PageEventListener();
@@ -461,10 +659,8 @@
 		$(window).load(function() {
 			dispatcher = new V13wEv3ntD1spatch3r(app.getEvents())
 			dispatcher.onRegister()
-			dispatcher.onUnleash()
-			window.location.replace("#");
-			$('body').trigger('get-index',{'call':'get-index','id':'onLoad','index':0})
-			history.replaceState({'call':'get-index','id':'replaceState','index':0},0,"");
+			dispatcher.onUnleash(); // is listening now
+			$('body').trigger('get-start',{'call':'get-start','id':'onLoad'})
 		});
 
 	</script>
@@ -476,7 +672,7 @@
 			height:100%;
 		}
 		header canvas {
-			position: absolute;
+			position:absolute;
 		}
 
 		header canvas#one{
@@ -493,13 +689,21 @@
 		}
 
 		header a.fa-question-circle,
+		header a.fa-question-circle-o,
+		header a.fa-circle-thin{
+			position:absolute;
+			right:32px;
+		}
+		header a.fa-question-circle,
 		header a.fa-question-circle-o{
-			position: absolute;
+			right:32px;
+		}
+		header a.fa-circle-thin{
 			right:0px;
 		}
 		header a.fa-cog,
 		header nav#cfg-navigation{
-			position: absolute;
+			position:absolute;
 			right:0px;
 			bottom:0px;
 		}
@@ -519,21 +723,21 @@
 		}
 		header a.fa-chevron-up,
 		header a.fa-chevron-down{
-			position: absolute;
-			width: calc(100% - 32px - 25%);
-			height: 14px;
+			position:absolute;
+			width:calc(100% - 32px - 25%);
+			height:14px;
 			left:25%;
-			bottom: 0px;
-			line-height: 14px;
-			vertical-align: middle;
-			text-align: center;
+			bottom:0px;
+			line-height:14px;
+			vertical-align:middle;
+			text-align:center;
 		}
 		header user{
 			position:absolute;
 			height:32px;
 			width:25%;
 			bottom:0px;
-			overflow: hidden;
+			overflow:hidden;
 		}
 		user form,
 		user card{
@@ -559,10 +763,10 @@
 
 
 		header section#content{
-		    position: absolute;
-		    top: 0px;
-		    width: 100%;
-		    height: 100%;
+		    position:absolute;
+		    top:0px;
+		    width:100%;
+		    height:100%;
 		}
 
 
@@ -571,18 +775,18 @@
 		body popup {
 			font-size:1.5em;
 			color:white;
-			position: fixed;
-			min-width: 32px;
-		    max-width: calc(100%);
-		    min-height: 32px;
-		    max-height: calc(100%);
-	        word-wrap: break-word;
+			position:fixed;
+			min-width:32px;
+		    max-width:calc(100%);
+		    min-height:32px;
+		    max-height:calc(100%);
+	        word-wrap:break-word;
 		}
 		body overlay {
-			position: absolute;
-			width: 100%;
-		    height: 100%;
-		    background: rgba(255,255,255,0.7);
+			position:absolute;
+			width:100%;
+		    height:100%;
+		    background:rgba(255,255,255,0.7);
 		}
 
 
@@ -595,29 +799,98 @@
 			position:absolute;
 			top:25%;
 			left:calc(100%/8);
-			width:75%
+			max-width:75%
 		}
-		footer section p {
+		footer section p{
 			font-size:1.5em;
+			line-height:1.5em;
+			vertical-align:middle;
 			margin-bottom:2em;
 		}
-		footer section p:last-child {
+		footer section img.lico {
+		    position:absolute;
+			width:2.5em;
+			height:2.5em;
+		}
+		footer section textarea{
+			font-size:2em;
+			margin-bottom:0.5em;
+			resize:none;
+			border:0px solid #000;
+			outline:none;
+			overflow:hidden;
+		 	width:100%;
+			height:50%;
+			color:rgba(34,34,34,1);
+		}
+		footer section p:last-child,
+		footer section textarea:last-child{
 			margin-bottom:0em;
 		}
 
+
+		footer edge{
+			position:absolute;
+			display:inline-block;
+			height:32px;
+			line-height:32px;
+		}
+		footer edge.hr{
+			right:0px;
+		}
+		footer edge.bl{
+			bottom:0px;
+		}
+		footer edge.br{
+			right:0px;
+			bottom:0px;
+		}
+		footer topic{
+			position:absolute;
+			text-transform:uppercase;
+			height:48px;
+			line-height:48px;
+		}
+
+		tip{
+			/* move to design element file */
+			position:fixed;
+			visibility:invisible; /* tootip effect */
+			opacity:0;
+			transition:opacity 0.5s;
+			min-height:calc(2.5em - 10px);
+			/* move to design theme file */
+			font-size:1rem;
+			background-color:rgba(34,34,34,1);
+			color:rgba(187,187,187,1);
+			padding:13px;
+			border-radius:7px;
+		}
+
+
+
+
+		img.lang{
+			position:absolute;
+			width:25%;
+		    left:50%;
+	    	top:40%;
+		}
+
+		img.skill{
+			position:absolute;
+			width:96px;
+			height:96px;
+		    left:calc(100px - 96px/2);
+	    	top:calc(75px - 96px/2);
+		}
 	</style>
 </head>
 <body>
 	<header id="zone">
 		<img class="after-effect" src="" alt="">
-		<!-- hidden -->
-		<img id="img-circle-0" src='/images/code.png' class="hide" width="0" height="0">
-		<img id="img-circle-1" src='/images/code.png' class="hide" width="0" height="0">
-		<img id="img-circle-2" src='/images/code.png' class="hide" width="0" height="0">
-		<img id="img-circle-3" src='/images/code.png' class="hide" width="0" height="0">
-		<img id="img-circle-4" src='/images/code.png' class="hide" width="0" height="0">
-		<!-- hidden -->
 		<section id="content" index="0"></section>
+		<a href="#" class="fa fa-circle-thin fa-1-5x" call="dox-toggle"></a>
 		<a href="#" class="fa fa-question-circle-o fa-1-5x" call="help-toggle"></a>
 		<a href="#" class="fa fa-cog fa-1-5x" call="cfg-toggle"></a>
 		<nav id="cfg-navigation" class="hide">
@@ -646,7 +919,15 @@
 		<overlay class="hide"></overlay>
 	</header>
 	<footer>
-		<section id="content" index="0"></section>		
+		<edge class="hr">
+			<a href="#" class="fa fa-download fa-1-5x" call="animation-colors"></a>
+			<a href="#" class="fa fa-print fa-1-5x" call="animation-colors"></a>
+		</edge>
+		<section id="content" index="0"></section>
+		<edge class="br">
+			<a href="#" class="fa fa-github fa-2x" call="animation-colors"></a>
+		</edge>
 	</footer>
+	<tip></tip>
 </body>
 </html>

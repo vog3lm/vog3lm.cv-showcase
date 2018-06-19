@@ -267,14 +267,16 @@ function FoxNetSetting(){
        ,'dotVelScale':1
        ,'dotVelMin':-0.2
        ,'dotVelMax':0.2
+       ,'dotLeft':10
+       ,'dotTop':10 // canvas.height-canvas.height/scaleFactor
        ,'dotLogs':{
-            '0':{'pos':[85,15],'con':['1','5','6']}     // L -
-            ,'1':{'pos':[295,160],'con':['0','2','7']}   // J -
-            ,'2':{'pos':[365,160],'con':['1','3']}   // P - 
-            ,'3':{'pos':[435,160],'con':['2','4','8']}   // J
-            ,'4':{'pos':[645,10],'con':['3','9','10']}    // L  
-            ,'5':{'pos':[115,245],'con':['0','15']}   // N  
-            ,'6':{'pos':[180,200],'con':['0','15']}   // M  
+            '0':{'pos':[85,15],'con':['1','5','6']}     // L - 85,15 left ear top
+            ,'1':{'pos':[295,160],'con':['0','2','7']}   // J - 295,160
+            ,'2':{'pos':[365,160],'con':['1','3']}   // P - 365,160
+            ,'3':{'pos':[435,160],'con':['2','4','8']}   // J - 435,160
+            ,'4':{'pos':[645,10],'con':['3','9','10']}    // L - 645,10 right ear top
+            ,'5':{'pos':[115,245],'con':['0','15']}   // N - 115,245
+            ,'6':{'pos':[180,200],'con':['0','15']}   // M - 180,200
             ,'7':{'pos':[250,210],'con':['1','12','11']}   //   
             ,'8':{'pos':[475,205],'con':['3','13','14']}   //   
             ,'9':{'pos':[545,195],'con':['4','24']}  //   
@@ -283,8 +285,8 @@ function FoxNetSetting(){
             ,'12':{'pos':[310,360],'con':['7','11']}  //   
             ,'13':{'pos':[415,355],'con':['8','14']}  //   
             ,'14':{'pos':[570,305],'con':['8','13','24']}  //   
-            ,'15':{'pos':[70,390],'con':['16','5','6','11']}   // F
-            ,'16':{'pos':[170,425],'con':['15','17','25']}  // E 
+            ,'15':{'pos':[70,390],'con':['16','5','6','11']}   // F - 70,39
+            ,'16':{'pos':[170,425],'con':['15','17','25']}  // E - 170,425
             ,'17':{'pos':[210,440],'con':['16','18']}  //   
             ,'18':{'pos':[315,550],'con':['17','19','20']}  //   
             ,'19':{'pos':[365,505],'con':['18','20','2','20']}  //   
@@ -293,14 +295,14 @@ function FoxNetSetting(){
             ,'22':{'pos':[505,445],'con':['21','23']}  //   
             ,'23':{'pos':[530,435],'con':['22','24','26']}  //   
             ,'24':{'pos':[655,390],'con':['23','10','9','14']}  //   
-            ,'25':{'pos':[10,605],'con':['16','26','30']}   // Q  
-            ,'26':{'pos':[370,850],'con':['25','17','27','23']}  // Z 
-            ,'27':{'pos':[435,890],'con':['26','32','30']}  // Y 
-            ,'28':{'pos':[10,865],'con':['25','29']}   // T  
-            ,'29':{'pos':[110,1070],'con':['28','30']} // U 
-            ,'30':{'pos':[210,1095],'con':['29','25','27','31']} // V 
-            ,'31':{'pos':[340,1130],'con':['30','32']} // W 
-            ,'32':{'pos':[500,1045],'con':['27','31']} // X 
+            ,'25':{'pos':[10,605],'con':['16','26','30']}   // Q - 10,605
+            ,'26':{'pos':[370,850],'con':['25','17','27','23']}  // Z - 370,850
+            ,'27':{'pos':[435,890],'con':['26','32','30']}  // Y - 435,890 
+            ,'28':{'pos':[10,865],'con':['25','29']}   // T - 10,865
+            ,'29':{'pos':[110,1070],'con':['28','30']} // U - 110,1070
+            ,'30':{'pos':[210,1095],'con':['29','25','27','31']} // V - 210,1095
+            ,'31':{'pos':[340,1130],'con':['30','32']} // W - 340,1130
+            ,'32':{'pos':[500,1045],'con':['27','31']} // X - 500,1045
         }
        ,'dotMoves':0.1
        ,'drunken':true
@@ -340,21 +342,14 @@ function FoxNetAnimation(animation){
         holder.objects.pane = canvas;
         holder.objects.ctxt = canvas.getContext("2d");
 
-    //    canvas.setAttribute('style',"left:calc(50% - "+canvas.width/2+"px);top:calc(50% - "+canvas.height/2+"px)");
-
         // squares = A_screen / A_square = A_screen / (a_square,exponent)
         var dots = holder.objects.dots;
         var cons = holder.objects.cons;
         var scouts = holder.objects.scouts;
         var logs = args.dotLogs;
-        var width = args.scaleWidth;
-        var height = args.scaleHeight;
-        var factor = args.scaleFactor;
-        var left = 100;
-        var top = canvas.height-250;
         for(var key in logs){
-            logs[key].pos[0] = logs[key].pos[0] * canvas.width / width / factor + left;
-            logs[key].pos[1] = logs[key].pos[1] * canvas.height / height / factor + top;
+            logs[key].pos[0] = logs[key].pos[0] * canvas.width / args.scaleWidth / args.scaleFactor + args.dotLeft;
+            logs[key].pos[1] = logs[key].pos[1] * canvas.height / args.scaleHeight / args.scaleFactor + args.dotTop;
             var tmp = new FoxConnector(holder,logs[key].pos[0],logs[key].pos[1]);
             dots.push(tmp);
             cons.push(new FoxCon(holder,tmp,logs[key].con));

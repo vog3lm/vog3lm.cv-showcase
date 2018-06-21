@@ -31,6 +31,77 @@ function CvStoryLine(animation,idx,cnt,clr){
 	}
 }
 
+function CvStoryTest(animation,idx,clr,lyr,dir){
+	var holder = animation;
+	var index = idx;
+	var color = "rgba("+clr[0]+","+clr[1]+","+clr[2]+",255)";
+	this.loc = {
+		'x': idx*window.innerWidth+window.innerWidth*1/10,
+		'y': window.innerHeight*2/3
+	};
+	this.push = function(){
+		context = holder.objects.ctxm;
+		lineWidth = holder.setting.args.lineWidth;
+		lineBlur = holder.setting.args.lineBlur;
+		lineArrow = holder.setting.args.lineArrow;
+		return this;
+	}
+	var context = null;
+	var lineBlur = 0;
+	var lineLength = window.innerWidth/3;
+	var lineWidth = 0;
+	var lineArrow = 0;
+	var lineLayer = lyr;
+	this.update = function(){
+		context.lineWidth=lineWidth;
+		context.strokeStyle=color;
+		context.shadowBlur=lineBlur;
+		context.shadowColor=color;
+		context.fillStyle=color;
+		context.beginPath(); // line
+		context.moveTo(this.loc.x,this.loc.y);
+		context.lineTo(this.loc.x+lineLength,this.loc.y);
+		context.stroke();
+		var radius = 50
+		var angle = Math.PI/6
+		context.beginPath(); // curve
+		context.arc(this.loc.x+lineLength,this.loc.y-radius,radius,angle,Math.PI/2,false);
+		context.stroke();
+
+		var h = lineArrow;
+		var g = lineArrow;
+		var x = this.loc.x+lineLength+radius+lineWidth
+		var y = this.loc.y+g/2-lineWidth/2-radius/2;
+
+		var A = [x,y];
+		var B = [x-g/2,y-h];
+		var C = [x-g,y];
+		var ABv = [A[0]-B[0],A[1]-B[1]];
+		var ABn = [-ABv[1],ABv[0]];
+		var ABm = [A[0]-0.5*ABv[0],A[1]-0.5*ABv[1]];
+		var t = -(B[0]-ABm[0])/ABn[0];
+		var M = [B[0],ABm[1]-t*ABn[1]];
+		var rotation = -Math.PI/6;
+		A = rotate(A,M,rotation);
+		B = rotate(B,M,rotation);
+		C = rotate(C,M,rotation);
+
+		context.beginPath(); // triangle
+		context.moveTo(A[0],A[1]);
+		context.lineTo(B[0],B[1]);
+		context.lineTo(C[0],C[1]);
+		context.lineTo(A[0],A[1]);
+		context.fill();
+
+		context.closePath();
+		return this;
+	}
+    function rotate(p,c,rad) {
+        return [Math.cos(-rad)*(p[0]-c[0])-Math.sin(-rad)*(p[1]-c[1])+c[0],Math.sin(-rad)*(p[0]-c[0])+Math.cos(-rad)*(p[1]-c[1])+c[1]];
+    }
+}
+
+
 function CvStoryStart(animation,idx,clr){
 	var holder = animation;
 	var index = idx;
@@ -42,7 +113,6 @@ function CvStoryStart(animation,idx,clr){
 	this.push = function(){
 		context = holder.objects.ctxm;
 		lineWidth = holder.setting.args.lineWidth;
-		lineLvl = holder.setting.args.lineLvl;
 		lineBlur = holder.setting.args.lineBlur;
 		return this;
 	}
@@ -73,7 +143,6 @@ function CvStoryLines(animation,idx,clr){
 	this.push = function(){
 		context = holder.objects.ctxm;
 		lineWidth = holder.setting.args.lineWidth;
-		lineLvl = holder.setting.args.lineLvl;
 		lineBlur = holder.setting.args.lineBlur;
 		return this;
 	}
@@ -104,7 +173,6 @@ function CvStoryClose(animation,idx,clr){
 	this.push = function(){
 		context = holder.objects.ctxm;
 		lineWidth = holder.setting.args.lineWidth;
-		lineLvl = holder.setting.args.lineLvl;
 		lineBlur = holder.setting.args.lineBlur;
 		return this;
 	}
@@ -195,6 +263,7 @@ function CvSkillRing(animation,sk,clr,x,y){
 }
 
 
+
 function CvAnimationValidation(animation){
     var holder = animation;
     this.holder = () => {
@@ -237,10 +306,10 @@ function CvAnimationSetting(){
        ,'paneHeight':window.innerHeight
        ,'paneBorder':0
        ,'lines':true
-       ,'lineColor':'rgba(0,0,0,1)'
-       ,'lineWidth':19
-       ,'lineLvl':600
-       ,'lineBlur':3
+       ,'lineColors':[[170,255,0],[250,0,150],[62,215,247],[112,48,160],[250,250,10]]
+       ,'lineWidth':5
+       ,'lineBlur':0
+       ,'lineArrow':30
     }
     this.decorate = function(opts){
         for(var key in opts){
@@ -268,17 +337,19 @@ function CvAnimationOperator(animation){
         holder.objects.ctxm = canvas.getContext("2d");
         console.info('cv animation created');
 
-        colors = [[170,255,0],[250,0,150],[62,215,247],[112,48,160],[250,250,10]]
+        var args = holder.setting.args;
 
-        var start = new CvStoryStart(holder,0,colors[0]).push().update();
-    //    var about = new CvStoryLines(holder,1,colors[1]).push().update();
-        var exp_a = new CvStoryLines(holder,1,colors[1]).push().update();
-        var edu_b = new CvStoryLines(holder,2,colors[2]).push().update();
-        var edu_c = new CvStoryLines(holder,3,colors[3]).push().update();
-        var touch = new CvStoryClose(holder,4,colors[4]).push().update();
+        var about = new CvStoryStart(holder,0,args.lineColors[0]).push().update();
+    	var test = new CvStoryTest(holder,1,   args.lineColors[1],0).push().update();
+    	var test = new CvStoryTest(holder,1.04,args.lineColors[3],1).push().update();
+    	
+    //   var exp_a = new CvStoryLines(holder,1,args.lineColors[1]).push().update();
+        var edu_b = new CvStoryLines(holder,2,args.lineColors[2]).push().update();
+        var edu_c = new CvStoryLines(holder,3,args.lineColors[3]).push().update();
+        var touch = new CvStoryClose(holder,4,args.lineColors[4]).push().update();
 
         /* draw story
-        var arrow = new CvStoryLine(holder,0,6,colors[0]);
+        var arrow = new CvStoryLine(holder,0,6,args.lineColors[0]);
         arrow.push();
         arrow.update();
         arrow = new CvStoryLine(holder,1,6,colors[1]);

@@ -1,37 +1,230 @@
 
+/* move to backend... */
+function HtmlCancasTool(animation){
+	var holder = animation;
+    this.canvasParse = (id) => {
+        return document.getElementById(id);
+    }
+    this.canvasScroll = () => {
+    	// wrap canvas to scroll container
+        var canvas = document.createElement("canvas");
+        var scroll = document.createElement("scroll");
+        scroll.appendChild(canvas);
+        if('body' === holder.setting.args.paneParent){
+        	document.body.appendChild(scroll)
+        //    document.body.appendChild(canvas);
+        } else {
+            var element = document.getElementById(holder.setting.args.paneParent);
+            element.insertBefore(scroll, element.childNodes[0])
+        //    element.insertBefore(canvas, element.childNodes[0]);
+        }
+        return canvas;
+    }
+    this.canvasCreate = () => {
+        var canvas = document.createElement("canvas");
+        if('body' === holder.setting.args.paneParent){
+            document.body.appendChild(canvas);
+        } else {
+            var element = document.getElementById(holder.setting.args.paneParent);
+            element.insertBefore(canvas, element.childNodes[0]);
+        }
+        return canvas;
+    }
+    this.labelLocation = (idx) => {
+    	var border = 150;
+    	var tmp = {'x':0,'y':0};
+    	var left = idx*window.innerWidth+border;
+    	var right = (idx+1)*window.innerWidth-125-200;
+    	var top = 100;
+    	var bottom = window.innerHeight-300-border;
+		do{
+		    tmp.x = Math.random()*window.innerWidth;
+		    tmp.y = Math.random()*window.innerHeight;
+		} while((left >= tmp.x || (right) <= tmp.x) && (top >= tmp.y || bottom >= tmp.y));
+        return tmp;
+    }
+}
 
 /* main stuff */
-function CvStoryLine(animation,idx,cnt,clr){
+function CvMilestoneLabelMe(animation,clr){
+	var holder = animation;
+    this.loc = {
+        'x': window.innerWidth*0.01,
+        'y': window.innerHeight*0.5
+    };
+	this.push = function(){
+		context = holder.objects.ctxm;
+		return this;
+	}
+	var context = null;
+	var color = "rgba("+clr[0]+","+clr[1]+","+clr[2]+",255)";
+	this.update = function(){
+		var x = this.loc.x;
+		var y = this.loc.y;
+		var w = 3*16*2.5;
+		context.beginPath();
+		context.fillStyle=color;
+		context.font = "5ex mp-light";
+		context.fillText("19041985",x,y,w); // unix timestamp 482716800
+		context.font = "7ex mp-bold";
+		context.fillText("HELLO",x,y+2*17,w); // .fillText(string,x,y,width)
+		context.fillText("WORLD",x,y+4*17,w);
+		context.font = "5ex mp-light";
+		context.fillText('47° 49‘ 35.050"',x,y+6*17,w);
+		context.fillText('09° 57‘ 27.359"',x,y+8*17,w);
+		//context.strokeText("Hello World",10,50); // .strokeText(string,x,y,width)
+		context.closePath();
+		return this;
+	}
+}
+function CvMilestoneLabelOne(animation,clr,text,idx){
+	var holder = animation;
+	var lines = text;
+    this.loc = holder.util.labelLocation(idx);
+	this.push = function(){
+		context = holder.objects.ctxm;
+		return this;
+	}
+	var context = null;
+	var color = "rgba("+clr[0]+","+clr[1]+","+clr[2]+",255)";
+	this.update = function(){
+		var x = this.loc.x;
+		var y = this.loc.y;
+		var s = 3;
+		var d = 16*s // 1rem = 16px height
+		var w = d*2.25;
+		context.beginPath();
+		context.fillStyle=color;
+		context.font = s+"rem mp-light";
+		context.fillText(lines[0],x,y+0*d,w);
+		context.fillText(lines[1],x,y+1*d*2/3,w);
+		context.font = s*3/2+"rem mp-bold";
+		context.fillText(lines[2],x,y+2*d*3/4,w); // .fillText(string,x,y,width)
+		//context.strokeText("Hello World",10,50); // .strokeText(string,x,y,width)
+		context.closePath();
+		return this;
+	}
+}
+function CvMilestoneLabelTwo(animation,clr,text,idx){
+	var holder = animation;
+	var lines = text;
+    this.loc = holder.util.labelLocation(idx);
+	this.push = function(){
+		context = holder.objects.ctxm;
+		return this;
+	}
+	var context = null;
+	var color = "rgba("+clr[0]+","+clr[1]+","+clr[2]+",255)";
+	this.update = function(){
+		var x = this.loc.x;
+		var y = this.loc.y;
+		var s = 3;
+		var d = 16*s // 1rem = 16px height
+		var w = d*2.25
+		context.beginPath();
+		context.fillStyle=color;
+		context.font = s+"rem mp-light";
+		context.fillText(lines[0],x,y+0*d,w);
+		s=s*3/2;
+		context.font = s+"rem mp-bold";
+		context.fillText(lines[1],x,y+1*d*0.85,w);
+		context.font = s+"rem mp-bold";
+		context.fillText(lines[2],x,y+2*d*0.8,w); // .fillText(string,x,y,width)
+		//context.strokeText("Hello World",10,50); // .strokeText(string,x,y,width)
+		context.closePath();
+		return this;
+	}
+}
+function CvMilestoneLabelTre(animation,clr,text,idx){
+	var holder = animation;
+	var lines = text;
+	this.loc = holder.util.labelLocation(idx);
+	this.push = function(){
+		context = holder.objects.ctxm;
+		return this;
+	}
+	var context = null;
+	var color = "rgba("+clr[0]+","+clr[1]+","+clr[2]+",255)";
+	this.update = function(){
+		var x = this.loc.x;
+		var y = this.loc.y;
+		var s = 40;
+		context.beginPath();
+		context.fillStyle=color;
+		context.font = s+"px mp-light";
+		context.fillText(lines[0],x,y+0*s,125);
+		context.font = s*3/2+"px mp-bold";
+		context.fillText(lines[1],x,y+1*s+5,125);
+		context.font = s+"px mp-light";
+		context.fillText(lines[2],x,y+2*s-3,125);
+		context.font = s*3/2+"px mp-bold";
+		context.fillText(lines[3],x,y+3*s,125); // .fillText(string,x,y,width)
+		context.closePath();
+		return this;
+	}
+}
+function CvMilestoneLabelIhk(animation,clr,text,idx){
+	var holder = animation;
+	var lines = text;
+	this.loc = holder.util.labelLocation(idx);
+	this.push = function(){
+		context = holder.objects.ctxm;
+		return this;
+	}
+	var context = null;
+	var color = "rgba("+clr[0]+","+clr[1]+","+clr[2]+",255)";
+	this.update = function(){
+		var x = this.loc.x;
+		var y = this.loc.y;
+		var s = 40;
+		context.beginPath();
+		context.fillStyle=color;
+		context.font = s+"px mp-light";
+		context.fillText(lines[0],x,y+0*s,150);
+		context.fillText(lines[1],x,y+1*s-7,150);
+		s = s*3/2;
+		context.font = s+"px mp-bold";
+		context.fillText(lines[2],x,y+2*s*2/3,150);
+		context.font = s*5/4+"px mp-bold";
+		context.fillText(lines[3],x,y+2*s+14,150); // .fillText(string,x,y,width)
+		context.closePath();
+		return this;
+	}
+}
+
+
+
+function CvStoryLineStart(animation,idx,clr){
 	var holder = animation;
 	var index = idx;
-	var count = cnt;
-	var color = "rgba("+clr[0]+","+clr[1]+","+clr[2]+",255)";
 	this.loc = {
-		'x': 0,
-		'y': 0
+		'x': window.innerWidth*1/3,
+		'y': window.innerHeight*2/3
 	};
 	this.push = function(){
 		context = holder.objects.ctxm;
-		lineWidth = holder.setting.lineWidth;
-		lineLvl = holder.setting.lineLvl;
+		lineWidth = holder.setting.args.lineWidth;
+		lineBlur = holder.setting.args.lineBlur;
+		return this;
 	}
 	var context = null;
+	var color = "rgba("+clr[0]+","+clr[1]+","+clr[2]+",255)";
 	var lineBlur = 0;
-	var lineLength = 150;
-	var lineWidth = 19;
+	var lineLength = window.innerWidth*(2/3+1/10);
+	var lineWidth = 1;
 	this.update = function(){
 		context.lineWidth=lineWidth;
 		context.strokeStyle=color;
 		context.shadowBlur=lineBlur;
 		context.shadowColor=color;
 		context.beginPath();
-		context.moveTo(this.loc.x+lineLength*index,this.loc.y);
-		context.lineTo(this.loc.x+lineLength*index+lineLength,this.loc.y);
+		context.moveTo(this.loc.x,this.loc.y);
+		context.lineTo(this.loc.x+lineLength,this.loc.y);
 		context.stroke();
+		return this;
 	}
 }
-
-function CvStoryTest(animation,idx,clr,lyr,dir){
+function CvStoryLineArrowBendUp(animation,idx,clr,lyr,dir){
 	var holder = animation;
 	var index = idx;
 	var color = "rgba("+clr[0]+","+clr[1]+","+clr[2]+",255)";
@@ -100,39 +293,7 @@ function CvStoryTest(animation,idx,clr,lyr,dir){
         return [Math.cos(-rad)*(p[0]-c[0])-Math.sin(-rad)*(p[1]-c[1])+c[0],Math.sin(-rad)*(p[0]-c[0])+Math.cos(-rad)*(p[1]-c[1])+c[1]];
     }
 }
-
-
-function CvStoryStart(animation,idx,clr){
-	var holder = animation;
-	var index = idx;
-	var color = "rgba("+clr[0]+","+clr[1]+","+clr[2]+",255)";
-	this.loc = {
-		'x': window.innerWidth*1/3,
-		'y': window.innerHeight*2/3
-	};
-	this.push = function(){
-		context = holder.objects.ctxm;
-		lineWidth = holder.setting.args.lineWidth;
-		lineBlur = holder.setting.args.lineBlur;
-		return this;
-	}
-	var context = null;
-	var lineBlur = 0;
-	var lineLength = window.innerWidth*(2/3+1/10);
-	var lineWidth = 1;
-	this.update = function(){
-		context.lineWidth=lineWidth;
-		context.strokeStyle=color;
-		context.shadowBlur=lineBlur;
-		context.shadowColor=color;
-		context.beginPath();
-		context.moveTo(this.loc.x,this.loc.y);
-		context.lineTo(this.loc.x+lineLength,this.loc.y);
-		context.stroke();
-		return this;
-	}
-}
-function CvStoryLines(animation,idx,clr){
+function CvStoryLine(animation,idx,clr){
 	var holder = animation;
 	var index = idx;
 	var color = "rgba("+clr[0]+","+clr[1]+","+clr[2]+",255)";
@@ -162,7 +323,7 @@ function CvStoryLines(animation,idx,clr){
 		return this;
 	}
 }
-function CvStoryClose(animation,idx,clr){
+function CvStoryLineClose(animation,idx,clr){
 	var holder = animation;
 	var index = idx;
 	var color = "rgba("+clr[0]+","+clr[1]+","+clr[2]+",255)";
@@ -192,13 +353,9 @@ function CvStoryClose(animation,idx,clr){
 		return this;
 	}
 }
-
 /* hidden stuff */
 /* about.me */
-function CvLanguageMap(){
-}
-function CvLanguageLabel(){
-}
+// language mal + labels
 /* edu */
 function CvSkillRing(animation,sk,clr,x,y){
 	var holder = animation;
@@ -216,7 +373,7 @@ function CvSkillRing(animation,sk,clr,x,y){
         width = image.width;
         height = image.height;
         radius = width/2;
-        console.log(width)
+	//        console.log(width) // TODO delete
     }
     var image = null;
     var context = null;
@@ -264,6 +421,8 @@ function CvSkillRing(animation,sk,clr,x,y){
 
 
 
+
+
 function CvAnimationValidation(animation){
     var holder = animation;
     this.holder = () => {
@@ -306,7 +465,12 @@ function CvAnimationSetting(){
        ,'paneHeight':window.innerHeight
        ,'paneBorder':0
        ,'lines':true
-       ,'lineColors':[[170,255,0],[250,0,150],[62,215,247],[112,48,160],[250,250,10]]
+       ,'lineColors':{'green':[170,255,0]
+       				 ,'pink':[250,0,150]
+       				 ,'blue':[62,215,247]
+       				 ,'purple':[112,48,160]
+       				 ,'yellow':[250,250,10]
+       				 ,'gray':[74,74,74]}
        ,'lineWidth':5
        ,'lineBlur':0
        ,'lineArrow':30
@@ -329,48 +493,54 @@ function CvAnimationOperator(animation){
     }
     this.create = function(){
     	/* main pane */
-    	holder.objects.main = canvasScroll();
+    	holder.objects.main = holder.util.canvasScroll();
         canvas = holder.objects.main;
         canvas.id = holder.setting.args.paneId+'-main';
         canvas.width = holder.setting.args.paneWidth;
         canvas.height = holder.setting.args.paneHeight;
         holder.objects.ctxm = canvas.getContext("2d");
-        console.info('cv animation created');
 
         var args = holder.setting.args;
+        /* cv milestone labels */
+    //	new CvMilestoneLabelMe(holder,args.lineColors.gray).push().update();
+    //	new CvMilestoneLabelOne(holder,args.lineColors.green,['GRUND','SCHULE','1995'],0).push().update();
+    //	new CvMilestoneLabelTwo(holder,args.lineColors.blue,['MITTLERE','REIFE','2001'],0).push().update();
 
-        var about = new CvStoryStart(holder,0,args.lineColors[0]).push().update();
-    	var test = new CvStoryTest(holder,1,   args.lineColors[1],0).push().update();
-    	var test = new CvStoryTest(holder,1.04,args.lineColors[3],1).push().update();
+    //	new CvMilestoneLabelOne(holder,args.lineColors.yellow,['BERUFS','SCHULE','2004'],0).push().update();
+    //	new CvMilestoneLabelTre(holder,args.lineColors.purple,['SPARKASSE','BANK','KAUFMANN','2004'],0).push().update();
+    //	new CvMilestoneLabelIhk(holder,args.lineColors.pink,['IHK BODENSEE','OBERSCHWABEN','KAUFMANN','2004'],0).push().update();
+
+    //	new CvMilestoneLabelTwo(holder,args.lineColors.green,['RHK BW','ZIVILDIENST','2005'],1).push().update();
+    //	new CvMilestoneLabelTwo(holder,args.lineColors.yellow,['RHK BW','AMBULANZ','2006'],1).push().update();
+    //	new CvMilestoneLabelTwo(holder,args.lineColors.pink,['RHK BW','SERVICE','2013'],1).push().update();
+
+    //	new CvMilestoneLabelTwo(holder,args.lineColors.blue,['WG WANGEN','ABITUR','2009'],1).push().update(); // TODO 4 lines
+
+    //	new CvMilestoneLabelIhk(holder,args.lineColors.blue,['UNIVERSITAT','KONSTANZ','MATHE','2010'],2).push().update();
+    //	new CvMilestoneLabelIhk(holder,args.lineColors.green,['HOCHSCHULE','WEINGARTEN','HIWI','2011'],2).push().update();
+    //	new CvMilestoneLabelIhk(holder,args.lineColors.yellow,['HOCHSCHULE','WEINGARTEN','TUTOR','2013'],2).push().update();
+    //	new CvMilestoneLabelTre(holder,args.lineColors.pink,['HOCHSCHULE','BACHELOR','INFORMATIK','2014'],2).push().update(); // TODO
+    //	new CvMilestoneLabelOne(holder,args.lineColors.purple,['ZF FN AG','TRAINEE','2014'],2).push().update(); // TODO
     	
-    //   var exp_a = new CvStoryLines(holder,1,args.lineColors[1]).push().update();
-        var edu_b = new CvStoryLines(holder,2,args.lineColors[2]).push().update();
-        var edu_c = new CvStoryLines(holder,3,args.lineColors[3]).push().update();
-        var touch = new CvStoryClose(holder,4,args.lineColors[4]).push().update();
+    //	new CvMilestoneLabelIhk(holder,args.lineColors.pink,['HOCHSCHULE','WEINGARTEN','INFORMATIK','2018'],3).push().update();
+    //	new CvMilestoneLabelIhk(holder,args.lineColors.green,['HOCHSCHULE','WEINGARTEN','WIRTSCHAFT','2018'],3).push().update();
+    //	new CvMilestoneLabelIhk(holder,args.lineColors.blue,['HOCHSCHULE','WEINGARTEN','PAEDAGOGIK','2018'],3).push().update();
 
-        /* draw story
-        var arrow = new CvStoryLine(holder,0,6,args.lineColors[0]);
-        arrow.push();
-        arrow.update();
-        arrow = new CvStoryLine(holder,1,6,colors[1]);
-        arrow.push();
-        arrow.update();
-        arrow = new CvStoryLine(holder,2,6,colors[2]);
-        arrow.push();
-        arrow.update();
-        arrow = new CvStoryLine(holder,3,6,colors[0]);
-        arrow.push();
-        arrow.update();
-        arrow = new CvStoryLine(holder,4,6,colors[1]);
-        arrow.push();
-        arrow.update();
-        arrow = new CvStoryLine(holder,5,6,colors[2]);
-        arrow.push();
-        arrow.update();
-         */
+    //	new CvMilestoneLabelTwo(holder,args.lineColors.purple,['SCHULERHILFE','LEHRER','2018'],3).push().update(); // TODO
+
+    	console.info('cv animation created');
+    	
+        /* cv story line arrows */
+    //	var about = new CvStoryLineStart(holder,0,args.lineColors[0]).push().update();
+    //	var test = new CvStoryLineArrowBendUp(holder,1,   args.lineColors[1],0).push().update();
+    //	var test = new CvStoryLineArrowBendUp(holder,1.04,args.lineColors[3],1).push().update();
+    //	var exp_a = new CvStoryLine(holder,1,args.lineColors[1]).push().update();
+    //	var edu_b = new CvStoryLine(holder,2,args.lineColors[2]).push().update();
+    //	var edu_c = new CvStoryLine(holder,3,args.lineColors[3]).push().update();
+    //	var touch = new CvStoryLineClose(holder,4,args.lineColors[4]).push().update();
 
         /* hidden pane */
-    	holder.objects.hide = canvasCreate();
+    	holder.objects.hide = holder.util.canvasCreate();
         canvas = holder.objects.hide;
         canvas.id = holder.setting.args.paneId+'-hide';
         canvas.width = holder.setting.args.paneWidth;
@@ -389,7 +559,7 @@ function CvAnimationOperator(animation){
 		var off = 1;
 		var delta = 100;
 		for (var i=0; i<data.cv.length; i++) {
-			console.log(data.cv[i])
+			console.log(data.cv[i])  // TODO delete
 			var tmp = data.cv[i];
 			if(tmp[3] != grp){off = 1;}
 			grp = tmp[3];
@@ -402,34 +572,6 @@ function CvAnimationOperator(animation){
 
     	console.info('cv animation visible');
         return this;
-    }
-    function canvasParse(id){
-        return document.getElementById(id);
-    }
-    function canvasScroll(){
-    	// wrap canvas to scroll container
-        var canvas = document.createElement("canvas");
-        var scroll = document.createElement("scroll");
-        scroll.appendChild(canvas);
-        if('body' === holder.setting.args.paneParent){
-        	document.body.appendChild(scroll)
-        //    document.body.appendChild(canvas);
-        } else {
-            var element = document.getElementById(holder.setting.args.paneParent);
-            element.insertBefore(scroll, element.childNodes[0])
-        //    element.insertBefore(canvas, element.childNodes[0]);
-        }
-        return canvas;
-    }
-    function canvasCreate(){
-        var canvas = document.createElement("canvas");
-        if('body' === holder.setting.args.paneParent){
-            document.body.appendChild(canvas);
-        } else {
-            var element = document.getElementById(holder.setting.args.paneParent);
-            element.insertBefore(canvas, element.childNodes[0]);
-        }
-        return canvas;
     }
 }
 function CvAnimationListener(animation){
@@ -456,7 +598,8 @@ function CvAnimationHolder(){
     this.operator = new CvAnimationOperator(this);
 	// this.engine = new CvAnimationEngine(this);
     this.setting = new CvAnimationSetting();
-    this.validate = new CvAnimationValidation(this); 
+    this.validate = new CvAnimationValidation(this);
+    this.util = new HtmlCancasTool(this);
 } 
 
 

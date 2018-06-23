@@ -1,3 +1,23 @@
+/* Font Import */
+/*	font-kerning:;
+	font-size:;
+	font-size-adjust:;
+	font-stretch:;
+	font-style:;
+	font-variant:;
+	font-weight:;*/
+@font-face {
+	src: url('../fonts/MyriadPro-Light.woff') format('woff');
+	font-family:"mp-light";
+}
+@font-face {
+	src: url('../fonts/MyriadPro-Semibold.woff') format('woff');
+	font-family:"mp-sbold";
+}
+@font-face {
+	src: url('../fonts/MyriadPro-Bold.woff') format('woff');
+	font-family:"mp-bold";
+}
 /* Font and Color */
 body, a, h1, h2, h3, h4, h5, h6,
 input, span, p, pre { font-family:'Monospace',serif; white-space:normal; word-break:normal; word-wrap:break-word; white-space:normal; text-align:left; }

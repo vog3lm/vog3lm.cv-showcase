@@ -8,6 +8,10 @@
     <link rel="stylesheet" href="css/font.awesome.min.css"/>
     <link rel="stylesheet" href="css/font.geometry.css"/>
     <link rel="stylesheet" href="css/design.geometry.css"/>
+    <!-- PRELOAD FONTS -->
+    <link rel="preload" href="fonts/MyriadPro-Light.woff" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="fonts/MyriadPro-Semibold.woff" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="fonts/MyriadPro-Bold.woff" as="font" crossorigin="anonymous" />
 
 	<link rel="shortcut icon" href="images/favicon.coyote.poly_white.b.png" type="image/x-icon"/>
 	<link rel="icon" 		  href="images/favicon.coyote.poly_white.b.png" type="image/x-icon"/>
@@ -327,7 +331,24 @@
 					footer = '<p>'+'Restricted. Apply for access.'+'</p>';
 				}
 				return {'title':'about.me'
-					   ,'header':''
+					   ,'header':'<img class="" width="96" height="128" id="" src="images/hello.world-l.png"></img>'
+					   			+'<img class="" width="96" height="96" id="" src="images/grund.schule-p.png"></img>'
+					   			+'<img class="" width="96" height="96" id="" src="images/mittlere.reife-b.png"></img>'
+					   			+'<img class="" width="96" height="128" id="" src="images/ihk.bank-g.png"></img>'
+					   			// berufsschule
+					   			+'<img class="" width="96" height="128" id="" src="images/ksk.bank-y.png"></img>'
+					   			+'<img class="" width="96" height="96" id="" src="images/rhk.zivi.png"></img>'
+					   			+'<img class="" width="96" height="96" id="" src="images/rhk.service.png"></img>'
+					   			+'<img class="" width="96" height="96" id="" src="images/wg.abi.png"></img>'
+					   			+'<img class="" width="96" height="128" id="" src="images/uni.mathe.png"></img>'
+					   			+'<img class="" width="96" height="128" id="" src="images/hs.tutor.png"></img>'
+					   			+'<img class="" width="96" height="128" id="" src="images/hs.hiwi.png"></img>'
+					   			// bachelor
+
+					   			// schülerhilfe
+					   			// Wirtschafts-informatik
+					   			// Pädagogik
+
 					   ,'footer':footer
 					   ,'cv':[['lang-legend',[250,0,150],0]]
 				};
@@ -671,6 +692,7 @@
 
 	</script>
 	<style type="text/css">
+
 		body header {
 			overflow:hidden;
 			position:relative;
@@ -904,6 +926,7 @@
 		    left:calc(100px - 96px/2);
 	    	top:calc(75px - 96px/2);
 		}
+
 	</style>
 </head>
 <body>

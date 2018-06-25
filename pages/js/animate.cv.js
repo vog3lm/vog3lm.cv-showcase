@@ -48,16 +48,22 @@ function CvLabelHolder(animation,id){
         border = holder.setting.args.paneBorder;
         width = element.width();
         height = element.height();
+        if(this.loc.x >= canvas.width+border-width){ // check right
+            this.loc.x = this.loc.x+width;
+        }
+        if(this.loc.y >= canvas.height+border-height){ // check bottom
+            this.loc.y = this.loc.y-height;
+        }
     };
     var border = null;
     var width = null;
     var height = null;
     var drunken = true;
     this.update = function() {
-        if(this.loc.x >= canvas.width+border-width || this.loc.x <= -border+width){ //left||right
+        if(this.loc.x >= canvas.width+border-width || this.loc.x <= -border){ //right||left
             this.vel.x = -this.vel.x;
         }
-        if(this.loc.y >= canvas.height+border-height || this.loc.y <= -border+height){ //top||bottom
+        if(this.loc.y >= canvas.height+border-height || this.loc.y <= -border){ //bottom||top
             this.vel.y = -this.vel.y;
         }
         this.loc.x += this.vel.x*drunken;
@@ -137,7 +143,7 @@ function CvAnimationSetting(){
        ,'paneWidth':window.innerWidth
        ,'paneHeight':window.innerHeight
        ,'paneBorder':0
-       ,'velScale':0.5
+       ,'velScale':0.1
        ,'velMin':-0.5
        ,'velMax':0.5
        ,'lines':true

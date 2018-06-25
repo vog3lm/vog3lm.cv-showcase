@@ -192,11 +192,11 @@
 					footer.attr('index',index);
 					// SWIPE HTML NEXT //
 					// SCROLL CANVAS NEXT //
-					var scroll = $('scroll');
-					var delta = scroll.scrollLeft()+window.innerWidth;
-					var end = scroll.find('canvas').innerWidth;
-					if(end > delta){delta = end;}
-					scroll.scrollLeft(delta);
+					// var scroll = $('scroll');
+					// var delta = scroll.scrollLeft()+window.innerWidth;
+					// var end = scroll.find('canvas').innerWidth;
+					// if(end > delta){delta = end;}
+					// scroll.scrollLeft(delta);
 					// SCROLL CANVAS PREV //
 
 					return index;
@@ -220,10 +220,10 @@
 					// SWIPE HTML NEXT //
 
 					// SCROLL CANVAS NEXT //
-					var scroll = $('scroll');
-					var delta = scroll.scrollLeft()-window.innerWidth;
-					if(0 > delta){delta = 0;}
-					scroll.scrollLeft(delta);
+					// var scroll = $('scroll');
+					// var delta = scroll.scrollLeft()-window.innerWidth;
+					// if(0 > delta){delta = 0;}
+					// scroll.scrollLeft(delta);
 					// SCROLL CANVAS PREV //
 
 					return index;
@@ -253,16 +253,18 @@
 			this.page = {
 				'show':(data) => {
 					document.title = data.title;
-					var topic = $('topic').html(data.topic);
-					var header = $('header section#content');
-					header.html(data.header);
-					var holder = $('header');
-					var footer = $('footer section#content');
+
+					//var header = $('header section#content'); // add header data
+					//header.html(data.header);
+					//var holder = $('header');
+
+					var footer = $('footer section#content'); // add footer data
 					footer.html(data.footer);
 					holder = $('footer');
 					footer.css({'top':(holder.outerHeight()-footer.outerHeight())/2}) // center vertical
 					footer.css({'left':(holder.outerWidth()-footer.outerWidth())/2}) // center horizontal
 
+					/*
 					$('footer section img.lico').each(function(){ // pos left icon
 						var element = $(this);
 						var source = element.attr('src')
@@ -299,6 +301,8 @@
 							$('tip').css({'visibility':'invisible','opacity':0});
 						});
 					});
+					*/
+
 				}
 				,'clear':() => {
 					document.title = 'smart.cv.og3lm';
@@ -312,192 +316,30 @@
 		function PagePresentationAdapter(){
 			this.get = (data) => {
 				switch(data.index){
-				    case 0:return about(data.records);
-				    case 1:return exp_a(data.records);
-				    case 2:return edu_b(data.records);
-				    case 3:return edu_a(data.records);
-				    case 4:return connect(data.records);
+				    case 0:return {
+				    	 'title':'about.me'
+						,'footer':'<p>'+'Restricted. Apply for access.'+'</p>'
+					};
+				    case 1:return {
+				    	'title':'job.xp'
+					   ,'footer':'<p>'+'Restricted. Apply for access.'+'</p>'
+					};
+				    case 2:return {
+				    	'title':'edu.higher'
+					   ,'footer':'<p>'+'Restricted. Apply for access.'+'</p>'
+					};
+				    case 3:return {
+				    	'title':'edu.base'
+					   ,'footer':'<p>'+'Restricted. Apply for access.'+'</p>'
+					};
+				    case 4:return {
+				    	'title':'get.connected'
+					   ,'footer':'<textarea maxlength="31415" placeholder="leave a message.."></textarea>'
+								+'<p><a href="#" class="fa fa-send" call="msg-send" url="https://github.com"></a></p>'
+					};
 				    default: null;
 				}
 			};
-
-			function about(records){
-				var footer = ''
-				if(records.type.indexOf('text') != -1){
-					for(var line in records.data) {
-						footer = footer+'<p>'+records.data[line].replace('\n','<br>')+'</p>'
-					}
-				} else {
-					footer = '<p>'+'Restricted. Apply for access.'+'</p>';
-				}
-				return {'title':'about.me'
-					   ,'header':'<img class="" width="96" height="128" id="" src="images/hello.world-l.png"></img>'
-					   			+'<img class="" width="96" height="96" id="" src="images/grund.schule-p.png"></img>'
-					   			+'<img class="" width="96" height="96" id="" src="images/mittlere.reife-b.png"></img>'
-					   			+'<img class="" width="96" height="128" id="" src="images/ihk.bank-g.png"></img>'
-					   			// berufsschule
-					   			+'<img class="" width="96" height="128" id="" src="images/ksk.bank-y.png"></img>'
-					   			+'<img class="" width="96" height="96" id="" src="images/rhk.zivi.png"></img>'
-					   			+'<img class="" width="96" height="96" id="" src="images/rhk.service.png"></img>'
-					   			+'<img class="" width="96" height="96" id="" src="images/wg.abi.png"></img>'
-					   			+'<img class="" width="96" height="128" id="" src="images/uni.mathe.png"></img>'
-					   			+'<img class="" width="96" height="128" id="" src="images/hs.tutor.png"></img>'
-					   			+'<img class="" width="96" height="128" id="" src="images/hs.hiwi.png"></img>'
-					   			// bachelor
-
-					   			// schülerhilfe
-					   			// Wirtschafts-informatik
-					   			// Pädagogik
-
-					   ,'footer':footer
-					   ,'cv':[['lang-legend',[250,0,150],0]]
-				};
-			}
-			function exp_a(records){
-				var footer = ''
-				var tips = {};
-				if(records.type.indexOf('list') != -1){
-					var tmp = records.data;
-					for(var i=0;i<tmp.length;i++){
-						var id = tmp[i][0];
-						footer = footer+'<img class="lico" alt="'+id+'" src="'+tmp[i][1]+'" tip="'+id+':rate"></img>';
-						footer = footer+'<p>'+tmp[i][2]+' - '+tmp[i][3]+' | '+tmp[i][4]+' ('+tmp[i][5]+')</p>';
-						tips[id] = tmp[i][6];
-					}
-				} else {
-					footer = '<p>'+'Restricted. Apply for access.'+'</p>';
-				}
-				return {'title':'job.xp'
-					   ,'header':'<img class="skill hide" width="96" height="96" tip="0" id="skill-html" src="images/skills/html.png"></img>'
-								+'<img class="skill hide" width="96" height="96" tip="0" id="skill-css" src="images/skills/css.png"></img>'
-								+'<img class="skill hide" width="96" height="96" tip="0" id="skill-js" src="images/skills/js.png"></img>'
-								+'<img class="skill hide" width="96" height="96" tip="0" id="skill-jq" src="images/skills/jq.png"></img>'
-					   ,'footer':footer
-					   ,'tips':tips
-					   ,'cv':[['skill-html',[250,0,150],0]
-					   		 ,['skill-css',[250,0,150],0]
-					   		 ,['skill-js',[250,0,150],0]
-					   		 ,['skill-jq',[250,0,150],0]]
-				};
-			}
-			function edu_b(records){
-				var footer = '';
-				var tips = {};
-				var tmp = records.data;
-				if(records.type.indexOf('list') != -1){
-					for(var i=0;i<tmp.length;i++){
-						var id = tmp[i][0];
-						tips[id] = {};
-						if('' != tmp[i][6] && null != tmp[i][6]){
-							footer = footer+'<img class="lico tip" alt="'+id+'" src="images/ico.graduate.png" tip="'+id+':graduate"></img>';
-							tips[id]['graduate'] = tmp[i][6].replace(/\n/g,'<br>');
-						}
-						if('' != tmp[i][7] && null != tmp[i][7]){
-							footer = footer+'<img class="lico tip" alt="'+id+'" src="images/ico.award.png" tip="'+id+':award"></img>';
-							tips[id]['award'] = tmp[i][7].replace(/\n/g,'<br>');
-						}
-						if('' != tmp[i][8] && null != tmp[i][8]){
-							tips[id]['rate'] = tmp[i][8].replace(/\n/g,'<br>');
-						}
-						footer = footer+'<img class="lico tip" alt="'+id+'" src="images/ico.study.png" tip="'+id+':rate"></img>';
-						footer = footer+'<p>'+tmp[i][1]+' - '+tmp[i][2]+' | '+tmp[i][3]+' ('+tmp[i][4]+' '+tmp[i][5]+')</p>';
-					}
-				} else {
-					footer = '<p>'+'Restricted. Apply for access.'+'</p>';
-				}
-				var grpClrs = [[250,0,150],[62,215,247],[170,255,0],[112,48,160],[250,250,10]]
-				var imgWidth = 96*0.6;
-				var imgHeight = 96*0.6;
-				return {'title':'edu.higher'
-								// web technologies
-					   ,'header':'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-html" src="images/skills/html.png"></img>'
-								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-css" src="images/skills/css.png"></img>'
-								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-js" src="images/skills/js.png"></img>'
-								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-jq" src="images/skills/jq.png"></img>'
-								// office family
-								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-access" src="images/skills/access.png"></img>'
-								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-excel" src="images/skills/excel.png"></img>'
-								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-pp" src="images/skills/pp.png"></img>'
-								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-outlook" src="images/skills/outlook.png"></img>'
-								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-word" src="images/skills/word.png"></img>'
-								// data storage technologies
-								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-sql" src="images/skills/sql.png"></img>'
-								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-csv" src="images/skills/csv.png"></img>'
-								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-xml" src="images/skills/xml.png"></img>'
-								// programming language technologies
-								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-c" src="images/skills/c.png"></img>'
-								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-c++" src="images/skills/c.png"></img>'
-								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-java" src="images/skills/jar.png"></img>'
-								// programming language technologies
-								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-jar" src="images/skills/jar.png"></img>'
-								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-exe" src="images/skills/exe.png"></img>'
-								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-apk" src="images/skills/apk.png"></img>'
-								+'<img class="skill hide" width="'+imgWidth+'" height="'+imgHeight+'" tip="0" id="skill-vb" src="images/skills/vb.png"></img>'
-
-					   ,'footer':footer
-					   ,'tips':tips
-					   ,'cv':[['skill-html',grpClrs[0],0,1] // [id,[r,g,b],level,group]
-							 ,['skill-css',grpClrs[0],0,1] // pink
-							 ,['skill-js',grpClrs[0],0,1]
-							 ,['skill-jq',grpClrs[0],0,1]
-							 ,['skill-access',grpClrs[1],0,2] // [id,[r,g,b],level,group]
-							 ,['skill-excel',grpClrs[1],0,2] // lblue
-							 ,['skill-pp',grpClrs[1],0,2]
-							 ,['skill-outlook',grpClrs[1],0,2]
-							 ,['skill-word',grpClrs[1],0,2]
-							 ,['skill-sql',grpClrs[2],0,3] // [id,[r,g,b],level,group]
-							 ,['skill-csv',grpClrs[2],0,3] // green
-							 ,['skill-xml',grpClrs[2],0,3] 
-							 ,['skill-c',grpClrs[3],0,4] // [id,[r,g,b],level,group]
-							 ,['skill-c++',grpClrs[3],0,4] // purple
-							 ,['skill-java',grpClrs[3],0,4]
-							 ,['skill-c',grpClrs[4],0,5] // [id,[r,g,b],level,group]
-							 ,['skill-c++',grpClrs[4],0,5] // yellow
-							 ,['skill-java',grpClrs[4],0,5] 
-
-							 ]
-					};
-			}
-			function edu_a(records){
-				var footer = '';
-				var tips = {};
-				var tmp = records.data;
-				if(records.type.indexOf('list') != -1){
-					for(var i=0;i<tmp.length;i++){
-						var id = tmp[i][0];
-						tips[id] = {};
-						if('' != tmp[i][6] && null != tmp[i][6]){
-							footer = footer+'<img class="lico tip" alt="'+id+'" src="images/ico.graduate.png" tip="'+id+':graduate"></img>';
-							tips[id]['graduate'] = tmp[i][6].replace(/\n/g,'<br>');
-						}
-						if('' != tmp[i][7] && null != tmp[i][7]){
-							footer = footer+'<img class="lico tip" alt="'+id+'" src="images/ico.award.png" tip="'+id+':award"></img>';
-							tips[id]['award'] = tmp[i][7].replace(/\n/g,'<br>');
-						}
-						if('' != tmp[i][8] && null != tmp[i][8]){
-							tips[id]['rate'] = tmp[i][8].replace(/\n/g,'<br>');
-						}
-						footer = footer+'<img class="lico tip" alt="'+id+'" src="images/ico.study.png" tip="'+id+':rate"></img>';
-						footer = footer+'<p>'+tmp[i][1]+' - '+tmp[i][2]+' | '+tmp[i][3]+' ('+tmp[i][4]+')</p>';
-					}
-				} else {
-					footer = '<p>'+'Restricted. Apply for access.'+'</p>';
-				}
-				return {'title':'edu.basic'
-					   ,'header':''
-					   ,'footer':footer
-					   ,'tips':tips
-					   ,'cv':[]
-				};
-			}
-			function connect(records){
-				return {'title':'get.connected'
-					   ,'header':''
-					   ,'footer':'<textarea maxlength="31415" placeholder="leave a message.."></textarea>'
-								+'<p><a href="#" class="fa fa-send" call="msg-send" url="https://github.com"></a></p>'
-					   ,'cv':[]
-				};
-			}
 		}
 
 		var animations= {'fox':{'lineColor':'#444','lineWidth':'1px','paneParent':'zone','paneId':'fox','scaleFactor':11
@@ -568,11 +410,6 @@
 
 			    ,'get-start':(data) => {
 					window.location.replace("#");
-					if(true){
-					//	presenter.load.show({'content':'loading..'});
-						console.log('loading ...');
-					}
-
 					$('body').trigger('get-index',{'call':'get-index','id':'onLoad','index':0});
 					history.replace({'call':'get-index','id':'replaceState','index':0});
 			    }
@@ -601,12 +438,6 @@
 					data.index = presenter.swipe.index();
 					presenter.page.show(data); 		// show elements
 					cv.show(data)
-
-				//	setTimeout(function(){
-    			//		cv.show(data) 				// show animation
-				//		presenter.load.hide() 		// hide loading
-				//	}, 75);
-
 				}
 
 
@@ -760,6 +591,7 @@
 			vertical-align:middle;
 			text-align:center;
 		}
+		/* user login/logout structure */
 		header user{
 			position:absolute;
 			height:32px;
@@ -767,20 +599,20 @@
 			bottom:0px;
 			overflow:hidden;
 		}
-		user form,
-		user card{
+		header user form,
+		header user card{
 			width:calc(100% - 32px);
 			height:100%;
 			padding:0px;
 		}
-		user form input{
+		header user form input{
 			height:32px;
 			width:50%;
 			line-height:32px;
 			vertical-align:middle;
 			float:left;
 		}
-		user card id{
+		header user card id{
 			height:32px;
 			width:calc(100% - 2*32px);
 			line-height:32px;
@@ -796,8 +628,25 @@
 		    width:100%;
 		    height:100%;
 		}
-
-
+		/* cv labels */
+		header section#content img.label{
+			position:absolute;
+			margin:0px;
+			padding:0px;
+			width:15%;
+		}
+		header section#content img.s{
+			max-width:144px;
+			min-width:48px;
+			max-height:144px;
+			min-height:48px;
+		}
+		header section#content img.m{
+			max-width:144px;
+			min-width:48px;
+			max-height:168px;
+			min-height:56px;
+		}
 
 
 		body popup {
@@ -873,12 +722,6 @@
 			right:0px;
 			bottom:0px;
 		}
-		footer topic{
-			position:absolute;
-			text-transform:uppercase;
-			height:48px;
-			line-height:48px;
-		}
 
 		tip{
 			/* move to design element file */
@@ -895,7 +738,7 @@
 			border-radius:7px;
 		}
 
-
+		/* dynamically created animation.js */
 		scroll{
 			position:absolute;
 			top:0px;
@@ -904,6 +747,8 @@
 			overflow:hidden;
 		}
 
+
+		/* footer stuff/skill stuff refactored... */
 		img.lang{
 			position:absolute;
 			width:15%;
@@ -932,7 +777,23 @@
 <body>
 	<header id="zone">
 		<img class="after-effect" src="" alt="">
-		<section id="content" index="0"></section>
+		<section id="content" index="0">
+			<img class="label m" id="hello-world" src="images/labels/hello.world.png"></img>
+			<img class="label s" id="grundschule" src="images/labels/grund.schule.png"></img>
+			<img class="label s" id="realschule" src="images/labels/mittlere.reife.png"></img>
+			<img class="label m" id="bank-ihk" src="images/labels/ihk.bank.png"></img>
+			<img class="label m" id="bank-ksk" src="images/labels/ksk.bank.png"></img>
+			<img class="label s" id="rhk-zivi" src="images/labels/rhk.zivi.png"></img>
+			<img class="label s" id="rhk-service" src="images/labels/rhk.service.png"></img>
+			<img class="label s" id="abitur" src="images/labels/wg.abi.png"></img>
+			<img class="label m" id="konstanz" src="images/labels/uni.mathe.png"></img>
+			<img class="label m" id="hs-tutor" src="images/labels/hs.tutor.png"></img>
+			<img class="label m" id="hs-hiwi" src="images/labels/hs.hiwi.png"></img>
+			<img class="label m" id="hs-bachelor" src="images/labels/hs.bachelor.png"></img>
+			<img class="label m" id="hs-lehrer" src="images/labels/ph.png"></img>
+			<img class="label m" id="hs-wi" src="images/labels/hs.wi.png"></img>
+			<img class="label m" id="lehrer" src="images/labels/sh.png"></img>
+		</section>
 		<a href="#" class="fa fa-circle-thin fa-1-5x" call="dox-toggle"></a>
 		<a href="#" class="fa fa-question-circle-o fa-1-5x" call="help-toggle"></a>
 		<a href="#" class="fa fa-cog fa-1-5x" call="cfg-toggle"></a>

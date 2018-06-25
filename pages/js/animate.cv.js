@@ -461,7 +461,7 @@ function CvAnimationSetting(){
        'paneParent':'body'
        ,'paneId':'cv-'+(Math.random()*(99999-10000)+10000)
        ,'paneColor':'rgba(0,0,0,0)'
-       ,'paneWidth':window.innerWidth*6
+       ,'paneWidth':window.innerWidth // *6
        ,'paneHeight':window.innerHeight
        ,'paneBorder':0
        ,'lines':true
@@ -493,51 +493,12 @@ function CvAnimationOperator(animation){
     }
     this.create = function(){
     	/* main pane */
-    	holder.objects.main = holder.util.canvasScroll();
+    	holder.objects.main = holder.util.canvasCreate();
         canvas = holder.objects.main;
         canvas.id = holder.setting.args.paneId+'-main';
         canvas.width = holder.setting.args.paneWidth;
         canvas.height = holder.setting.args.paneHeight;
         holder.objects.ctxm = canvas.getContext("2d");
-
-        var args = holder.setting.args;
-        /* cv milestone labels */
-    //	new CvMilestoneLabelMe(holder,args.lineColors.gray).push().update();
-    //	new CvMilestoneLabelOne(holder,args.lineColors.green,['GRUND','SCHULE','1995'],0).push().update();
-    //	new CvMilestoneLabelTwo(holder,args.lineColors.blue,['MITTLERE','REIFE','2001'],0).push().update();
-
-    //	new CvMilestoneLabelOne(holder,args.lineColors.yellow,['BERUFS','SCHULE','2004'],0).push().update();
-    //	new CvMilestoneLabelTre(holder,args.lineColors.purple,['SPARKASSE','BANK','KAUFMANN','2004'],0).push().update();
-    //	new CvMilestoneLabelIhk(holder,args.lineColors.pink,['IHK BODENSEE','OBERSCHWABEN','KAUFMANN','2004'],0).push().update();
-
-    //	new CvMilestoneLabelTwo(holder,args.lineColors.green,['RHK BW','ZIVILDIENST','2005'],1).push().update();
-    //	new CvMilestoneLabelTwo(holder,args.lineColors.yellow,['RHK BW','AMBULANZ','2006'],1).push().update();
-    //	new CvMilestoneLabelTwo(holder,args.lineColors.pink,['RHK BW','SERVICE','2013'],1).push().update();
-
-    //	new CvMilestoneLabelTwo(holder,args.lineColors.blue,['WG WANGEN','ABITUR','2009'],1).push().update(); // TODO 4 lines
-
-    //	new CvMilestoneLabelIhk(holder,args.lineColors.blue,['UNIVERSITAT','KONSTANZ','MATHE','2010'],2).push().update();
-    //	new CvMilestoneLabelIhk(holder,args.lineColors.green,['HOCHSCHULE','WEINGARTEN','HIWI','2011'],2).push().update();
-    //	new CvMilestoneLabelIhk(holder,args.lineColors.yellow,['HOCHSCHULE','WEINGARTEN','TUTOR','2013'],2).push().update();
-    //	new CvMilestoneLabelTre(holder,args.lineColors.pink,['HOCHSCHULE','BACHELOR','INFORMATIK','2014'],2).push().update(); // TODO
-    //	new CvMilestoneLabelOne(holder,args.lineColors.purple,['ZF FN AG','TRAINEE','2014'],2).push().update(); // TODO
-    	
-    //	new CvMilestoneLabelIhk(holder,args.lineColors.pink,['HOCHSCHULE','WEINGARTEN','INFORMATIK','2018'],3).push().update();
-    //	new CvMilestoneLabelIhk(holder,args.lineColors.green,['HOCHSCHULE','WEINGARTEN','WIRTSCHAFT','2018'],3).push().update();
-    //	new CvMilestoneLabelIhk(holder,args.lineColors.blue,['HOCHSCHULE','WEINGARTEN','PAEDAGOGIK','2018'],3).push().update();
-
-    //	new CvMilestoneLabelTwo(holder,args.lineColors.purple,['SCHULERHILFE','LEHRER','2018'],3).push().update(); // TODO
-
-    	console.info('cv animation created');
-    	
-        /* cv story line arrows */
-    //	var about = new CvStoryLineStart(holder,0,args.lineColors[0]).push().update();
-    //	var test = new CvStoryLineArrowBendUp(holder,1,   args.lineColors[1],0).push().update();
-    //	var test = new CvStoryLineArrowBendUp(holder,1.04,args.lineColors[3],1).push().update();
-    //	var exp_a = new CvStoryLine(holder,1,args.lineColors[1]).push().update();
-    //	var edu_b = new CvStoryLine(holder,2,args.lineColors[2]).push().update();
-    //	var edu_c = new CvStoryLine(holder,3,args.lineColors[3]).push().update();
-    //	var touch = new CvStoryLineClose(holder,4,args.lineColors[4]).push().update();
 
         /* hidden pane */
     	holder.objects.hide = holder.util.canvasCreate();
@@ -547,6 +508,8 @@ function CvAnimationOperator(animation){
         canvas.height = holder.setting.args.paneHeight;
         holder.objects.ctxh = canvas.getContext("2d");
         console.info('cv animation created');
+
+        var args = holder.setting.args;
 
         return this;
     }

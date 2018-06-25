@@ -1,6 +1,75 @@
 
+/* move to backend... */
+function HtmlCancasTool(animation){
+	var holder = animation;
+    this.canvasParse = (id) => {
+        return document.getElementById(id);
+    }
+    this.canvasScroll = () => {
+    	// wrap canvas to scroll container
+        var canvas = document.createElement("canvas");
+        var scroll = document.createElement("scroll");
+        scroll.appendChild(canvas);
+        if('body' === holder.setting.args.paneParent){
+        	document.body.appendChild(scroll)
+        //    document.body.appendChild(canvas);
+        } else {
+            var element = document.getElementById(holder.setting.args.paneParent);
+            element.insertBefore(scroll, element.childNodes[0])
+        //    element.insertBefore(canvas, element.childNodes[0]);
+        }
+        return canvas;
+    }
+    this.canvasCreate = () => {
+        var canvas = document.createElement("canvas");
+        if('body' === holder.setting.args.paneParent){
+            document.body.appendChild(canvas);
+        } else {
+            var element = document.getElementById(holder.setting.args.paneParent);
+            element.insertBefore(canvas, element.childNodes[0]);
+        }
+        return canvas;
+    }
+}
 
 
+function CvLabelHolder(animation,id){
+	var holder = animation;
+	var element = $('img#'+id);
+    this.loc = {
+        'x': Math.random() * holder.objects.main.width,
+        'y': Math.random() * holder.objects.main.height
+    };
+    this.vel = {
+        'x': (Math.round(Math.random())*2-1)*(Math.random()*(holder.setting.args.velMax-holder.setting.args.velMin)+holder.setting.args.velMin)/holder.setting.args.velScale,
+        'y': (Math.round(Math.random())*2-1)*(Math.random()*(holder.setting.args.velMax-holder.setting.args.velMin)+holder.setting.args.velMin)/holder.setting.args.velScale
+    };
+    this.push = function(){
+        border = holder.setting.args.paneBorder;
+        width = element.width();
+        height = element.height();
+    };
+    var border = null;
+    var width = null;
+    var height = null;
+    var drunken = true;
+    this.update = function() {
+        if(this.loc.x >= canvas.width+border-width || this.loc.x <= -border+width){ //left||right
+            this.vel.x = -this.vel.x;
+        }
+        if(this.loc.y >= canvas.height+border-height || this.loc.y <= -border+height){ //top||bottom
+            this.vel.y = -this.vel.y;
+        }
+        this.loc.x += this.vel.x*drunken;
+        this.loc.y += this.vel.y*drunken;
+    	element.css({'top':this.loc.y,'left':this.loc.x});
+    }
+}
+
+
+
+
+/* main animation code */
 function CvAnimationValidation(animation){
     var holder = animation;
     this.holder = () => {
@@ -32,16 +101,45 @@ function CvAnimationValidation(animation){
         this.objects();
     }
 }
-/*	engine 	*/
+function CvAnimationEngine(animation){
+    var holder = animation;
+    var canvas = null;
+    var context = null;
+    this.start = function(){
+        context = holder.objects.ctxm;
+        canvas = holder.objects.main;
+        this.push();
+        update();
+    }
+    this.push = function(){
+    	for(key in holder.objects.labels){
+    		holder.objects.labels[key].push();
+    	}
+    }
+    var paused = false;
+    var stopped = false;
+    function update() {
+    	context.clearRect(0,0,canvas.width,canvas.height);
+    	for(key in holder.objects.labels){
+    		holder.objects.labels[key].update();
+    	}
+        if(!stopped){
+            requestAnimationFrame(update);
+        }
+    }
+}
 function CvAnimationSetting(){
     this.rad = 2 * Math.PI;
     this.args = {
        'paneParent':'body'
        ,'paneId':'cv-'+(Math.random()*(99999-10000)+10000)
        ,'paneColor':'rgba(0,0,0,0)'
-       ,'paneWidth':window.innerWidth // *6
+       ,'paneWidth':window.innerWidth
        ,'paneHeight':window.innerHeight
        ,'paneBorder':0
+       ,'velScale':0.5
+       ,'velMin':-0.5
+       ,'velMax':0.5
        ,'lines':true
        ,'lineColors':{'green':[170,255,0]
        				 ,'pink':[250,0,150]
@@ -85,33 +183,27 @@ function CvAnimationOperator(animation){
         canvas.width = holder.setting.args.paneWidth;
         canvas.height = holder.setting.args.paneHeight;
         holder.objects.ctxh = canvas.getContext("2d");
-        console.info('cv animation created');
+
 
         var args = holder.setting.args;
 
+        var x = (canvas.width*6+2*args.paneBorder);
+        var y = (canvas.height*6+2*args.paneBorder);
+        var area = x*y;
+
+        $("img.label").each(function(index){	// load label images
+        	var id = $(this).attr('id');
+			holder.objects.labels[id] = new CvLabelHolder(holder,id)
+		});
+
         return this;
     }
-    this.show = function(data){
-		var ctx = holder.objects.ctxh;
-		ctx.clearRect(0,0,holder.objects.hide.width,holder.objects.hide.height);
-
-		/* load skill rings
-		var grp = 1;
-		var off = 1;
-		var delta = 100;
-		for (var i=0; i<data.cv.length; i++) {
-			console.log(data.cv[i])  // TODO delete
-			var tmp = data.cv[i];
-			if(tmp[3] != grp){off = 1;}
-			grp = tmp[3];
-			var ring = new CvSkillRing(holder,tmp[0],[tmp[1][0],tmp[1][1],tmp[1][2],0.7],0+delta*off,0+delta*grp)
-			ring.push()
-			ring.update();
-			off = off+1;
-		};
-		*/
-
-    	console.info('cv animation visible');
+    this.validate = function(){
+        return this;
+    }
+    this.start = function(mode='any'){
+        holder.engine.start();
+        console.info('cv animation started');
         return this;
     }
 }
@@ -128,16 +220,18 @@ function CvAnimationListener(animation){
     }
 }
 function CvAnimationObjects(){
-	var main = null;
-	var ctxm = null;
-	var hide = null;
-	var ctxh = null;
+	this.main = null;
+	this.ctxm = null;
+	this.hide = null;
+	this.ctxh = null;
+
+	this.labels = {};
 }
 function CvAnimationHolder(){
     var listener = new CvAnimationListener(this);
     this.objects = new CvAnimationObjects();
     this.operator = new CvAnimationOperator(this);
-	// this.engine = new CvAnimationEngine(this);
+	this.engine = new CvAnimationEngine(this);
     this.setting = new CvAnimationSetting();
     this.validate = new CvAnimationValidation(this);
     this.util = new HtmlCancasTool(this);

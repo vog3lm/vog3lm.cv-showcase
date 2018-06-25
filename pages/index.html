@@ -368,7 +368,7 @@
 			//	dotsOne = dotsOne.concat(tre.objects.dots);
 
 			var fox = new FoxNetHolder().operator.decorate(animations.fox).interlink(dotsOne).create().start();
-			var cv = new CvAnimationHolder().operator.decorate(animations.cv).create();
+			var cv = new CvAnimationHolder().operator.decorate(animations.cv).create().start();
 
 			var presenter = new PagePagePresenter();
 			var adapter = new PagePresentationAdapter();
@@ -437,7 +437,6 @@
 					data = adapter.get(data);
 					data.index = presenter.swipe.index();
 					presenter.page.show(data); 		// show elements
-					cv.show(data)
 				}
 
 
@@ -778,21 +777,21 @@
 	<header id="zone">
 		<img class="after-effect" src="" alt="">
 		<section id="content" index="0">
-			<img class="label m" id="hello-world" src="images/labels/hello.world.png"></img>
+			<img class="label m" id="hello" src="images/labels/hello.world.png"></img>
 			<img class="label s" id="grundschule" src="images/labels/grund.schule.png"></img>
 			<img class="label s" id="realschule" src="images/labels/mittlere.reife.png"></img>
-			<img class="label m" id="bank-ihk" src="images/labels/ihk.bank.png"></img>
-			<img class="label m" id="bank-ksk" src="images/labels/ksk.bank.png"></img>
-			<img class="label s" id="rhk-zivi" src="images/labels/rhk.zivi.png"></img>
-			<img class="label s" id="rhk-service" src="images/labels/rhk.service.png"></img>
+			<img class="label m" id="berufsschule" src="images/labels/ihk.bank.png"></img>
+			<img class="label m" id="bank" src="images/labels/ksk.bank.png"></img>
+			<img class="label s" id="zivildienst" src="images/labels/rhk.zivi.png"></img>
+			<img class="label s" id="service" src="images/labels/rhk.service.png"></img>
 			<img class="label s" id="abitur" src="images/labels/wg.abi.png"></img>
 			<img class="label m" id="konstanz" src="images/labels/uni.mathe.png"></img>
-			<img class="label m" id="hs-tutor" src="images/labels/hs.tutor.png"></img>
-			<img class="label m" id="hs-hiwi" src="images/labels/hs.hiwi.png"></img>
-			<img class="label m" id="hs-bachelor" src="images/labels/hs.bachelor.png"></img>
-			<img class="label m" id="hs-lehrer" src="images/labels/ph.png"></img>
-			<img class="label m" id="hs-wi" src="images/labels/hs.wi.png"></img>
-			<img class="label m" id="lehrer" src="images/labels/sh.png"></img>
+			<img class="label m" id="tutor" src="images/labels/hs.tutor.png"></img>
+			<img class="label m" id="hiwi" src="images/labels/hs.hiwi.png"></img>
+			<img class="label m" id="bachelor" src="images/labels/hs.bachelor.png"></img>
+			<img class="label m" id="paedagogik" src="images/labels/ph.png"></img>
+			<img class="label m" id="wirtschaftsinformatik" src="images/labels/hs.wi.png"></img>
+			<img class="label m" id="schuelerhilfe" src="images/labels/sh.png"></img>
 		</section>
 		<a href="#" class="fa fa-circle-thin fa-1-5x" call="dox-toggle"></a>
 		<a href="#" class="fa fa-question-circle-o fa-1-5x" call="help-toggle"></a>

@@ -21,7 +21,6 @@
 
 	<script type="text/javascript" src="js/jq.min.js"></script>
 	<script type="text/javascript" src="js/backend.js"></script>
-	<script type="text/javascript" src="js/content.js"></script>
 	<script type="text/javascript" src="js/animate.fox.js"></script>
 	<script type="text/javascript" src="js/animate.cv.js"></script>
 	<script type="text/javascript" src="js/animate.dots.js"></script>
@@ -168,7 +167,7 @@
 				}
 			}
 			/* swipe args */
-			var swipeMax = 4;
+			var swipeMax = 3;
 			var swipeStart = 0;
 			/* swipe args */
 			this.swipe = {
@@ -360,6 +359,7 @@
 			var one = new DotNetHolder()
 			one.operator.decorate(animations.one).create().start();
 			var dotsOne = one.objects.dots;
+
 			//	two = new DotNetHolder()
 			//	two.operator.decorate(animations.two).create().start();
 			//	dotsOne = dotsOne.concat(two.objects.dots);
@@ -372,8 +372,6 @@
 
 			var presenter = new PagePagePresenter();
 			var adapter = new PagePresentationAdapter();
-
-			var content = new IndexOfflineContent()
 
 			var events = {
 				'footer-toggle':(data) => {presenter.footer.toggle();}
@@ -433,7 +431,7 @@
 				,'got-token':(data) => {console.log('got token. user is logged in.');}
 				,'got-mvp':(data) => {
 					data.index = presenter.swipe.index();
-					data.records = content.get(data.index);
+					/* load some offline content */
 					data = adapter.get(data);
 					data.index = presenter.swipe.index();
 					presenter.page.show(data); 		// show elements
@@ -468,10 +466,14 @@
 				,'animation-colors':(data) => {
 					var colors = ['#fb1','#67f','#b0f','#2F2','#6be','#e5f','#ff1','#777']
 				  	one.operator.decorate({'lineColor':colors[Math.floor(Math.random()*(colors.length-1))]})
-				  	two.operator.decorate({'lineColor':colors[Math.floor(Math.random()*(colors.length-1))]})
+				//  	two.operator.decorate({'lineColor':colors[Math.floor(Math.random()*(colors.length-1))]})
 				}
 
 
+				/*test stuff*/
+				,'test':(data) => {
+					console.log(data)
+				}
 				,'content-header-request':(data) => {
 					authenicate.reqHeader('https://us-central1-vog3lm-0x1.cloudfunctions.net/mvc/');
 				}
@@ -522,7 +524,6 @@
 
 	</script>
 	<style type="text/css">
-
 		body header {
 			overflow:hidden;
 			position:relative;
@@ -539,7 +540,6 @@
 		header canvas#two{
 			transform:rotateY(-20deg) scaleX(1.15);
 		}
-
 		header img.after-effect,
 		footer img.after-effect{
 			width:100%;
@@ -627,9 +627,24 @@
 		    width:100%;
 		    height:100%;
 		}
+		header playground {
+			position:absolute;
+			top:0px;
+			left:0px;
+			width:100%;
+			height:100%;
+		}
+		header playground:nth-child(1){
+			left:100%;
+		}
+		header playground:nth-child(2){
+			left:200%;
+		}
+
 		/* cv labels */
 		header section#content img.label{
 			position:absolute;
+			cursor:pointer;
 			margin:0px;
 			padding:0px;
 			width:15%;
@@ -722,6 +737,7 @@
 			bottom:0px;
 		}
 
+
 		tip{
 			/* move to design element file */
 			position:fixed;
@@ -736,7 +752,6 @@
 			padding:13px;
 			border-radius:7px;
 		}
-
 		/* dynamically created animation.js */
 		scroll{
 			position:absolute;
@@ -762,7 +777,6 @@
 	    	top:calc(100px + 15%);
 	    	border-radius:50%;
 		}
-
 		img.skill{
 			position:absolute;
 			width:96px;
@@ -770,28 +784,33 @@
 		    left:calc(100px - 96px/2);
 	    	top:calc(75px - 96px/2);
 		}
-
 	</style>
 </head>
 <body>
 	<header id="zone">
 		<img class="after-effect" src="" alt="">
 		<section id="content" index="0">
-			<img class="label m" id="hello" src="images/labels/hello.world.png"></img>
-			<img class="label s" id="grundschule" src="images/labels/grund.schule.png"></img>
-			<img class="label s" id="realschule" src="images/labels/mittlere.reife.png"></img>
-			<img class="label m" id="berufsschule" src="images/labels/ihk.bank.png"></img>
-			<img class="label m" id="bank" src="images/labels/ksk.bank.png"></img>
-			<img class="label s" id="zivildienst" src="images/labels/rhk.zivi.png"></img>
-			<img class="label s" id="service" src="images/labels/rhk.service.png"></img>
-			<img class="label s" id="abitur" src="images/labels/wg.abi.png"></img>
-			<img class="label m" id="konstanz" src="images/labels/uni.mathe.png"></img>
-			<img class="label m" id="tutor" src="images/labels/hs.tutor.png"></img>
-			<img class="label m" id="hiwi" src="images/labels/hs.hiwi.png"></img>
-			<img class="label m" id="bachelor" src="images/labels/hs.bachelor.png"></img>
-			<img class="label m" id="paedagogik" src="images/labels/ph.png"></img>
-			<img class="label m" id="wirtschaftsinformatik" src="images/labels/hs.wi.png"></img>
-			<img class="label m" id="schuelerhilfe" src="images/labels/sh.png"></img>
+			<playground index="2">
+				<img class="label m" idx="0" call="footer-toggle" id="berufsschule" src="images/labels/ihk.bank.png"></img>
+				<img class="label m" idx="0" call="footer-toggle" id="bank" src="images/labels/ksk.bank.png"></img>
+				<img class="label s" idx="0" call="footer-toggle" id="zivildienst" src="images/labels/rhk.zivi.png"></img>
+				<img class="label s" idx="0" call="footer-toggle" id="grundschule" src="images/labels/grund.schule.png"></img>
+				<img class="label s" idx="0" call="footer-toggle" id="realschule" src="images/labels/mittlere.reife.png"></img>
+			</playground>
+			<playground index="1">
+				<img class="label m" call="footer-toggle" id="tutor" src="images/labels/hs.tutor.png"></img>
+				<img class="label m" call="footer-toggle" id="hiwi" src="images/labels/hs.hiwi.png"></img>
+				<img class="label s" call="footer-toggle" id="abitur" src="images/labels/wg.abi.png"></img>
+				<img class="label m" call="footer-toggle" id="konstanz" src="images/labels/uni.mathe.png"></img>
+				<img class="label s" call="footer-toggle" id="service" src="images/labels/rhk.service.png"></img>
+			</playground>
+			<playground index="0">
+				<img class="label m" call="footer-toggle" id="hello" src="images/labels/hello.world.png"></img>
+				<img class="label m" call="footer-toggle" id="bachelor" src="images/labels/hs.bachelor.png"></img>
+				<img class="label m" call="footer-toggle" id="paedagogik" src="images/labels/ph.png"></img>
+				<img class="label m" call="footer-toggle" id="wirtschaftsinformatik" src="images/labels/hs.wi.png"></img>
+				<img class="label m" call="footer-toggle" id="schuelerhilfe" src="images/labels/sh.png"></img>
+			</playground>
 		</section>
 		<a href="#" class="fa fa-circle-thin fa-1-5x" call="dox-toggle"></a>
 		<a href="#" class="fa fa-question-circle-o fa-1-5x" call="help-toggle"></a>
@@ -817,7 +836,7 @@
 		</user>
 		<a href="#" id="get-next" class="fa fa-chevron-right fa-2x" call="get-next"></a>
 		<a href="#" id="get-prev" class="fa fa-chevron-left fa-2x hide" call="get-prev"></a>
-		<a href="#" id="footer-toggle" class="fa fa-chevron-up" call="footer-toggle"></a>
+	<!--	<a href="#" id="footer-toggle" class="fa fa-chevron-up" call="footer-toggle"></a> -->
 		<popup class="hide"></popup>
 		<overlay class="hide"></overlay>
 	</header>

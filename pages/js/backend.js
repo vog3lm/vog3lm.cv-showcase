@@ -1,3 +1,38 @@
+
+function HtmlCancasTool(animation){
+	var holder = animation;
+    this.canvasParse = (id) => {
+        return document.getElementById(id);
+    }
+    this.canvasScroll = () => {
+    	// wrap canvas to scroll container
+        var canvas = document.createElement("canvas");
+        var scroll = document.createElement("scroll");
+        scroll.appendChild(canvas);
+        if('body' === holder.setting.args.paneParent){
+        	document.body.appendChild(scroll)
+        //    document.body.appendChild(canvas);
+        } else {
+            var element = document.getElementById(holder.setting.args.paneParent);
+            element.insertBefore(scroll, element.childNodes[0])
+        //    element.insertBefore(canvas, element.childNodes[0]);
+        }
+        return canvas;
+    }
+    this.canvasCreate = () => {
+        var canvas = document.createElement("canvas");
+        if('body' === holder.setting.args.paneParent){
+            document.body.appendChild(canvas);
+        } else {
+            var element = document.getElementById(holder.setting.args.paneParent);
+            element.insertBefore(canvas, element.childNodes[0]);
+        }
+        return canvas;
+    }
+}
+
+
+
 function F1rebas3Storage4p1Operator(firebase){
 	var base = firebase.storage();
 	var events = {
@@ -20,7 +55,6 @@ function F1rebas3Storage4p1Operator(firebase){
 		return this;
 	}
 }
-
 function F1rebas3Auth4p1Operator(firebase){
 	var base = firebase.auth();
 	var dispatcher = null;
@@ -190,9 +224,7 @@ function Mvp4p1Operator(){
 		// firebase.auth().currentUser.getIdToken().then(function(token){/* call token each request */});
 	}
 	/* move to content request js... */
-
 }
-
 function Scr1pt4p1Operator(){
 	this.decorate = function(opts){
 		for(var key in opts) {
@@ -211,7 +243,6 @@ function Scr1pt4p1Operator(){
 
     }
 }
-
 function D3s1gn4p1Operator(){
 	var dispatcher = null;
 	var src = 'unset';
@@ -292,7 +323,6 @@ function D3s1gn4p1Operator(){
 		}
     }
 }
-
 function Scro114p1Operator(){
 	var content = null;
 	var scrolled = 0;
@@ -406,7 +436,6 @@ function Scro114p1Operator(){
 		}
 	}
 }
-
 function BrowserHistorD1spatcher(){
 	this.replace = (state) => {
 		window.history.replaceState(state,0,location.href);
@@ -433,7 +462,16 @@ function V13wEv3ntD1spatch3r(holder){
         return this;
     }
     this.onUnleash = function(){
-        $("a").each(function(){
+        $("img").each(function(){ // make images clickable
+            var element = $(this)
+            if(element.attr('call')){
+                element.on('click',function(){
+                    var tmp = $(this)
+                    $('body').trigger(tmp.attr('call'),{call:element.attr('call'),id:element.attr('id'),url:tmp.attr('url')});
+                });
+            }
+        });
+        $("a").each(function(){ // make ankors clickable
             var element = $(this)
             if(element.attr('call')){
                 element.on('click',function(){

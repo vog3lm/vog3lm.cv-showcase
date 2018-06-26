@@ -1,44 +1,11 @@
-
-/* move to backend... */
-function HtmlCancasTool(animation){
-	var holder = animation;
-    this.canvasParse = (id) => {
-        return document.getElementById(id);
-    }
-    this.canvasScroll = () => {
-    	// wrap canvas to scroll container
-        var canvas = document.createElement("canvas");
-        var scroll = document.createElement("scroll");
-        scroll.appendChild(canvas);
-        if('body' === holder.setting.args.paneParent){
-        	document.body.appendChild(scroll)
-        //    document.body.appendChild(canvas);
-        } else {
-            var element = document.getElementById(holder.setting.args.paneParent);
-            element.insertBefore(scroll, element.childNodes[0])
-        //    element.insertBefore(canvas, element.childNodes[0]);
-        }
-        return canvas;
-    }
-    this.canvasCreate = () => {
-        var canvas = document.createElement("canvas");
-        if('body' === holder.setting.args.paneParent){
-            document.body.appendChild(canvas);
-        } else {
-            var element = document.getElementById(holder.setting.args.paneParent);
-            element.insertBefore(canvas, element.childNodes[0]);
-        }
-        return canvas;
-    }
-}
-
-
 function CvLabelHolder(animation,id){
 	var holder = animation;
 	var element = $('img#'+id);
+	var parent = element.parent();
+	var position = parent.get(0).getBoundingClientRect();
     this.loc = {
-        'x': Math.random() * holder.objects.main.width,
-        'y': Math.random() * holder.objects.main.height
+        'x': Math.random()*position.width,
+        'y': Math.random()*position.height
     };
     this.vel = {
         'x': (Math.round(Math.random())*2-1)*(Math.random()*(holder.setting.args.velMax-holder.setting.args.velMin)+holder.setting.args.velMin)/holder.setting.args.velScale,
@@ -48,10 +15,10 @@ function CvLabelHolder(animation,id){
         border = holder.setting.args.paneBorder;
         width = element.width();
         height = element.height();
-        if(this.loc.x >= canvas.width+border-width){ // check right
-            this.loc.x = this.loc.x+width;
+        if(this.loc.x >= position.width+border-width){ // check right
+            this.loc.x = this.loc.x-width;
         }
-        if(this.loc.y >= canvas.height+border-height){ // check bottom
+        if(this.loc.y >= position.height+border-height){ // check bottom
             this.loc.y = this.loc.y-height;
         }
     };
@@ -60,10 +27,10 @@ function CvLabelHolder(animation,id){
     var height = null;
     var drunken = true;
     this.update = function() {
-        if(this.loc.x >= canvas.width+border-width || this.loc.x <= -border){ //right||left
+        if(this.loc.x >= position.left+position.width+border-width || position.left+this.loc.x <= -border){ //right||left
             this.vel.x = -this.vel.x;
         }
-        if(this.loc.y >= canvas.height+border-height || this.loc.y <= -border){ //bottom||top
+        if(this.loc.y >= position.top+position.height+border-height || position.top+this.loc.y <= -border){ //bottom||top
             this.vel.y = -this.vel.y;
         }
         this.loc.x += this.vel.x*drunken;
@@ -143,7 +110,7 @@ function CvAnimationSetting(){
        ,'paneWidth':window.innerWidth
        ,'paneHeight':window.innerHeight
        ,'paneBorder':0
-       ,'velScale':0.1
+       ,'velScale':0.75  // def 0.75
        ,'velMin':-0.5
        ,'velMax':0.5
        ,'lines':true
@@ -182,13 +149,13 @@ function CvAnimationOperator(animation){
         canvas.height = holder.setting.args.paneHeight;
         holder.objects.ctxm = canvas.getContext("2d");
 
-        /* hidden pane */
+        /* hidden pane
     	holder.objects.hide = holder.util.canvasCreate();
         canvas = holder.objects.hide;
         canvas.id = holder.setting.args.paneId+'-hide';
         canvas.width = holder.setting.args.paneWidth;
         canvas.height = holder.setting.args.paneHeight;
-        holder.objects.ctxh = canvas.getContext("2d");
+        holder.objects.ctxh = canvas.getContext("2d"); */
 
 
         var args = holder.setting.args;
@@ -207,9 +174,8 @@ function CvAnimationOperator(animation){
     this.validate = function(){
         return this;
     }
-    this.start = function(mode='any'){
+    this.start = function(){
         holder.engine.start();
-        console.info('cv animation started');
         return this;
     }
 }
@@ -228,9 +194,8 @@ function CvAnimationListener(animation){
 function CvAnimationObjects(){
 	this.main = null;
 	this.ctxm = null;
-	this.hide = null;
-	this.ctxh = null;
-
+	//this.hide = null;
+	//this.ctxh = null;
 	this.labels = {};
 }
 function CvAnimationHolder(){

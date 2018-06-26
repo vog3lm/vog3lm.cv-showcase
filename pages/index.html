@@ -298,7 +298,6 @@
 						});
 					});
 					*/
-
 				}
 				,'clear':() => {
 					document.title = 'smart.cv.og3lm';
@@ -306,6 +305,26 @@
 					header.html('')
 					var footer = $('footer section#content');
 					footer.html('')
+				}
+				,'rearrange':(data) => {
+					$('img.label').css({'visibility':'hidden'}); // hide other labels
+					$('a.fa-chevron-right').css({'visibility':'hidden'}); // hide ui chevrons
+					$('a.fa-chevron-left').css({'visibility':'hidden'});
+					var element = $('#'+data.id);
+					window.requestAnimationFrame(function(){
+						element.css({
+							'visibility':'visible'
+							,'position':'fixed'
+							,'left':window.innerWidth*0.05+'px'
+							,'top':window.innerHeight*0.05+'px'
+						})
+					});
+				}
+				,'arrange':(data) => {
+					$('#'+data.id).css({'position':'absolute'});
+					$('img.label').css({'visibility':'visible'}); // show all labels
+					$('a.fa-chevron-right').css({'visibility':'visible'}); // show ui chevrons
+					$('a.fa-chevron-left').css({'visibility':'visible'});
 				}
 			}
 		}
@@ -371,7 +390,12 @@
 			var adapter = new PagePresentationAdapter();
 
 			var events = {
-				'footer-toggle':(data) => {presenter.footer.toggle();}
+				'footer-toggle':(data) => {
+					presenter.footer.toggle();
+					var flag = cv.toggle();
+					if(flag){presenter.page.arrange(data);} 
+					else{presenter.page.rearrange(data);}
+				}
 				,'cfg-toggle':(data) => {presenter.cfg.toggle();}
 				// popups
 				,'help-toggle':(data) => {presenter.popup.show({'content':'help popup overlay'});}
@@ -588,6 +612,7 @@
 			line-height:14px;
 			vertical-align:middle;
 			text-align:center;
+			z-index:10;
 		}
 		/* user login/logout structure */
 		header user{
@@ -643,6 +668,7 @@
 
 		/* cv labels */
 		header section#content img.label{
+			z-index:1;
 			position:absolute;
 			cursor:pointer;
 			margin:0px;
@@ -684,7 +710,7 @@
 		body footer {
 			position:relative;
 			width:100%;
-			height:60%;
+			height:70%;
 		}
 		footer section {
 			position:absolute;
@@ -791,11 +817,11 @@
 		<img class="after-effect" src="" alt="">
 		<section id="content" index="0">
 			<playground index="2">
-				<img class="label m" idx="0" call="footer-toggle" id="berufsschule" src="images/labels/ihk.bank.png"></img>
-				<img class="label m" idx="0" call="footer-toggle" id="bank" src="images/labels/ksk.bank.png"></img>
-				<img class="label s" idx="0" call="footer-toggle" id="zivildienst" src="images/labels/rhk.zivi.png"></img>
-				<img class="label s" idx="0" call="footer-toggle" id="grundschule" src="images/labels/grund.schule.png"></img>
-				<img class="label s" idx="0" call="footer-toggle" id="realschule" src="images/labels/mittlere.reife.png"></img>
+				<img class="label m" call="footer-toggle" id="berufsschule" src="images/labels/ihk.bank.png"></img>
+				<img class="label m" call="footer-toggle" id="bank" src="images/labels/ksk.bank.png"></img>
+				<img class="label s" call="footer-toggle" id="zivildienst" src="images/labels/rhk.zivi.png"></img>
+				<img class="label s" call="footer-toggle" id="grundschule" src="images/labels/grund.schule.png"></img>
+				<img class="label s" call="footer-toggle" id="realschule" src="images/labels/mittlere.reife.png"></img>
 			</playground>
 			<playground index="1">
 				<img class="label m" call="footer-toggle" id="tutor" src="images/labels/hs.tutor.png"></img>

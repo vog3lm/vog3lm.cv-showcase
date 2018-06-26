@@ -27,14 +27,14 @@ function CvLabelHolder(animation,id){
     var height = null;
     var drunken = true;
     this.update = function() {
-        if(this.loc.x >= position.left+position.width+border-width || position.left+this.loc.x <= -border){ //right||left
+        if(this.loc.x >= position.width+border-width || this.loc.x <= -border){ //right||left
             this.vel.x = -this.vel.x;
         }
-        if(this.loc.y >= position.top+position.height+border-height || position.top+this.loc.y <= -border){ //bottom||top
+        if(this.loc.y >= position.height+border-height || this.loc.y <= -border){ //bottom||top
             this.vel.y = -this.vel.y;
         }
-        this.loc.x += this.vel.x*drunken;
-        this.loc.y += this.vel.y*drunken;
+        this.loc.x += this.vel.x;
+        this.loc.y += this.vel.y;
     	element.css({'top':this.loc.y,'left':this.loc.x});
     }
 }
@@ -82,22 +82,33 @@ function CvAnimationEngine(animation){
         context = holder.objects.ctxm;
         canvas = holder.objects.main;
         this.push();
+        stopFlag = false;
+        this.stopped = false;
         update();
+    }
+    this.pause = function(){
+    	stopFlag = true;
+    	this.stopped = true;
+    }
+    this.resume = function(){
+    	stopFlag = false;
+    	this.stopped = false;
+    	update();
     }
     this.push = function(){
     	for(key in holder.objects.labels){
     		holder.objects.labels[key].push();
     	}
     }
-    var paused = false;
-    var stopped = false;
+    var stopFlag = true;
+    this.stopped = true;
     function update() {
     	context.clearRect(0,0,canvas.width,canvas.height);
     	for(key in holder.objects.labels){
     		holder.objects.labels[key].update();
     	}
-        if(!stopped){
-            requestAnimationFrame(update);
+        if(!stopFlag){
+            window.requestAnimationFrame(update);
         }
     }
 }
@@ -110,7 +121,7 @@ function CvAnimationSetting(){
        ,'paneWidth':window.innerWidth
        ,'paneHeight':window.innerHeight
        ,'paneBorder':0
-       ,'velScale':0.1  // def 0.75
+       ,'velScale':0.5  // def 0.75
        ,'velMin':-0.5
        ,'velMax':0.5
        ,'lines':true
@@ -141,14 +152,14 @@ function CvAnimationOperator(animation){
         return this;
     }
     this.create = function(){
-    	/* main pane */
+    	/* main pane*/
     	holder.objects.main = holder.util.canvasCreate();
         canvas = holder.objects.main;
         canvas.id = holder.setting.args.paneId+'-main';
         canvas.width = holder.setting.args.paneWidth;
         canvas.height = holder.setting.args.paneHeight;
         holder.objects.ctxm = canvas.getContext("2d");
-
+	 	 
         /* hidden pane
     	holder.objects.hide = holder.util.canvasCreate();
         canvas = holder.objects.hide;
@@ -157,12 +168,7 @@ function CvAnimationOperator(animation){
         canvas.height = holder.setting.args.paneHeight;
         holder.objects.ctxh = canvas.getContext("2d"); */
 
-
         var args = holder.setting.args;
-
-        var x = (canvas.width*6+2*args.paneBorder);
-        var y = (canvas.height*6+2*args.paneBorder);
-        var area = x*y;
 
         $("img.label").each(function(index){	// load label images
         	var id = $(this).attr('id');
@@ -175,8 +181,15 @@ function CvAnimationOperator(animation){
         return this;
     }
     this.start = function(){
+    	holder.engine.pause();
         holder.engine.start();
         return this;
+    }
+    this.toggle = function(){
+    	var stopped = holder.engine.stopped;
+    	if(stopped){holder.engine.resume();}
+    	else{holder.engine.pause();}
+        return stopped;
     }
 }
 function CvAnimationListener(animation){

@@ -48,7 +48,7 @@ function F1rebas3Storage4p1Operator(firebase){
 	};
 	this.create = function(){
 		try{
-			dispatcher = new V13wEv3ntD1spatch3r({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
+			dispatcher = new V13wEv3ntD1spatch3r().onDecorate({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
 		}catch(error){
 			console.error(error);
 		}
@@ -98,7 +98,7 @@ function F1rebas3Auth4p1Operator(firebase){
 			case 'session':args.scope = firebase.auth.Auth.Persistence.SESSION; break;
 			default:args.scope = firebase.auth.Auth.Persistence.LOCAL; break;
 		}
-		dispatcher = new V13wEv3ntD1spatch3r({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
+		dispatcher = new V13wEv3ntD1spatch3r().onDecorate({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
 		return this;
 	}
 	base.onAuthStateChanged((u) => {
@@ -179,7 +179,7 @@ function Mvp4p1Operator(){
 		return this;
 	}
 	this.create = function(){
-		dispatcher = new V13wEv3ntD1spatch3r({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
+		dispatcher = new V13wEv3ntD1spatch3r().onDecorate({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
 		return this;
 	}
 	/* move to content request js... */
@@ -293,7 +293,7 @@ function D3s1gn4p1Operator(){
 		try{
 			src = args.path+'/'+args.url+'.'+args.design+'.'+args.format;
 			cssAdd(src);
-			dispatcher = new V13wEv3ntD1spatch3r({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
+			dispatcher = new V13wEv3ntD1spatch3r().onDecorate({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
 		}catch(error){
 			console.error(error);
 		}
@@ -435,6 +435,58 @@ function Scro114p1Operator(){
 		}
 	}
 }
+function Swipe4p1Operator(){
+	/*	http://jquerymobile.com/download-builder/	*//*
+		jQuery Mobile event cheat sheet 			*//*
+		orientationchange 
+		pinch 
+		pinchopen // two fingers away from each other
+		pinchclose // two fingers against each other
+		rotate 
+		rotatecw // clockwise
+		rotateccw // counterclockwise
+		swipemove
+		swipeone // one touch point
+		swipetwo // two touch points
+		swipethree 
+		swipefour 
+		swipeup 
+		swiperightup
+		swiperight
+		swiperightdown
+		swipedown
+		swipeleftdown
+		swipeleft 
+		swipeleftup 
+		tapone 
+		taptwo 
+		tapthree 		*/
+	var mapping = {};
+	var events = {
+		 'map-swipes':(map) => {this.create(map);}
+		,'create-swipes':() => {this.create();}
+	};
+	this.map = (map) => {
+		mapping = map;
+		console.log(mapping);
+		return this;
+	}
+	this.create = () => {
+		if(mapping.hasOwnProperty('swipeleft')){
+			$(document).on("swipeleft",function(){
+				var tmp = mapping["swipeleft"];
+				$('body').trigger(tmp.call,{'call':tmp.call,'id':'swipeleft'});
+			});
+		}
+		if(mapping.hasOwnProperty('swiperight')){
+			$(document).on("swiperight",function(){
+				var tmp = mapping["swiperight"];
+				$('body').trigger(tmp.call,{'call':tmp.call,'id':'swiperight'});
+			});
+		}
+	    return this;
+	}
+}
 function BrowserHistorD1spatcher(){
 	this.replace = (state) => {
 		window.history.replaceState(state,0,location.href);
@@ -492,10 +544,21 @@ function Keyboard4p1Operator(){
 	}
 }
 
-function V13wEv3ntD1spatch3r(holder){
-    var events = holder.events;
-    var issues = holder.issues;
+
+
+function V13wEv3ntD1spatch3r(){
+    var events = null;
+    var issues = null;
+    this.onDecorate = function(holder){
+	    events = holder.events;
+	    issues = holder.issues;
+	    return this;
+    }
     this.onRegister = function(){
+    	if(events == null || issues == null){
+    		throw 'view event dispachter not decorated. call onDecorate first!'
+    		return this;
+    	}
 		for (var i=0; i<events.length; i++) {
             $('body').on(events[i],selfDispatch);
         };
@@ -533,6 +596,9 @@ function V13wEv3ntD1spatch3r(holder){
     }
     function selfDispatch(evt,data){
         try {
+	    	if(events == null || issues == null){
+	    		throw 'view event dispachter not decorated. call onDecorate first!'
+	    	}
             index = events.indexOf(evt.type)
             if(index < 0){
                 throw 'view event Intel not Found!'

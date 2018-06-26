@@ -20,6 +20,7 @@
 	<script src="https://www.gstatic.com/firebasejs/4.9.1/firebase-auth.js"></script>
 
 	<script type="text/javascript" src="js/jq.min.js"></script>
+	<script type="text/javascript" src="js/jm.min.js"></script>
 	<script type="text/javascript" src="js/backend.js"></script>
 	<script type="text/javascript" src="js/animate.fox.js"></script>
 	<script type="text/javascript" src="js/animate.cv.js"></script>
@@ -372,6 +373,9 @@
 			var scroller = new Scro114p1Operator().decorate({'node':'section#content div#story','orientation':'horizontal'}).create();
 			var history = new BrowserHistorD1spatcher();
 			var keyboard = new Keyboard4p1Operator().map({'37':{'call':'get-prev'},'39':{'call':'get-next'}}).create();
+			var clicker = new V13wEv3ntD1spatch3r();
+			var swiper = new Swipe4p1Operator().map({'swiperight':{'call':'get-prev'}
+													,'swipeleft':{'call':'get-next'}}).create();
 
 			var one = new DotNetHolder()
 			one.operator.decorate(animations.one).create().start();
@@ -431,6 +435,7 @@
 
 			    ,'get-start':(data) => {
 					window.location.replace("#");
+					clicker.onUnleash();
 					$('body').trigger('get-index',{'call':'get-start','id':'onLoad','index':0});
 					history.replace({'call':'get-index','id':'get-start','index':0});
 					presenter.swipe.initialize();
@@ -524,9 +529,7 @@
 					req.send();
 				}
 			}
-			this.getEvents = function(){
-				return {'events':Object.keys(events),'issues':Object.values(events)}
-			}
+			clicker.onDecorate({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
 		}
 
 		var app = null;
@@ -541,9 +544,6 @@
 			app = new PageEventListener();
 		});
 		$(window).load(function() {
-			dispatcher = new V13wEv3ntD1spatch3r(app.getEvents())
-			dispatcher.onRegister()
-			dispatcher.onUnleash(); // ui listen now
 			$('body').trigger('get-start',{'call':'get-start','id':'onLoad'});
 		});
 

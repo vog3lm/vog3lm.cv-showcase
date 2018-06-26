@@ -110,7 +110,7 @@ function CvAnimationSetting(){
        ,'paneWidth':window.innerWidth
        ,'paneHeight':window.innerHeight
        ,'paneBorder':0
-       ,'velScale':0.75  // def 0.75
+       ,'velScale':0.1  // def 0.75
        ,'velMin':-0.5
        ,'velMax':0.5
        ,'lines':true

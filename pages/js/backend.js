@@ -182,7 +182,6 @@ function Mvp4p1Operator(){
 		dispatcher = new V13wEv3ntD1spatch3r({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
 		return this;
 	}
-
 	/* move to content request js... */
 	this.header = function(url,type="GET"){
 		if('unset' !== args.token){
@@ -450,6 +449,47 @@ function BrowserHistorD1spatcher(){
 			$('body').trigger(state.call,state)
 	    }
 	});
+}
+function Keyboard4p1Operator(){
+	/*	key code cheat sheet *//*
+		Enter			13	Home			36
+		Up arrow		38	Backspace		8
+		Down arrow		40	End				35
+		Left arrow		37	Insert			45
+		Right arrow		39	Delete			46
+		Escape			27	Page Up			33
+		Spacebar		32	Page Down		34
+		Ctrl			17	Numlock			144
+		Alt				18	Scroll-lock		145
+		Tab				 9	Pause-break		19
+		Shift			16	F1-F12			112-123
+		Caps-lock		20	Print-screen	??
+		Windows key		91	
+		Windows option key	93				*/
+	var mapping = {};
+	var events = {
+		 'map-keyboard':(map) => {this.create(map);}
+		,'create-keyboard':() => {this.create();}
+	};
+	this.map = (map) => {
+		mapping = map;
+		return this;
+	}
+	this.create = () => {
+	    $(document).keydown(function(e){ // need keydown, keypress no working on special keys
+	    	e.preventDefault();
+	    	if(mapping.hasOwnProperty(e.which)){
+	    		var tmp = mapping[e.which];
+	    		$('body').trigger(tmp.call,{'call':tmp.call,'id':'onKeydown'});
+	    		return;
+			}
+	        if(e.which == 116){ //F5
+	        	location.reload();
+	        }
+	        
+	    });
+	    return this;
+	}
 }
 
 function V13wEv3ntD1spatch3r(holder){

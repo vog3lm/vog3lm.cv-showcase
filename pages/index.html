@@ -310,13 +310,13 @@
 					$('img.label').css({'visibility':'hidden'}); // hide other labels
 					$('a.fa-chevron-right').css({'visibility':'hidden'}); // hide ui chevrons
 					$('a.fa-chevron-left').css({'visibility':'hidden'});
-					var element = $('#'+data.id);
 					window.requestAnimationFrame(function(){
+						var element = $('#'+data.id);
 						element.css({
 							'visibility':'visible'
 							,'position':'fixed'
 							,'left':window.innerWidth*0.05+'px'
-							,'top':window.innerHeight*0.05+'px'
+							,'top':(window.innerHeight*0.3/2-element.height()/2)+'px'
 						})
 					});
 				}
@@ -371,10 +371,12 @@
 			//	var storage = new F1rebas3Storage4p1Operator(firebase);
 			var scroller = new Scro114p1Operator().decorate({'node':'section#content div#story','orientation':'horizontal'}).create();
 			var history = new BrowserHistorD1spatcher();
+			var keyboard = new Keyboard4p1Operator().map({'37':{'call':'get-prev'},'39':{'call':'get-next'}}).create();
 
 			var one = new DotNetHolder()
 			one.operator.decorate(animations.one).create().start();
 			var dotsOne = one.objects.dots;
+
 
 			//	two = new DotNetHolder()
 			//	two.operator.decorate(animations.two).create().start();
@@ -541,8 +543,8 @@
 		$(window).load(function() {
 			dispatcher = new V13wEv3ntD1spatch3r(app.getEvents())
 			dispatcher.onRegister()
-			dispatcher.onUnleash(); // is listening now
-			$('body').trigger('get-start',{'call':'get-start','id':'onLoad'})
+			dispatcher.onUnleash(); // ui listen now
+			$('body').trigger('get-start',{'call':'get-start','id':'onLoad'});
 		});
 
 	</script>
@@ -826,8 +828,8 @@
 			<playground index="1">
 				<img class="label m" call="footer-toggle" id="tutor" src="images/labels/hs.tutor.png"></img>
 				<img class="label m" call="footer-toggle" id="hiwi" src="images/labels/hs.hiwi.png"></img>
-				<img class="label s" call="footer-toggle" id="abitur" src="images/labels/wg.abi.png"></img>
 				<img class="label m" call="footer-toggle" id="konstanz" src="images/labels/uni.mathe.png"></img>
+				<img class="label s" call="footer-toggle" id="abitur" src="images/labels/wg.abi.png"></img>
 				<img class="label s" call="footer-toggle" id="service" src="images/labels/rhk.service.png"></img>
 			</playground>
 			<playground index="0">

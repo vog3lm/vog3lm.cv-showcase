@@ -185,6 +185,14 @@ function CvAnimationOperator(animation){
         holder.engine.start();
         return this;
     }
+    this.pause = function(){
+        holder.engine.pause();
+        return this;
+    }
+    this.resume = function(){
+        holder.engine.resume();
+        return this;
+    }
     this.toggle = function(){
     	var stopped = holder.engine.stopped;
     	if(stopped){holder.engine.resume();}

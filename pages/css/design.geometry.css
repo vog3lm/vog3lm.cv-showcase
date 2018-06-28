@@ -1,7 +1,7 @@
 /* Geometry */
 * {margin: 0px;padding: 0px;}
 /* Geometry */
-html,body { position:absolute; height:100%; width:100%; padding:0px; margin:0px; overflow:hidden; }
+html,body { position:fixed; height:100%; width:100%; padding:0px; margin:0px; overflow:hidden; -webkit-overflow-scrolling:hidden; }
 
 a    { display:block; height:32px; line-height:32px; }
 a.fa { width:32px; line-height:32px; }
@@ -11,7 +11,8 @@ a.fa { width:32px; line-height:32px; }
 .hide {display:none;}
 
 
-
+/* 	doube in index .. used in reader ... 
+	TODO rearrange and seperate design stuff relational */
 body header {
 	overflow:hidden;
 	position:relative;

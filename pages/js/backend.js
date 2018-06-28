@@ -248,26 +248,8 @@ function D3s1gn4p1Operator(){
 	var args = {'design':'dark','designs':['white','dark']
 			   ,'path':'css','url':'design','format':'css'}
 	var events = {
-		'design-call':(data) => {
-			try{}
-			catch(error){console.error(error);}
-			cssRemove(src);
-			src = src.replace(args.design,data.design);
-			args.design = data.design;
-			cssAdd(src);
-		}
-		,'design-toggle':(data) => {
-			cssRemove(src);
-			if('white' == args.design){
-				src = src.replace(args.design,'dark');
-				args.design = 'dark';
-			}
-			else{
-				src = src.replace(args.design,'white');
-				args.design = 'white';
-			}
-			cssAdd(src);
-		}
+		'design-call':(data) => {this.call(data);}
+		,'design-toggle':(data) => {this.toggle(data);}
 	    ,'design-iterate':(data) => {
 			wrapRemove(args.path+'/'+args.url+'.'+args.design+'.'+args.format);
 			var index = args.designs.indexOf(args.design);
@@ -300,7 +282,26 @@ function D3s1gn4p1Operator(){
 		return this;
 	}
 	this.design = function(){return args.design;}
-
+	this.call = function(){
+		cssRemove(src);
+		src = src.replace(args.design,data.design);
+		args.design = data.design;
+		cssAdd(src);
+	}
+	this.toggle = function(data){
+		cssRemove(src);
+		if('white' == args.design){
+			src = src.replace(args.design,'dark');
+			args.design = 'dark';
+			document.querySelector('meta[name="theme-color"]').setAttribute("content",'#222222');
+		}
+		else{
+			src = src.replace(args.design,'white');
+			args.design = 'white';
+			document.querySelector('meta[name="theme-color"]').setAttribute("content",'#ffffff');
+		}
+		cssAdd(src);
+	}
 
     function cssAdd(filename){
 		var fileref=document.createElement("link")
@@ -468,7 +469,6 @@ function Swipe4p1Operator(){
 	};
 	this.map = (map) => {
 		mapping = map;
-		console.log(mapping);
 		return this;
 	}
 	this.create = () => {
@@ -484,9 +484,17 @@ function Swipe4p1Operator(){
 				$('body').trigger(tmp.call,{'call':tmp.call,'id':'swiperight'});
 			});
 		}
+		if(mapping.hasOwnProperty('orientationchange')){
+			$(document).on("orientationchange",function(event){
+				console.log('orientationchange',event.orientation,event)
+			});
+		}
 	    return this;
 	}
 }
+
+
+
 function BrowserHistorD1spatcher(){
 	this.replace = (state) => {
 		window.history.replaceState(state,0,location.href);
@@ -543,9 +551,6 @@ function Keyboard4p1Operator(){
 	    return this;
 	}
 }
-
-
-
 function V13wEv3ntD1spatch3r(){
     var events = null;
     var issues = null;

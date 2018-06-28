@@ -268,7 +268,8 @@ function FoxNetSetting(){
        ,'dotVelMin':-0.2
        ,'dotVelMax':0.2
        ,'dotLeft':10
-       ,'dotTop':10 // canvas.height-canvas.height/scaleFactor
+       ,'dotTop':null // canvas.height-canvas.height/scaleFactor
+       ,'dotBottom':null
        ,'dotLogs':{
             '0':{'pos':[85,15],'con':['1','5','6']}     // L - 85,15 left ear top
             ,'1':{'pos':[295,160],'con':['0','2','7']}   // J - 295,160
@@ -326,7 +327,7 @@ function FoxNetAnimation(animation){
         return this;
     }
     this.create = () => {
-        var canvas = canvasCreate();
+        var canvas = holder.util.canvasCreate();
         var args = holder.setting.args;
         canvas.id = args.paneId
         if(window.innerWidth <= window.innerHeight){
@@ -347,9 +348,17 @@ function FoxNetAnimation(animation){
         var cons = holder.objects.cons;
         var scouts = holder.objects.scouts;
         var logs = args.dotLogs;
+        var dotX = args.dotLeft;
+        var dotY = 0;
+        var height = (1130-10)/args.scaleFactor; // tiefster-hoechster
+        if(null != args.dotBottom && null == args.dotTop){
+            dotY = canvas.height-args.dotBottom-height;
+        } else if(null != args.dotTop && null == args.dotBottom){
+            dotY = args.dotTop;
+        }
         for(var key in logs){
-            logs[key].pos[0] = logs[key].pos[0] * canvas.width / args.scaleWidth / args.scaleFactor + args.dotLeft;
-            logs[key].pos[1] = logs[key].pos[1] * canvas.height / args.scaleHeight / args.scaleFactor + args.dotTop;
+            logs[key].pos[0] = logs[key].pos[0] * canvas.width / args.scaleWidth / args.scaleFactor + dotX;
+            logs[key].pos[1] = logs[key].pos[1] * canvas.height / args.scaleHeight / args.scaleFactor + dotY;
             var tmp = new FoxConnector(holder,logs[key].pos[0],logs[key].pos[1]);
             dots.push(tmp);
             cons.push(new FoxCon(holder,tmp,logs[key].con));
@@ -390,21 +399,6 @@ function FoxNetAnimation(animation){
         holder.engine.start();
         return this;
     }
-
-
-    function canvasParse(id){
-        return document.getElementById(id);
-    }
-    function canvasCreate(){
-        var canvas = document.createElement("canvas");
-        if('body' === holder.setting.args.paneParent){
-            document.body.appendChild(canvas);
-        } else {
-            var element = document.getElementById(holder.setting.args.paneParent);
-            element.insertBefore(canvas, element.childNodes[0]);
-        }
-        return canvas;
-    }
 }
 function FoxNetListener(animation){
     var holder = animation;
@@ -437,5 +431,6 @@ function FoxNetHolder(){
     this.objects = new FoxNetObjects();
     this.engine = new FoxNetEngine(this);
     this.setting = new FoxNetSetting();
-    this.validate = new FoxNetValidation(this); 
+    this.validate = new FoxNetValidation(this);
+    this.util = new HtmlCancasTool(this);
 }  

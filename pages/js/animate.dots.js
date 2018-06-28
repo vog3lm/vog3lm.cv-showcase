@@ -149,6 +149,15 @@ function DotNetEngine(animation){
         this.push();
         update();
     }
+    this.pause = function(){
+        this.stopped = true;
+        stopFlag = true;
+    }
+    this.resume = function(){
+        stopFlag = false;
+        this.stopped = false;
+        update();
+    }
     this.push = function(){
         var tmpArg = holder.setting.args;
         paneFrames = tmpArg.paneFrames;
@@ -162,8 +171,8 @@ function DotNetEngine(animation){
         for(var i=0; i<move.length; i++){move[i].push();}
     }
 
-    var paused = false;
-    var stopped = false;
+    this.stopped = false;
+    var stopFlag = false;
 
     var lastTime = Date.now();
     function update() {
@@ -201,7 +210,7 @@ function DotNetEngine(animation){
                 /**/
             }
         }
-        if(!stopped){
+        if(!stopFlag){
             requestAnimationFrame(update);
         }
     }
@@ -252,7 +261,7 @@ function DotNetAnimation(animation){
         return this;
     }
     this.create = function(){
-        var canvas = canvasCreate();
+        var canvas = holder.util.canvasCreate();
         canvas.id = holder.setting.args.paneId
         canvas.width = holder.setting.args.paneWidth;
         canvas.height = holder.setting.args.paneHeight;
@@ -287,8 +296,6 @@ function DotNetAnimation(animation){
             ,holder.setting.args.drinker,'percent drunken.\n'
             ,holder.setting.args.effects.length,'effects involved.\n'
             ,holder.setting.args.paneUi.length,'active ui interfaces.\n');
-
-        
         return this;
     }
     this.validate = function(){
@@ -298,26 +305,17 @@ function DotNetAnimation(animation){
         holder.engine.start();
         return this;
     }
-    this.pause = function(){console.error('Not implemented!')}
+    this.pause = function(){
+        holder.engine.pause();
+        return this;
+    }
+    this.resume = function(){
+        holder.engine.resume();
+        return this;
+    }
     this.refresh = function(){
         holder.engine.push();
         return this;
-    }
-    this.lock = function(){console.error('Not implemented!')}
-    this.stop = function(){console.error('Not implemented!')}
-
-    function canvasParse(id){
-        return document.getElementById(id);
-    }
-    function canvasCreate(){
-        var canvas = document.createElement("canvas");
-        if('body' === holder.setting.args.paneParent){
-            document.body.appendChild(canvas);
-        } else {
-            var element = document.getElementById(holder.setting.args.paneParent);
-            element.insertBefore(canvas, element.childNodes[0]);
-        }
-        return canvas;
     }
 }
 function DotNetListener(animation){
@@ -348,5 +346,6 @@ function DotNetHolder(){
     this.objects = new DotNetObjects();
     this.engine = new DotNetEngine(this);
     this.setting = new DotNetSetting();
-    this.validate = new DotNetValidation(this); 
+    this.validate = new DotNetValidation(this);
+    this.util = new HtmlCancasTool(this);
 }  

@@ -2,6 +2,7 @@
 <html>
 <head>
 	<meta charset='utf-8'/>
+	<meta name="theme-color" content="#222222"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 	<title>smart.cv.og3lm</title>
 	<link rel="manifest" href="/manifest.json"/>
@@ -9,6 +10,7 @@
     <link rel="stylesheet" href="css/font.geometry.css"/>
     <link rel="stylesheet" href="css/design.geometry.css"/>
     <!-- PRELOAD FONTS -->
+    <link rel="preload" href="fonts/UbuntuMono-R.ttf" as="font" crossorigin="anonymous" />
     <link rel="preload" href="fonts/MyriadPro-Light.woff" as="font" crossorigin="anonymous" />
     <link rel="preload" href="fonts/MyriadPro-Semibold.woff" as="font" crossorigin="anonymous" />
     <link rel="preload" href="fonts/MyriadPro-Bold.woff" as="font" crossorigin="anonymous" />
@@ -28,10 +30,6 @@
 
 
 	<script type="text/javascript">
-
-		var animations = {}
-		var dispatcher = null
-
 		function PagePagePresenter(){
 			this.popup = {
 				'show':(data) => {
@@ -86,19 +84,11 @@
 				'toggle':() => {
 					var element = $("body")
 					if(!element.hasClass('scroll-flag')){
-						element.scrollTop($(document).height());
-						$("a#get-next").css({'top':'80%'});
-						$("a#get-prev").css({'top':'80%'});
+						element.scrollTop($('footer').height());
 					}else{
 						element.scrollTop(0);
-						$("a#get-next").css({'top':'50%'});
-						$("a#get-prev").css({'top':'50%'});
 					}
 					element.toggleClass('scroll-flag');
-					var clicker = $("a#footer-toggle");
-					clicker.toggleClass('fa-chevron-down');
-					clicker.toggleClass('fa-chevron-up');
-					
 				}
 				,'replace':(views) => {
 					console.log('replace footer left',views);
@@ -182,6 +172,9 @@
 				}
 				,'index':() => {return parseInt($('header section#content').attr('index'));}
 				,'next':() => {
+					if($("body").hasClass('scroll-flag')){
+						return index;
+					}
 					var header = $('header section#content');
 					var index = parseInt(header.attr('index'));
 					if(index == swipePages){
@@ -205,6 +198,9 @@
 					return index;
 				}
 				,'prev':() => {
+					if($("body").hasClass('scroll-flag')){
+						return index;
+					}
 					var header = $('header section#content');
 					var index = parseInt(header.attr('index'));
 					if(index == 0){
@@ -251,15 +247,16 @@
 				'show':(data) => {
 					document.title = data.title;
 
-					//var header = $('header section#content'); // add header data
-					//header.html(data.header);
-					//var holder = $('header');
+
 
 					var footer = $('footer section#content'); // add footer data
 					footer.html(data.footer);
 					holder = $('footer');
 					footer.css({'top':(holder.outerHeight()-footer.outerHeight())/2}) // center vertical
 					footer.css({'left':(holder.outerWidth()-footer.outerWidth())/2}) // center horizontal
+
+
+
 
 					/*
 					$('footer section img.lico').each(function(){ // pos left icon
@@ -316,9 +313,18 @@
 						element.css({
 							'visibility':'visible'
 							,'position':'fixed'
-							,'left':window.innerWidth*0.05+'px'
+							,'left':(window.innerWidth*0.95-element.width())+'px'
 							,'top':(window.innerHeight*0.3/2-element.height()/2)+'px'
 						})
+					});
+
+					/* move to ... */
+					var url = null;
+					if(data.id.indexOf('hello') != -1){
+						url = 'images/portraits/me.pass_gate.jpg';
+					}
+					$('<img class="portrait" src="'+url+'">').load(function(){
+						$(this).appendTo('header section#content');
 					});
 				}
 				,'arrange':(data) => {
@@ -326,70 +332,56 @@
 					$('img.label').css({'visibility':'visible'}); // show all labels
 					$('a.fa-chevron-right').css({'visibility':'visible'}); // show ui chevrons
 					$('a.fa-chevron-left').css({'visibility':'visible'});
+					document.title = 'smart.cv.og3lm';
+					$('header section#content img.portrait').remove();
 				}
 			}
 		}
 		function PagePresentationAdapter(){
 			this.get = (data) => {
-				switch(data.index){
-				    case 0:return {
-				    	 'title':'about.me'
-						,'footer':'<p>'+'Restricted. Apply for access.'+'</p>'
+				console.log(data)
+
+				var text = data.id+'\nLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\nLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\nLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\nLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\nLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'
+
+				text = text.split('\n');
+				var adaption = ''
+				for (var i=0; i<text.length; i++) {
+					adaption = adaption+'<p>'+text[i]+'</p>';
+				};
+				return {
+				    	 'title':data.id
+				    	,'footer':adaption
 					};
-				    case 1:return {
-				    	'title':'job.xp'
-					   ,'footer':'<p>'+'Restricted. Apply for access.'+'</p>'
-					};
-				    case 2:return {
-				    	'title':'edu.higher'
-					   ,'footer':'<p>'+'Restricted. Apply for access.'+'</p>'
-					};
-				    case 3:return {
-				    	'title':'edu.base'
-					   ,'footer':'<p>'+'Restricted. Apply for access.'+'</p>'
-					};
-				    case 4:return {
-				    	'title':'get.connected'
-					   ,'footer':'<textarea maxlength="31415" placeholder="leave a message.."></textarea>'
-								+'<p><a href="#" class="fa fa-send" call="msg-send" url="https://github.com"></a></p>'
-					};
-				    default: null;
-				}
 			};
 		}
 
-		var animations= {'fox':{'lineColor':'#444','lineWidth':'1px','paneParent':'zone','paneId':'fox','scaleFactor':11
-							   ,'dotLeft':25,'dotTop':window.innerHeight*(1-1/10)}
+		var animations = {'fox':{'lineColor':'#444','lineWidth':'1px','paneParent':'zone','paneId':'fox','scaleFactor':11
+							   ,'dotLeft':25,'dotBottom':5}
 						,'cv':{'lineColor':'#444','lineWidth':7,'paneParent':'zone','paneId':'cv'}
 						,'one':{'lineColor':'#444','lineWidth':'1px','paneParent':'zone','paneId':'one'}
-					//	,'two':{'lineColor':'#444','lineWidth':'1px','paneParent':'zone','paneId':'two'}
-					//	,'tre':{'lineColor':'#444','lineWidth':'1px','paneParent':'zone','paneId':'tre'}
-						};
+						,'two':{'lineColor':'#444','lineWidth':'1px','paneParent':'zone','paneId':'two'}
+						,'tre':{'lineColor':'#444','lineWidth':'1px','paneParent':'zone','paneId':'tre'}
+					};
+
+		var keymap = {'37':{'call':'get-prev'},'39':{'call':'get-next'}};
+
+		var gestures = {'swiperight':{'call':'get-prev'}
+					   ,'swipeleft':{'call':'get-next'}
+					   ,'orientationchange':{'call':'get-reloaded'}
+					};
 
 		function PageEventListener(){
 			var style = new D3s1gn4p1Operator().create();
 			var authenicate = new F1rebas3Auth4p1Operator(firebase).create();
 			//	var storage = new F1rebas3Storage4p1Operator(firebase);
-			var scroller = new Scro114p1Operator().decorate({'node':'section#content div#story','orientation':'horizontal'}).create();
 			var history = new BrowserHistorD1spatcher();
-			var keyboard = new Keyboard4p1Operator().map({'37':{'call':'get-prev'},'39':{'call':'get-next'}}).create();
+			var keyboard = new Keyboard4p1Operator().map(keymap).create();
 			var clicker = new V13wEv3ntD1spatch3r();
-			var swiper = new Swipe4p1Operator().map({'swiperight':{'call':'get-prev'}
-													,'swipeleft':{'call':'get-next'}}).create();
-
+			var swiper = new Swipe4p1Operator().map(gestures).create();
 			var one = new DotNetHolder()
 			one.operator.decorate(animations.one).create().start();
-			var dotsOne = one.objects.dots;
-
-
-			//	two = new DotNetHolder()
-			//	two.operator.decorate(animations.two).create().start();
-			//	dotsOne = dotsOne.concat(two.objects.dots);
-			//	var tre = new DotNetHolder()
-			//	tre.operator.decorate(animations.tre).create().start();
-			//	dotsOne = dotsOne.concat(tre.objects.dots);
-
-			var fox = new FoxNetHolder().operator.decorate(animations.fox).interlink(dotsOne).create().start();
+			var dots = one.objects.dots;
+			var fox = new FoxNetHolder().operator.decorate(animations.fox).interlink(dots).create().start();
 			var cv = new CvAnimationHolder().operator.decorate(animations.cv).create().start();
 
 			var presenter = new PagePagePresenter();
@@ -397,6 +389,10 @@
 
 			var events = {
 				'footer-toggle':(data) => {
+
+					// call content
+					 presenter.page.show(adapter.get(data))
+
 					presenter.footer.toggle();
 					var flag = cv.toggle();
 					if(flag){presenter.page.arrange(data);} 
@@ -433,43 +429,55 @@
 			    }
 
 
+
+			    /* REFACOTR !!! content call in footer toggle !!! */
 			    ,'get-start':(data) => {
 					window.location.replace("#");
 					clicker.onUnleash();
 					$('body').trigger('get-index',{'call':'get-start','id':'onLoad','index':0});
 					history.replace({'call':'get-index','id':'get-start','index':0});
 					presenter.swipe.initialize();
-					presenter.swipe.show({'call':'get-index','id':'get-start','index':0});
+				//	presenter.swipe.show({'call':'get-index','id':'get-start','index':0});
+			    }
+			    ,'get-reloaded':() => {
+			    	console.log('page get-reloaded refresh manually');
 			    }
 				,'get-index':(data) => {
 					// start loading
-					var index = presenter.swipe.show(data);
-					$('body').trigger('got-mvp',{'call':'got-mvp','id':'get-index'});
+				//	var index = presenter.swipe.show(data);
+				//	$('body').trigger('got-mvp',{'call':'got-mvp','id':'get-index'});
 				}
 				,'get-next':(data) => {
 					var index = presenter.swipe.next();
-					history.push({'call':'get-index','id':'pushState','index':index})
-				//	window.history.pushState({'call':'get-index','id':'pushState','index':index},index,"");
-					$('body').trigger('got-mvp',{'call':'got-mvp','id':'get-next'});
+					// history.push({'call':'get-prev','id':'pushState','index':index})
+					// window.history.pushState({'call':'get-index','id':'pushState','index':index},index,"");
+					// $('body').trigger('got-mvp',{'call':'got-mvp','id':'get-next'});
 				}
 				,'get-prev':(data) => {
 					var index = presenter.swipe.prev();
-					history.push({'call':'get-index','id':'pushState','index':index})
-				//	window.history.pushState({'call':'get-index','id':'pushState','index':index},index,"");
-					$('body').trigger('got-mvp',{'call':'got-mvp','id':'get-prev'});
+					// history.push({'call':'get-next','id':'pushState','index':index})
+					// window.history.pushState({'call':'get-index','id':'pushState','index':index},index,"");
+					// $('body').trigger('got-mvp',{'call':'got-mvp','id':'get-prev'});
 				}
 				,'got-token':(data) => {console.log('got token. user is logged in.');}
-				,'got-mvp':(data) => {
+
+
+				,'got-mvp':(data) => { // useless...toggle footer is the deal
 					data.index = presenter.swipe.index();
 					/* load some offline content */
 					data = adapter.get(data);
 					data.index = presenter.swipe.index();
 					presenter.page.show(data); 		// show elements
 				}
+				/* REFACOTR !!! content call in footer toggle !!! */
 
 
-				,'click-animation':(data) => {
-					console.log('animationClick',data);
+
+				/* REFACOTR !!! move to dot animation !!! */
+				,'animation-colors':(data) => {
+					var colors = ['#fb1','#67f','#b0f','#2F2','#6be','#e5f','#ff1','#444']
+				  	one.operator.decorate({'lineColor':colors[Math.floor(Math.random()*(colors.length-1))]}).refresh();
+				//  	two.operator.decorate({'lineColor':colors[Math.floor(Math.random()*(colors.length-1))]}).refresh();
 				}
 				,'animation-pause':(data) => {
 					$('nav a.fa-pause').each(function(){
@@ -478,9 +486,9 @@
 						element.removeClass('fa-pause')
 						element.addClass('fa-play')
 					})
-					jQuery.each(animations,(key,value) => {
-					  	console.log('animation pause not found')
-					});
+					cv.pause();
+					one.operator.pause();
+				//	two.operator.pause();
 				}
 				,'animation-play':(data) => {
 					$('nav a.fa-play').each(function(){
@@ -489,15 +497,13 @@
 						element.removeClass('fa-play')
 						element.addClass('fa-pause')
 					})
-					jQuery.each(animations,(key,value) => {
-					  	console.log('animation pause not found')
-					});
+					cv.resume();
+					one.operator.resume();
+				//	two.operator.resume();
 				}
-				,'animation-colors':(data) => {
-					var colors = ['#fb1','#67f','#b0f','#2F2','#6be','#e5f','#ff1','#777']
-				  	one.operator.decorate({'lineColor':colors[Math.floor(Math.random()*(colors.length-1))]})
-				//  	two.operator.decorate({'lineColor':colors[Math.floor(Math.random()*(colors.length-1))]})
-				}
+
+
+
 
 
 				/*test stuff*/
@@ -532,8 +538,6 @@
 			clicker.onDecorate({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
 		}
 
-		var app = null;
-
 		$(document).ready(function(){
 			var config = {
 			    apiKey:"AIzaSyDmXSkwOam-aQ37z8-3d5aH-X257lIVS34",
@@ -541,7 +545,7 @@
 			    projectId:"vog3lm-0x1",
 			};
 			firebase.initializeApp(config);
-			app = new PageEventListener();
+			new PageEventListener();
 		});
 		$(window).load(function() {
 			$('body').trigger('get-start',{'call':'get-start','id':'onLoad'});
@@ -549,7 +553,7 @@
 
 	</script>
 	<style type="text/css">
-		body header {
+		body header {	/* d.css */
 			overflow:hidden;
 			position:relative;
 			width:100%;
@@ -616,7 +620,7 @@
 			text-align:center;
 			z-index:10;
 		}
-		/* user login/logout structure */
+		/* user login/logout structure *//* d.css */
 		header user{
 			position:absolute;
 			height:32px;
@@ -647,7 +651,7 @@
 		}
 
 
-		header section#content{
+		header section#content{ /* d.css */
 		    position:absolute;
 		    top:0px;
 		    width:100%;
@@ -689,7 +693,12 @@
 			max-height:168px;
 			min-height:56px;
 		}
-
+		header section#content img.portrait{
+			height: 212px;
+		    bottom: 40px;
+		    position: absolute;
+		    left:25px;
+		}
 
 		body popup {
 			font-size:1.5em;
@@ -713,18 +722,25 @@
 			position:relative;
 			width:100%;
 			height:70%;
+			max-height:70%;
 		}
 		footer section {
 			position:absolute;
-			top:25%;
-			left:calc(100%/8);
-			max-width:75%
+			padding-right:12.5%;	/* make responsive */
+			padding-left:12.5%;		/* make responsive */
+			overflow-y:auto;
+			max-width:100%;
+			max-height:100%;
+		}
+		footer section::-webkit-scrollbar {
+			display: none;
 		}
 		footer section p{
 			font-size:1.5em;
 			line-height:1.5em;
 			vertical-align:middle;
-			margin-bottom:2em;
+			margin-top:1em;
+			margin-bottom:1em;
 		}
 		footer section img.lico {
 		    position:absolute;
@@ -769,7 +785,7 @@
 		tip{
 			/* move to design element file */
 			position:fixed;
-			visibility:invisible; /* tootip effect */
+			visibility:hidden; /* tootip effect */
 			opacity:0;
 			transition:opacity 0.5s;
 			min-height:calc(2.5em - 10px);
@@ -864,7 +880,6 @@
 		</user>
 		<a href="#" id="get-next" class="fa fa-chevron-right fa-2x" call="get-next"></a>
 		<a href="#" id="get-prev" class="fa fa-chevron-left fa-2x hide" call="get-prev"></a>
-	<!--	<a href="#" id="footer-toggle" class="fa fa-chevron-up" call="footer-toggle"></a> -->
 		<popup class="hide"></popup>
 		<overlay class="hide"></overlay>
 	</header>

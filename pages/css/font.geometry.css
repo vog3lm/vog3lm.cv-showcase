@@ -18,9 +18,13 @@
 	src: url('../fonts/MyriadPro-Bold.woff') format('woff');
 	font-family:"mp-bold";
 }
+@font-face {
+	src: url('../fonts/UbuntuMono-R.ttf') format('woff');
+	font-family:"Monospace";
+}
 /* Font and Color */
 body, a, h1, h2, h3, h4, h5, h6,
-input, span, p, pre { font-family:'Monospace',serif; white-space:normal; word-break:normal; word-wrap:break-word; white-space:normal; text-align:left; }
+input, span, p, pre { font-family:'mp-light',serif; white-space:normal; word-break:normal; word-wrap:break-word; white-space:normal; text-align:left; }
 
 a, h1, h2, h3, h4, h5, h6 { vertical-align:middle; text-align:left; }
 a.fa 					  { vertical-align:middle; text-align:center; }
@@ -37,7 +41,7 @@ a.fa 					  { vertical-align:middle; text-align:center; }
 .fa-2-5x	{font-size:2.5rem;}
 .fa-3-5x	{font-size:3.5rem;}
 
-/* PORTRAIT SCREEN */
+/* PORTRAIT SCREEN mobile&tab */
 /* ? more breakpoints ? */
 @media screen and (min-width:0px)    and (orientation:portrait){
 }
@@ -53,7 +57,7 @@ a.fa 					  { vertical-align:middle; text-align:center; }
 
 
 /* LANDSCAPE SCREEN */
-/* ? more breakpoints ? */
+/* ? more breakpoints ? height 600, 768+ */
 @media screen and (min-width:0px)    and (orientation:landscape){
 }
 @media screen and (min-width:768px)  and (orientation:landscape){

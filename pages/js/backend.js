@@ -496,7 +496,7 @@ function Swipe4p1Operator(){
 
 
 function BrowserHistorD1spatcher(){
-	var last = 0;
+	var last = null;
 	this.replace = (state) => { // replace the current state
 		window.history.replaceState(state,0,location.href);
 	}
@@ -506,8 +506,10 @@ function BrowserHistorD1spatcher(){
 	$(window).bind('popstate',(e) => {
 	    if(null != e.originalEvent.state){ // forward/back has been hit
 	    	var state = e.originalEvent.state;
-	    	if(last > state.index){state.direction = -1;}
+	    	console.log(state.index,last)
+	    	if(last == state.index || null == last){state.direction = 0;}
 	    	else if(last < state.index){state.direction = 1;}
+	    	else if(last > state.index){state.direction = -1;}
 	    	last = state.index;
 	    	state.history = true;
 			$('body').trigger(state.call,state);

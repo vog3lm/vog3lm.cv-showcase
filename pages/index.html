@@ -472,6 +472,12 @@
 					console.log(data)
 					if(data.direction == -1){presenter.swipe.prev();}
 					else if(data.direction == 1){presenter.swipe.next();}
+					else{
+						console.log(data.id)
+						if(data.id.indexOf('get-next') != -1){presenter.swipe.prev();}
+						else if(data.id.indexOf('get-prev') != -1){presenter.swipe.next();}
+						else{alert('ojoj')}
+					}
 				}
 				,'got-token':(data) => {console.log('got token. user is logged in.');}
 

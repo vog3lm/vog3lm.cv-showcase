@@ -33,41 +33,45 @@ a.fa 					  { vertical-align:middle; text-align:center; }
 .right {text-align:right;}
 .center {text-align:center;}
 
-.fa-0-5x	{font-size:0.5rem;}
+.fa-0-5x	{font-size:0.5rem;} /* defaults *//* delete */
 .fa-1x		{font-size:1rem;}
 .fa-1-25x	{font-size:1.75rem;}
 .fa-1-5x	{font-size:1.5rem;}
 .fa-1-75x	{font-size:1.75rem;}
+.fa-2x		{font-size:2rem;}
 .fa-2-5x	{font-size:2.5rem;}
 .fa-3-5x	{font-size:3.5rem;}
 
-/* PORTRAIT SCREEN mobile&tab */
-/* ? more breakpoints ? */
-@media screen and (min-width:0px)    and (orientation:portrait){
+/* mobile screens */
+@media screen and (min-width:  0px) and (orientation:portrait){}
+@media screen and (min-width:240px) and (orientation:portrait){}
+@media screen and (min-width:320px) and (orientation:portrait){}
+@media screen and (min-width:320px) and (orientation:portrait){}
+@media screen and (min-width:320px) and (orientation:portrait){}
+@media screen and (min-width:360px) and (orientation:portrait){}
+@media screen and (min-width:375px) and (orientation:portrait){}
+@media screen and (min-width:414px) and (orientation:portrait){}
+
+
+/* tablet screens */
+@media screen and (min-width:800px) and (orientation:landscape){
+	a.fa{font-size:1.25rem;}
 }
-
-@media screen and (min-width:768px)  and (orientation:portrait){
+/* desktop screens */
+@media screen and (min-width:1024px) and (orientation:landscape){
+	a.fa{font-size:1.5rem;}
 }
-@media screen and (min-width:1024px) and (orientation:portrait){}
-@media screen and (min-width:1280px) and (orientation:portrait){}
-@media screen and (min-width:1440px) and (orientation:portrait){}
-@media screen and (min-width:1920px) and (orientation:portrait){}
-@media screen and (min-width:2560px) and (orientation:portrait){}
-
-
 
 /* LANDSCAPE SCREEN */
-/* ? more breakpoints ? height 600, 768+ */
-@media screen and (min-width:0px)    and (orientation:landscape){
-}
-@media screen and (min-width:768px)  and (orientation:landscape){
-}
+/* ? more breakpoints ? height 600, 768+
+@media screen and (min-width:0px)    and (orientation:landscape){}
+@media screen and (min-width:768px)  and (orientation:landscape){}
 @media screen and (min-width:1024px) and (orientation:landscape){}
 @media screen and (min-width:1280px) and (orientation:landscape){}
 @media screen and (min-width:1440px) and (orientation:landscape){}
 @media screen and (min-width:1920px) and (orientation:landscape){}
 @media screen and (min-width:2560px) and (orientation:landscape){}
-
+ */
 
 
 

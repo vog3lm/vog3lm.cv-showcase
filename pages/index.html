@@ -6,7 +6,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 	<title>smart.cv.og3lm</title>
 	<link rel="manifest" href="/manifest.json"/>
-    <link rel="stylesheet" href="css/font.awesome.min.css"/>
+	<link rel="stylesheet" href="css/font.awesome.min.css"/>
     <link rel="stylesheet" href="css/font.geometry.css"/>
     <link rel="stylesheet" href="css/design.geometry.css"/>
     <!-- PRELOAD FONTS -->
@@ -27,8 +27,6 @@
 	<script type="text/javascript" src="js/animate.fox.js"></script>
 	<script type="text/javascript" src="js/animate.cv.js"></script>
 	<script type="text/javascript" src="js/animate.dots.js"></script>
-
-
 	<script type="text/javascript">
 		function PagePagePresenter(){
 			this.popup = {
@@ -323,9 +321,18 @@
 					if(data.id.indexOf('hello') != -1){
 						url = 'images/portraits/me.pass_gate.jpg';
 					}
-					$('<img class="portrait" src="'+url+'">').load(function(){
-						$(this).appendTo('header section#content');
-					});
+					if(null != url){
+						$('<img class="portrait" src="'+url+'">').load(function(){
+							var element = $(this);
+							element.appendTo('header section#content');
+							element.css({
+								'left':(window.innerWidth*0.00)+'px'
+								,'top':(window.innerHeight*0.3/2-element.height()/2)+'px'
+							});
+							
+						});
+					}
+
 				}
 				,'arrange':(data) => {
 					$('#'+data.id).css({'position':'absolute'});
@@ -341,18 +348,31 @@
 			this.get = (data) => {
 				console.log(data)
 
-				var text = data.id+'\nLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\nLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\nLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\nLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\nLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'
+				data.type = 'text';
+				data.records = data.id+'\nLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\nLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\nLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\nLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.\nLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.';
 
-				text = text.split('\n');
-				var adaption = ''
-				for (var i=0; i<text.length; i++) {
-					adaption = adaption+'<p>'+text[i]+'</p>';
-				};
-				return {
+				var adaption = {
 				    	 'title':data.id
-				    	,'footer':adaption
+				    	,'footer':'<p>Restricted Access! Request Login.</p>'
 					};
+
+				if(data.type.indexOf('text') != -1){adaption.footer = text(data.records);}
+				else if(data.type.indexOf('list') != -1){adaption.footer = list(data.records);}
+				return adaption; 
 			};
+
+			function text(records){
+				records = records.split('\n');
+				var adaption = '';
+				for (var i=0; i<records.length; i++) {
+					adaption = adaption+'<p>'+records[i]+'</p>';
+				};
+				return adaption;
+			}
+			function list(records){
+				var adaption = '';
+				return adaption;
+			}
 		}
 
 		var animations = {'fox':{'lineColor':'#444','lineWidth':'1px','paneParent':'zone','paneId':'fox','scaleFactor':11
@@ -434,34 +454,29 @@
 			    ,'get-start':(data) => {
 					window.location.replace("#");
 					clicker.onUnleash();
-					$('body').trigger('get-index',{'call':'get-start','id':'onLoad','index':0});
-					history.replace({'call':'get-index','id':'get-start','index':0});
 					presenter.swipe.initialize();
-				//	presenter.swipe.show({'call':'get-index','id':'get-start','index':0});
+					history.replace({'call':'get-history','id':'get-next','index':0})
 			    }
 			    ,'get-reloaded':() => {
 			    	console.log('page get-reloaded refresh manually');
 			    }
-				,'get-index':(data) => {
-					// start loading
-				//	var index = presenter.swipe.show(data);
-				//	$('body').trigger('got-mvp',{'call':'got-mvp','id':'get-index'});
-				}
 				,'get-next':(data) => {
 					var index = presenter.swipe.next();
-					// history.push({'call':'get-prev','id':'pushState','index':index})
-					// window.history.pushState({'call':'get-index','id':'pushState','index':index},index,"");
-					// $('body').trigger('got-mvp',{'call':'got-mvp','id':'get-next'});
+					history.push({'call':'get-history','id':'get-next','index':index});
 				}
 				,'get-prev':(data) => {
 					var index = presenter.swipe.prev();
-					// history.push({'call':'get-next','id':'pushState','index':index})
-					// window.history.pushState({'call':'get-index','id':'pushState','index':index},index,"");
-					// $('body').trigger('got-mvp',{'call':'got-mvp','id':'get-prev'});
+					history.push({'call':'get-history','id':'get-prev','index':index});
+				}
+				,'get-history':(data) => {
+					console.log(data)
+					if(data.direction == -1){presenter.swipe.prev();}
+					else if(data.direction == 1){presenter.swipe.next();}
 				}
 				,'got-token':(data) => {console.log('got token. user is logged in.');}
 
 
+				/* REFACOTR !!! content call in footer toggle !!! */
 				,'got-mvp':(data) => { // useless...toggle footer is the deal
 					data.index = presenter.swipe.index();
 					/* load some offline content */
@@ -550,18 +565,9 @@
 		$(window).load(function() {
 			$('body').trigger('get-start',{'call':'get-start','id':'onLoad'});
 		});
-
 	</script>
 	<style type="text/css">
-		body header {	/* d.css */
-			overflow:hidden;
-			position:relative;
-			width:100%;
-			height:100%;
-		}
-		header canvas {
-			position:absolute;
-		}
+
 
 		header canvas#one{
 			transform:rotateY(30deg) scaleX(1.15);
@@ -569,111 +575,39 @@
 		header canvas#two{
 			transform:rotateY(-20deg) scaleX(1.15);
 		}
-		header img.after-effect,
-		footer img.after-effect{
-			width:100%;
-			height:100%;
-		}
 
-		header a.fa-question-circle,
-		header a.fa-question-circle-o,
-		header a.fa-circle-thin{
-			position:absolute;
-			right:32px;
-		}
-		header a.fa-question-circle,
-		header a.fa-question-circle-o{
-			right:32px;
-		}
-		header a.fa-circle-thin{
-			right:0px;
-		}
-		header a.fa-cog,
+
 		header nav#cfg-navigation{
 			position:absolute;
 			right:0px;
-			bottom:0px;
-		}
-		header nav#cfg-navigation{
 			bottom:32px;
 			width:32px;
 		}
-		header a.fa-chevron-right,
+		header a.fa-chevron-right, /* ui swipe */
 		header a.fa-chevron-left{
 			position:absolute;
-			left:0.5em;
 			top:50%;
 		}
 		header a.fa-chevron-right{
-			left:initial;
-			right:0.5em;
-		}
-		header a.fa-chevron-up,
-		header a.fa-chevron-down{
-			position:absolute;
-			width:calc(100% - 32px - 25%);
-			height:14px;
-			left:25%;
-			bottom:0px;
-			line-height:14px;
-			vertical-align:middle;
-			text-align:center;
-			z-index:10;
-		}
-		/* user login/logout structure *//* d.css */
-		header user{
-			position:absolute;
-			height:32px;
-			width:25%;
-			bottom:0px;
-			overflow:hidden;
-		}
-		header user form,
-		header user card{
-			width:calc(100% - 32px);
-			height:100%;
-			padding:0px;
-		}
-		header user form input{
-			height:32px;
-			width:50%;
-			line-height:32px;
-			vertical-align:middle;
-			float:left;
-		}
-		header user card id{
-			height:32px;
-			width:calc(100% - 2*32px);
-			line-height:32px;
-			vertical-align:middle;
-			float:right;
-			overflow:hidden;
+			right:0em;
 		}
 
 
-		header section#content{ /* d.css */
-		    position:absolute;
-		    top:0px;
-		    width:100%;
-		    height:100%;
-		    overflow:hidden;
-		}
-		header playground {
+
+		header section#content playground{ /* moving labels */
 			position:absolute;
 			top:0px;
 			left:0px;
 			width:100%;
 			height:100%;
 		}
-		header playground:nth-child(1){
+		header section#content playground:nth-child(1){
 			left:100%;
 		}
-		header playground:nth-child(2){
+		header section#content playground:nth-child(2){
 			left:200%;
 		}
-
-		/* cv labels */
-		header section#content img.label{
+		header section#content img.label{ 
 			z-index:1;
 			position:absolute;
 			cursor:pointer;
@@ -687,65 +621,25 @@
 			max-height:144px;
 			min-height:48px;
 		}
-		header section#content img.m{
+		header section#content img.m {
 			max-width:144px;
 			min-width:48px;
 			max-height:168px;
 			min-height:56px;
 		}
 		header section#content img.portrait{
-			height: 212px;
-		    bottom: 40px;
-		    position: absolute;
-		    left:25px;
-		}
-
-		body popup {
-			font-size:1.5em;
-			color:white;
 			position:fixed;
-			min-width:32px;
-		    max-width:calc(100%);
-		    min-height:32px;
-		    max-height:calc(100%);
-	        word-wrap:break-word;
-		}
-		body overlay {
-			position:absolute;
-			width:100%;
-		    height:100%;
-		    background:rgba(255,255,255,0.7);
+			/*height:216px;*/
+			max-height:27.5%;
 		}
 
 
-		body footer {
-			position:relative;
-			width:100%;
-			height:70%;
-			max-height:70%;
-		}
-		footer section {
-			position:absolute;
-			padding-right:12.5%;	/* make responsive */
-			padding-left:12.5%;		/* make responsive */
-			overflow-y:auto;
-			max-width:100%;
-			max-height:100%;
-		}
-		footer section::-webkit-scrollbar {
-			display: none;
-		}
-		footer section p{
-			font-size:1.5em;
+		footer section p{ /* refactor */
+			/*font-size:1.5em;
 			line-height:1.5em;
-			vertical-align:middle;
+			vertical-align:middle;*/
 			margin-top:1em;
 			margin-bottom:1em;
-		}
-		footer section img.lico {
-		    position:absolute;
-			width:2.5em;
-			height:2.5em;
 		}
 		footer section textarea{
 			font-size:2em;
@@ -758,30 +652,26 @@
 			height:50%;
 			color:rgba(34,34,34,1);
 		}
+		footer section p:first-child,
+		footer section textarea:first-child{
+			margin-top:5em;
+		}
 		footer section p:last-child,
 		footer section textarea:last-child{
-			margin-bottom:0em;
+			margin-bottom:5em;
+		}
+		footer section img.lico {
+		    position:absolute;
+			width:2.5em;
+			height:2.5em;
 		}
 
 
-		footer edge{
-			position:absolute;
-			display:inline-block;
-			height:32px;
-			line-height:32px;
-		}
-		footer edge.hr{
-			right:0px;
-		}
-		footer edge.bl{
-			bottom:0px;
-		}
-		footer edge.br{
-			right:0px;
-			bottom:0px;
-		}
 
 
+
+
+		/* unused right now */
 		tip{
 			/* move to design element file */
 			position:fixed;
@@ -803,30 +693,6 @@
 			width:100%;
 			height:100%;
 			overflow:hidden;
-		}
-
-
-		/* footer stuff/skill stuff refactored... */
-		img.lang{
-			position:absolute;
-			width:15%;
-		    left:50px;
-	    	top:50px;
-		}
-		img.me{
-			position:absolute;
-		    border: 1px solid rgb(170,255,0);
-			height:25%;
-		    left:50px;
-	    	top:calc(100px + 15%);
-	    	border-radius:50%;
-		}
-		img.skill{
-			position:absolute;
-			width:96px;
-			height:96px;
-		    left:calc(100px - 96px/2);
-	    	top:calc(75px - 96px/2);
 		}
 	</style>
 </head>
@@ -856,41 +722,47 @@
 				<img class="label m" call="footer-toggle" id="schuelerhilfe" src="images/labels/sh.png"></img>
 			</playground>
 		</section>
-		<a href="#" class="fa fa-circle-thin fa-1-5x" call="dox-toggle"></a>
-		<a href="#" class="fa fa-question-circle-o fa-1-5x" call="help-toggle"></a>
-		<a href="#" class="fa fa-cog fa-1-5x" call="cfg-toggle"></a>
+		<edge class="hr">
+			<a href="#" class="fa fa-question-circle-o" call="help-toggle"></a>
+			<a href="#" class="fa fa-circle-thin" call="dox-toggle"></a>
+		</edge>
+		<edge class="br">
+			<a href="#" class="fa fa-cog" call="cfg-toggle"></a>
+		</edge>
 		<nav id="cfg-navigation" class="hide">
 			<a href="#" class="fa fa-pause" call="animation-pause"></a>
 			<a href="#" class="fa"></a>
-			<a href="#" class="fa fa-eyedropper fa-1-5x" call="animation-colors"></a>
-			<a href="#" class="fa fa-eye-slash fa-1-5x" call="design-toggle"></a>
-			<a href="#" class="fa fa-tachometer fa-1-5x" call="animation-velocity"></a>
-			<a href="#" class="fa fa-wrench fa-1-5x" call="animation-refresh"></a>
+			<a href="#" class="fa fa-eyedropper" call="animation-colors"></a>
+			<a href="#" class="fa fa-eye-slash" call="design-toggle"></a>
+			<a href="#" class="fa fa-tachometer" call="animation-velocity"></a>
+			<a href="#" class="fa fa-wrench" call="animation-refresh"></a>
 		</nav>
-		<user>
-			<card class='hide'>
-				<a href="#" class="fa fa-user" call="log-out"></a>
-				<id></id>
-			</card>
-			<form class="hide" call="login-validate">
-				<input type="text" id="mail" name="mail" placeholder="mail" value="">
-				<input type="text" id="pass" name="pass" placeholder="pass" value="">				
-			</form>
-			<a href="#" class="fa fa-hashtag" call="login-show"></a>
-		</user>
-		<a href="#" id="get-next" class="fa fa-chevron-right fa-2x" call="get-next"></a>
-		<a href="#" id="get-prev" class="fa fa-chevron-left fa-2x hide" call="get-prev"></a>
+		<edge class="bl">
+			<user>
+				<card class='hide'>
+					<a href="#" class="fa fa-user" call="log-out"></a>
+					<id></id>
+				</card>
+				<form class="hide" call="login-validate">
+					<input type="text" id="mail" name="mail" placeholder="mail" value="">
+					<input type="text" id="pass" name="pass" placeholder="pass" value="">				
+				</form>
+				<a href="#" class="fa fa-hashtag" call="login-show"></a>
+			</user>
+		</edge>
+		<a href="#" id="get-next" class="fa fa-chevron-right" call="get-next"></a>
+		<a href="#" id="get-prev" class="fa fa-chevron-left hide" call="get-prev"></a>
 		<popup class="hide"></popup>
 		<overlay class="hide"></overlay>
 	</header>
 	<footer>
 		<edge class="hr">
-			<a href="#" class="fa fa-download fa-1-5x" call="animation-colors"></a>
-			<a href="#" class="fa fa-print fa-1-5x" call="animation-colors"></a>
+			<a href="#" class="fa fa-download" call="animation-colors"></a>
+			<a href="#" class="fa fa-print" call="animation-colors"></a>
 		</edge>
 		<section id="content" index="0"></section>
 		<edge class="br">
-			<a href="#" class="fa fa-github fa-2x" call="animation-colors"></a>
+			<a href="#" class="fa fa-github" call="animation-colors"></a>
 		</edge>
 	</footer>
 	<tip></tip>

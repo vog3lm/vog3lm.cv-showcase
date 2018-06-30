@@ -496,17 +496,21 @@ function Swipe4p1Operator(){
 
 
 function BrowserHistorD1spatcher(){
-	this.replace = (state) => {
+	var last = 0;
+	this.replace = (state) => { // replace the current state
 		window.history.replaceState(state,0,location.href);
 	}
-	this.push = (state) => {
+	this.push = (state) => { // add a new state to list
 		window.history.pushState(state,0,location.href);
 	}
 	$(window).bind('popstate',(e) => {
 	    if(null != e.originalEvent.state){ // forward/back has been hit
 	    	var state = e.originalEvent.state;
+	    	if(last > state.index){state.direction = -1;}
+	    	else if(last < state.index){state.direction = 1;}
+	    	last = state.index;
 	    	state.history = true;
-			$('body').trigger(state.call,state)
+			$('body').trigger(state.call,state);
 	    }
 	});
 }
@@ -537,15 +541,15 @@ function Keyboard4p1Operator(){
 	}
 	this.create = () => {
 	    $(document).keydown(function(e){ // need keydown, keypress no working on special keys
-	    	e.preventDefault();
 	    	if(mapping.hasOwnProperty(e.which)){
+	    		e.preventDefault();
 	    		var tmp = mapping[e.which];
 	    		$('body').trigger(tmp.call,{'call':tmp.call,'id':'onKeydown'});
 	    		return;
 			}
-	        if(e.which == 116){ //F5
-	        	location.reload();
-	        }
+	        // if(e.which == 116){ //F5
+	        // 	location.reload();
+	        // }
 	        
 	    });
 	    return this;

@@ -506,7 +506,7 @@ function BrowserHistorD1spatcher(){
 	$(window).bind('popstate',(e) => {
 	    if(null != e.originalEvent.state){ // forward/back has been hit
 	    	var state = e.originalEvent.state;
-	    	console.log(state.index,last)
+	    	console.log('popstate',state,last)
 	    	if(last == state.index || null == last){state.direction = 0;}
 	    	else if(last < state.index){state.direction = 1;}
 	    	else if(last > state.index){state.direction = -1;}

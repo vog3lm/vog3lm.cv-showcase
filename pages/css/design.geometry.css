@@ -152,6 +152,7 @@ edge{ /* commonize with header ui */
 	min-width:32px;
 	height:32px;
 	line-height:32px;
+	z-index:1;
 }
 edge.hr{
 	top:0px;

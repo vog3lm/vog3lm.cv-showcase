@@ -59,24 +59,14 @@ function F1rebas3Auth4p1Operator(firebase){
 	var base = firebase.auth();
 	var dispatcher = null;
 	var events = {
-		'log-in':(user) => {	
-			base.setPersistence(args.scope).then(() => {
-				/* Note: Firebase Auth web sessions are single host origin 
-						 and will be persisted for a single domain only.  */
-				base.signInWithEmailAndPassword(user.mail,user.pass).catch((error) => {
-				  	console.error('login error',error);
-					args.user = 'unset';
-					args.token = 'unset';
-					$('body').trigger('logged-err',{'call':'logged-err','id':'auth-log-in','code':error.code,'message':error.message})
-				//	$('body').trigger('logged-out',{'call':'logged-out','id':'auth-log-in'})
-				});
-			}).catch((error) => {console.error(error);});}
-	    ,'log-out':(data) => {base.signOut().catch((error) => {console.error('login error',error)});}
+		'log-in':(user) => {this.login(user);}
+	    ,'log-out':(data) => {this.logout();}
 	  /*,'log-in-custom':(token) => {base.signInWithCustomToken(token).catch(function(error){console.log(error)});}*/
 	    ,'log-decorate':(data) => {this.decorate(data.opts);}
 	    ,'log-create':(data) => {this.create();}
 	};
-	var args = {'events':events,'user':'unset','token':'unset','firebase':'unset','scope':firebase.auth.Auth.Persistence.LOCAL};
+	var args = {'events':events,'user':'unset','token':'unset','firebase':'unset'
+			   ,'scope':firebase.auth.Auth.Persistence.LOCAL}; // scopes LOCAL|SESSION|None
 	this.getToken = function(){return args.token;}	// mandatory
 	this.decorate = function(opts){
 		for(var key in opts) {
@@ -88,11 +78,23 @@ function F1rebas3Auth4p1Operator(firebase){
 		}
 		return this;
 	}
+	this.login = function(user){
+		base.setPersistence(args.scope).then(() => {
+			/* Note: Firebase Auth web sessions are single host origin 
+					 and will be persisted for a single domain only.  */
+			base.signInWithEmailAndPassword(user.mail,user.pass).catch((error) => {
+			  	console.error('login error',error);
+				args.user = 'unset';
+				args.token = 'unset';
+				$('body').trigger('logged-err',{'call':'logged-err','id':'auth-log-in','code':error.code,'message':error.message})
+			//	$('body').trigger('logged-out',{'call':'logged-out','id':'auth-log-in'})
+			});
+		}).catch((error) => {console.error(error);});
+	}
+	this.logout = function(){base.signOut().catch((error) => {console.error('login error',error)});}
 	this.create = function(){
 		if('unset' !== args.firebase){base = firebase.auth();}
-		if('unset' !== args.user){
-			conslole.log(window.user);
-		}
+		if('unset' !== args.user){conslole.log(window.user);} /* same-origin policy (host=host,port=port)*/
 		switch(args.scope) {
 			case 'none':args.scope = firebase.auth.Auth.Persistence.NONE; break;
 			case 'session':args.scope = firebase.auth.Auth.Persistence.SESSION; break;
@@ -102,7 +104,6 @@ function F1rebas3Auth4p1Operator(firebase){
 		return this;
 	}
 	base.onAuthStateChanged((u) => {
-	//	console.info(u,'User authentication state change!')
 		if(u){
 			args.user = u;
 			u.getIdToken(/* forceRefresh */true).then((userToken) => {
@@ -129,41 +130,9 @@ function F1rebas3Auth4p1Operator(firebase){
 
 function Mvp4p1Operator(){
 	var dispatcher = null;
-	/*  'https://us-central1-vog3lm-0x1.cloudfunctions.net/mvp/?q=query');  */
-	/*  'https://us-central1-vog3lm-0x1.cloudfunctions.net/mvp/?q=query');  */
-	var args = {'url':'https://us-central1-vog3lm-0x1.cloudfunctions.net/mvp/?q=','token':'unset'};
+	var args = {'url':'https://us-central1-vog3lm-0x1.cloudfunctions.net','token':'unset'};
 	var events = {
-		'call-mvp':(data) => {
-			try{
-				console.info('call mvp.',data);
-				var errors = [];
-				if('unset' !== args.token){
-					$.ajax({
-					  	url:args.url+data.q,
-					  	crossDomain: true,
-					  	headers:{'Authorization':'CONTENT_ID_TOKEN::'+args.token},
-					  	context: document.body,
-			  	  		statusCode: {
-						    404:() => {alert( "page not found" );}
-						}
-					}).done(function(data){
-						if(data.hasOwnProperty('promise')){
-							data.promise(data);
-						} else {
-							data['call'] = 'got-mvp';
-							data['id'] = data.q;
-							$('body').trigger('got-mvp',data);	
-						}
-					});
-				}else{
-					errors.push('no token found.');
-				}
-				if(0 < errors.length){throw errors}
-			}catch(error){
-				console.error(error);
-				$('body').trigger('got-mvp',{'recs':error,'cols':['error'],'meta':{'state':'error'}});
-			}
-		}
+		'call-mvp':(data) => {this.call(data);}
 		,'got-token':(data) => {args.token = data.token;}
 	    ,'decorate-mvp':(data) => {this.decorate(data.opts);}
 	    ,'create-mvp':(data) => {this.create();}
@@ -182,40 +151,105 @@ function Mvp4p1Operator(){
 		dispatcher = new V13wEv3ntD1spatch3r().onDecorate({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
 		return this;
 	}
+	this.call = function(data,api){
+		if(null == api){
+			api = 'mvp';
+		}
+		try{
+			var errors = [];
+			if('unset' !== args.token){
+				$.ajax({
+				  	url:args.url+'/'+api+'/?q='+data.q,
+				  	crossDomain: true,
+				  	headers:{'Authorization':'CONTENT_ID_TOKEN::'+args.token},
+				  	context: document.body,
+		  	  		statusCode: {404:() => {alert( "page not found" );}}
+				}).done(function(response){
+					if(data.hasOwnProperty('promise')){
+						data.promise(response);
+					} else {
+						response['call'] = 'got-'+api;
+						response['id'] = data.id;
+						response['type'] = 'text';
+						$('body').trigger('got-'+api,response);	
+					}
+				});
+			}else{
+				errors.push('no token found.');
+			}
+			if(0 < errors.length){throw errors}
+		}catch(error){
+			console.error(error);
+			$('body').trigger('got-mvp',{'recs':error,'cols':['error'],'meta':{'state':'error'}});
+		}		
+	}
+	this.pdf = function(data){
+		try{
+			var errors = [];
+			if('unset' !== args.token){
+				$.ajax({
+				  	url:args.url+'/pdf/?q='+data.q,
+				  	crossDomain: true,
+				  	headers:{'Authorization':'CONTENT_ID_TOKEN::'+args.token},
+				  	context: document.body,
+		  	  		statusCode: {404:() => {alert( "page not found" );}}
+				}).done(function(response){
+					if(data.hasOwnProperty('promise')){
+						data.promise(response);
+					} else {
+						$('body').trigger('got-pdf',response);	
+					}
+				});
+			}else{
+				errors.push('no token found.');
+			}
+			if(0 < errors.length){throw errors}
+		}catch(error){
+			console.error(error);
+			$('body').trigger('got-pdf',{'recs':error,'cols':['error'],'meta':{'state':'error'}});
+		}		
+	}
+
+
+
+
+
 	/* move to content request js... */
-	this.header = function(url,type="GET"){
+	this.header = function(view,type="GET"){
 		if('unset' !== args.token){
-			console.log('Sending request to', url, 'with ID token in Authorization header.');
+			console.log('Sending request to', args.url, 'with ID token in Authorization header.');
 			var req = new XMLHttpRequest();
 			req.onload = function() {
-				console.log(req)
+				console.log('receive content',req)
+				// send update content event ?!
 				//this.responseContainer.innerText = req.responseText;
 			};
 			req.onerror = function() {
-				console.error(req.responseText,'there was an error')
+				console.error('receive error',req)
+				// send update content event ?!
 				//this.responseContainer.innerText = 'There was an error';
 			};
-			req.open(type,url,true);
+			req.open(type,args.url+view,true);
 			req.setRequestHeader('Authorization', 'CONTENT_ID_TOKEN::'+args.token);
 			req.send();
 		} else {
 			console.error('No Content ID Token Found!')
 		}
-		// firebase.auth().currentUser.getIdToken().then(function(token){/* call token each request */});
+		//firebase.auth().currentUser.getIdToken().then(function(token){/* call token each request */});
 	}
-	this.cookie = function(url,type="GET"){
+	this.cookie = function(view,type="GET"){
 		if('unset' !== args.token){
 			// set the __session cookie
 			document.cookie = '__session=' + args.token + ';max-age=3600';
-			console.log('Sending request to', url, 'with ID token in __session cookie.');
+			console.log('Sending request to', args.url, 'with ID token in __session cookie.');
 			var req = new XMLHttpRequest();
 			req.onload = function() {
-				console.log(req.responseText)
+				console.log('receive content',req)
 			};
 			req.onerror = function() {
-				console.error(req.responseText,'there was an error')
+				console.error('receive error',req)
 			};
-			req.open(type, url, true);
+			req.open(type,args.url+view,true);
 			req.send();
 		} else {
 			console.error('No Content ID Token Found!')

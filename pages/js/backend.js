@@ -52,7 +52,7 @@ function F1rebas3Storage4p1Operator(firebase){
 			dispatcher = d;
 			dispatcher.onAppend({'events':Object.keys(events),'issues':Object.values(events)});
 		} else {
-			console.log('firebase storage operator','internal dispatcher used');
+			console.warn('firebase storage operator','internal dispatcher used');
 			dispatcher = new V13wEv3ntD1spatch3r().onDecorate({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
 		}
 		return this;
@@ -107,7 +107,7 @@ function F1rebas3Auth4p1Operator(firebase){
 			dispatcher = d;
 			dispatcher.onAppend({'events':Object.keys(events),'issues':Object.values(events)});
 		} else {
-			console.log('firebase authentication operator','internal dispatcher used');
+			console.warn('firebase authentication operator','internal dispatcher used');
 			dispatcher = new V13wEv3ntD1spatch3r().onDecorate({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
 		}
 		return this;
@@ -162,7 +162,7 @@ function Mvp4p1Operator(){
 			dispatcher = d;
 			dispatcher.onAppend({'events':Object.keys(events),'issues':Object.values(events)});
 		} else {
-			console.log('mvp api operator','internal dispatcher used');
+			console.warn('mvp api operator','internal dispatcher used');
 			dispatcher = new V13wEv3ntD1spatch3r().onDecorate({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
 		}
 		return this;
@@ -321,7 +321,7 @@ function D3s1gn4p1Operator(){
 				dispatcher = d;
 				dispatcher.onAppend({'events':Object.keys(events),'issues':Object.values(events)});
 			} else {
-				console.log('design api operator','internal dispatcher used');
+				console.warn('design api operator','internal dispatcher used');
 				dispatcher = new V13wEv3ntD1spatch3r().onDecorate({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
 			}
 		}catch(error){
@@ -542,7 +542,22 @@ function Swipe4p1Operator(){
 
 
 function BrowserHistorD1spatcher(){
+	var dispatcher = null;
+	var events = {
+		'history-replace':(data) => {this.replace(data);}
+		,'history-push':(data) => {this.push(data);}
+	}
 	var last = null;
+	this.create = (d) => {
+		if(d){
+			dispatcher = d;
+			dispatcher.onAppend({'events':Object.keys(events),'issues':Object.values(events)});
+		} else {
+			console.warn('history api operator','internal dispatcher used');
+			dispatcher = new V13wEv3ntD1spatch3r().onDecorate({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
+		}
+		return this;
+	}
 	this.replace = (state) => { // replace the current state
 		window.history.replaceState(state,0,location.href);
 	}

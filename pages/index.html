@@ -115,14 +115,16 @@
 				'show':(views) => {
 					var tag = $('user');
 					tag.find('form').removeClass('hide');
-					tag.find('a.fa-hashtag').attr('call','login-hide');
-					tag.find('a.fa-hashtag').attr('title','Hide Login');
+					var tmp = tag.find('a.fa-hashtag');
+					tmp.attr('call','login-hide');
+					tmp.attr('title','Hide Login');
 				}
 				,'hide':() => {
 					var tag = $('user');
 					tag.find('form').addClass('hide');
-					tag.find('a.fa-hashtag').attr('call','login-show');
-					tag.find('a.fa-hashtag').attr('title','Show Login');
+					var tmp = tag.find('a.fa-hashtag');
+					tmp.attr('call','login-show');
+					tmp.attr('title','Show Login');
 				}
 				,'toggle':(views) => {
 					var tag = $('user')
@@ -285,12 +287,11 @@
 			this.page = {
 				'show':(data) => {
 					document.title = data.title;
-
 					var footer = $('footer section#content'); // add footer data
 					footer.html(data.footer);
 					holder = $('footer');
-					footer.css({'top':(holder.outerHeight()-footer.outerHeight())/2}) // center vertical
-					footer.css({'left':(holder.outerWidth()-footer.outerWidth())/2}) // center horizontal
+					footer.css({'top':(holder.outerHeight()-footer.outerHeight())/2
+							   ,'left':(holder.outerWidth()-footer.outerWidth())/2*0}) // center vertical, horizontal
 				}
 				,'clear':() => {
 					document.title = 'smart.cv.og3lm';
@@ -454,10 +455,65 @@
 				}
 				,'cfg-toggle':(data) => {presenter.cfg.toggle();}
 				// popups
-				,'help-toggle':(data) => {presenter.popup.show({'content':'help popup overlay'});}
+				,'help-toggle':(data) => {
+					var text = '<p>swipe left/right</p>'
+							 + '<p>foldable footer</p>'
+							 + '<p>realtime animation control</p>'
+							 + '<p>user login</p>'
+					presenter.popup.show({'content':text});
+				}
 				,'token-toggle':(data) => {presenter.popup.show({'content':authenicate.getToken()});}
 				,'popup-toggle':(data) => {presenter.popup.hide();}
-				,'dox-toggle':(data) => {presenter.popup.show({'content':'swipe to docs (top down)'});}
+				,'dox-toggle':(data) => {
+					var text = '<p>full stack application mvp architecture</p>'
+
+
+
+							 + '<p>event driven user interface</p>'
+							 + '<p>dynamic backend analytics</p>'
+							 + '<p>access thread alarms</p>'
+							 + '<p>cookie free application</p>'
+							 + '<p>open source frontend code</p>'
+							 + '<p>open source backend code</p>'
+
+							 + '<p>download certification functionallity</p>'
+							 + '<p>download flyer functionallity</p>'
+							 + '<p>private content query functionallity</p>'
+							 + '<p>backend register new user functionallity</p>'
+							 + '<p>popup overlay functionallity</p>'
+							 + '<p>custom history functionallity</p>'
+							 + '<p>touch device ready</p>'
+							 + '<p>same origin ressource sharing policy</p>'
+
+							 + '<img src="images/logos/firebase.png" height="64px"></img>'
+							 + '<p>firebase functions backend</p>'
+							 + '<p>firebase storage database</p>'
+							 + '<p>firebase authenication</p>'
+							 + '<p>firebase hosting</p>'
+
+							 + '<img src="images/logos/html5.png" height="64px"></img>'
+							 + '<img src="images/logos/css3.png" height="64px"></img>'
+							 + '<img src="images/logos/js.png" height="64px"></img>'
+							 + '<img src="images/logos/jq.png" height="64px"></img>'
+							 + '<img src="images/logos/jqm.png" height="64px"></img>'
+							 + '<p>html5, css3, javascript, jQuery, jQuery Mobile</p>'
+
+
+							 + '<img src="images/logos/node.js.png" height="64px"></img>'
+							 + '<img src="images/logos/express.js.png" height="64px"></img>'
+
+
+							 + '<p>font-awesome, myriad pro, ubuntu mono</p>'
+
+							 + '<p>ssl encryption</p>'
+							 + '<p>responsive design</p>'
+							 + '<p>bootstrap free css</p>'
+
+							 + '<p>javascript animation</p>'
+
+							 + '<p>smart printmedia support (autologin)</p>'
+					presenter.popup.show({'content':text});
+				}
 				// user
 				,'login-show':(data) => {presenter.login.show(data)}
 				,'login-hide':(data) => {presenter.login.hide()}
@@ -482,6 +538,7 @@
 			    }
 			    // page/content
 			    ,'get-start':(data) => {
+
 					clicker.onUnleash();
 					presenter.swipe.initialize();
 					history.replace({'call':'get-history','id':'get-next','index':0});
@@ -796,8 +853,18 @@
 			</playground>
 		</section>
 		<edge class="hr">
-			<a href="#" class="fa fa-question-circle-o" call="help-toggle"></a>
-			<a href="#" class="fa fa-circle-thin" call="dox-toggle"></a>
+			<a href="#" class="fa-stack" call="help-toggle">
+				<i class="fa fa-circle-thin fa-stack-2x"></i>
+				<i class="fa fa-question fa-stack-1x"></i>
+			</a>
+			<a href="#" class="fa-stack" call="dox-toggle">
+				<i class="fa fa-circle-thin fa-stack-2x"></i>
+				<i class="fa fa-exclamation fa-stack-1x"></i>
+			</a>
+			<a href="#" class="fa-stack" call="dox-toggle">
+				<i class="fa fa-circle-thin fa-stack-2x"></i>
+				<i class="fa fa-certificate fa-stack-1x"></i>
+			</a>
 		</edge>
 		<edge class="br">
 			<a href="#" class="fa fa-cog" call="cfg-toggle"></a>

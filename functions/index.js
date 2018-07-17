@@ -231,7 +231,6 @@ exports.pdf = functions.https.onRequest((req,res) => {
 		});
 
     });
-
 });
 
 

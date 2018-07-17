@@ -599,6 +599,12 @@ function V13wEv3ntD1spatch3r(){
 	    issues = holder.issues;
 	    return this;
     }
+    this.onAppend = function(holder){
+    	// unregister all
+    	// extend events
+    	// extend issues
+    	// reregister all
+    }
     this.onRegister = function(){
     	if(events == null || issues == null){
     		throw 'view event dispachter not decorated. call onDecorate first!'

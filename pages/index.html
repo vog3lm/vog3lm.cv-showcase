@@ -409,8 +409,6 @@
 		}
 		function PageEventListener(){
 
-			var history = new BrowserHistorD1spatcher(); // make event listening
-
 			var one = new DotNetHolder()
 			one.operator.decorate(animations.one).create().start();
 			var dots = one.objects.dots;
@@ -420,7 +418,6 @@
 
 			var presenter = new PagePagePresenter();
 			var adapter = new PagePresentationAdapter();
-
 
 			var events = {
 				'footer-toggle':(data) => {
@@ -518,15 +515,15 @@
 			    /* page/content */
 			    ,'get-start':(data) => {
 					presenter.swipe.initialize();
-					history.replace({'call':'get-history','id':'get-next','index':0});
+					$('body').trigger('history-replace',{'call':'get-history','id':'get-next','index':0});
 			    }
 				,'get-next':(data) => {
 					var index = presenter.swipe.next();
-					history.push({'call':'get-history','id':'get-next','index':index});
+					$('body').trigger('history-push',{'call':'get-history','id':'get-next','index':index});
 				}
 				,'get-prev':(data) => {
 					var index = presenter.swipe.prev();
-					history.push({'call':'get-history','id':'get-prev','index':index});
+					$('body').trigger('history-push',{'call':'get-history','id':'get-prev','index':index});
 				}
 				,'get-history':(data) => {
 					presenter.footer.hide();
@@ -658,10 +655,9 @@
 			new D3s1gn4p1Operator().create(dispatcher);
 			new F1rebas3Auth4p1Operator(firebase).create(dispatcher);
 			//	new F1rebas3Storage4p1Operator(firebase).create(dispatcher);
-
-			//var history = new BrowserHistorD1spatcher();
-			//var keyboard = new Keyboard4p1Operator().map(keymap).create();
-			//var swiper = new Swipe4p1Operator().map(gestures).create();
+			new BrowserHistorD1spatcher().create(dispatcher);
+			new Keyboard4p1Operator().map(keymap).create();
+			new Swipe4p1Operator().map(gestures).create();
 
 		});
 		$(window).load(function() {

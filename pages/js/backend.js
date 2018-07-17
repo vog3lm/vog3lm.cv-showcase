@@ -34,6 +34,7 @@ function HtmlCancasTool(animation){
 
 
 function F1rebas3Storage4p1Operator(firebase){
+	var dispatcher = null;
 	var base = firebase.storage();
 	var events = {
 	    'storage-create':(data) => {this.create();}
@@ -46,11 +47,13 @@ function F1rebas3Storage4p1Operator(firebase){
 			});
 		}
 	};
-	this.create = function(){
-		try{
+	this.create = function(d){
+		if(d){
+			dispatcher = d;
+			dispatcher.onAppend({'events':Object.keys(events),'issues':Object.values(events)});
+		} else {
+			console.log('firebase storage operator','internal dispatcher used');
 			dispatcher = new V13wEv3ntD1spatch3r().onDecorate({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
-		}catch(error){
-			console.error(error);
 		}
 		return this;
 	}
@@ -92,7 +95,7 @@ function F1rebas3Auth4p1Operator(firebase){
 		}).catch((error) => {console.error(error);});
 	}
 	this.logout = function(){base.signOut().catch((error) => {console.error('login error',error)});}
-	this.create = function(){
+	this.create = function(d){
 		if('unset' !== args.firebase){base = firebase.auth();}
 		if('unset' !== args.user){conslole.log(window.user);} /* same-origin policy (host=host,port=port)*/
 		switch(args.scope) {
@@ -100,7 +103,13 @@ function F1rebas3Auth4p1Operator(firebase){
 			case 'session':args.scope = firebase.auth.Auth.Persistence.SESSION; break;
 			default:args.scope = firebase.auth.Auth.Persistence.LOCAL; break;
 		}
-		dispatcher = new V13wEv3ntD1spatch3r().onDecorate({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
+		if(d){
+			dispatcher = d;
+			dispatcher.onAppend({'events':Object.keys(events),'issues':Object.values(events)});
+		} else {
+			console.log('firebase authentication operator','internal dispatcher used');
+			dispatcher = new V13wEv3ntD1spatch3r().onDecorate({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
+		}
 		return this;
 	}
 	base.onAuthStateChanged((u) => {
@@ -130,12 +139,13 @@ function F1rebas3Auth4p1Operator(firebase){
 
 function Mvp4p1Operator(){
 	var dispatcher = null;
-	var args = {'url':'https://us-central1-vog3lm-0x1.cloudfunctions.net','token':'unset'};
+	// 'https://us-central1-vog3lm-0x1.cloudfunctions.net'
+	var args = {'url':'unset','token':'unset'};
 	var events = {
 		'call-mvp':(data) => {this.call(data);}
-		,'got-token':(data) => {args.token = data.token;}
 	    ,'decorate-mvp':(data) => {this.decorate(data.opts);}
-	    ,'create-mvp':(data) => {this.create();}
+	    ,'create-mvp':(data) => {this.create(data.d);}
+		,'got-token':(data) => {args.token = data.token;}
 	};
 	this.decorate = function(opts){
 		for(var key in opts) {
@@ -147,37 +157,39 @@ function Mvp4p1Operator(){
 		}
 		return this;
 	}
-	this.create = function(){
-		dispatcher = new V13wEv3ntD1spatch3r().onDecorate({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
+	this.create = function(d){
+		if(d){
+			dispatcher = d;
+			dispatcher.onAppend({'events':Object.keys(events),'issues':Object.values(events)});
+		} else {
+			console.log('mvp api operator','internal dispatcher used');
+			dispatcher = new V13wEv3ntD1spatch3r().onDecorate({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
+		}
 		return this;
 	}
 	this.call = function(data,api){
-		if(null == api){
-			api = 'mvp';
-		}
+		if(null == api){api = 'mvp';}
 		try{
 			var errors = [];
-			if('unset' !== args.token){
-				$.ajax({
-				  	url:args.url+'/'+api+'/?q='+data.q,
-				  	crossDomain: true,
-				  	headers:{'Authorization':'CONTENT_ID_TOKEN::'+args.token},
-				  	context: document.body,
-		  	  		statusCode: {404:() => {alert( "page not found" );}}
-				}).done(function(response){
-					if(data.hasOwnProperty('promise')){
-						data.promise(response);
-					} else {
-						response['call'] = 'got-'+api;
-						response['id'] = data.id;
-						response['type'] = 'text';
-						$('body').trigger('got-'+api,response);	
-					}
-				});
-			}else{
-				errors.push('no token found.');
-			}
+			if('unset' === args.token){errors.push('no token found.');}
+			if('unset' === args.url){errors.push('no url found.');}
 			if(0 < errors.length){throw errors}
+			$.ajax({
+			  	url:args.url+'/'+api+'/?q='+data.q,
+			  	crossDomain: true,
+			  	headers:{'Authorization':'CONTENT_ID_TOKEN::'+args.token},
+			  	context: document.body,
+	  	  		statusCode: {404:() => {alert( "page not found" );}}
+			}).done(function(response){
+				if(data.hasOwnProperty('promise')){
+					data.promise(response);
+				} else {
+					response['call'] = 'got-'+api;
+					response['id'] = data.id;
+					response['type'] = 'text';
+					$('body').trigger('got-'+api,response);	
+				}
+			});
 		}catch(error){
 			console.error(error);
 			$('body').trigger('got-mvp',{'recs':error,'cols':['error'],'meta':{'state':'error'}});
@@ -209,10 +221,6 @@ function Mvp4p1Operator(){
 			$('body').trigger('got-pdf',{'recs':error,'cols':['error'],'meta':{'state':'error'}});
 		}		
 	}
-
-
-
-
 
 	/* move to content request js... */
 	this.header = function(view,type="GET"){
@@ -305,11 +313,17 @@ function D3s1gn4p1Operator(){
 		}
 		return this;
 	}
-	this.create = function(){
+	this.create = function(d){
 		try{
 			src = args.path+'/'+args.url+'.'+args.design+'.'+args.format;
 			cssAdd(src);
-			dispatcher = new V13wEv3ntD1spatch3r().onDecorate({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
+			if(d){
+				dispatcher = d;
+				dispatcher.onAppend({'events':Object.keys(events),'issues':Object.values(events)});
+			} else {
+				console.log('design api operator','internal dispatcher used');
+				dispatcher = new V13wEv3ntD1spatch3r().onDecorate({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
+			}
 		}catch(error){
 			console.error(error);
 		}
@@ -403,8 +417,6 @@ function Scro114p1Operator(){
 				errors.push('orientation unknown');
 			}
 			if(!args.bars){$(args.node+' nav#doc-navigation').addClass('hide');}
-
-
 			if(0 > errors.length){throw errors;}
 		} catch(error) {
 			console.error(error);
@@ -592,22 +604,24 @@ function Keyboard4p1Operator(){
 	}
 }
 function V13wEv3ntD1spatch3r(){
-    var events = null;
-    var issues = null;
+    var events = [];
+    var issues = [];
     this.onDecorate = function(holder){
 	    events = holder.events;
 	    issues = holder.issues;
 	    return this;
     }
     this.onAppend = function(holder){
-    	// unregister all
-    	// extend events
-    	// extend issues
-    	// reregister all
+    	for(var i=0; i<holder.events.length; i++){
+    		var key = holder.events[i];
+			events.push(key);
+			issues.push(holder.issues[i]);
+    	}
+    	return this;
     }
     this.onRegister = function(){
-    	if(events == null || issues == null){
-    		throw 'view event dispachter not decorated. call onDecorate first!'
+    	if(null == events || null == issues || 0 == events.length || 0 == issues.length){
+    		throw 'view event dispachter not decorated. call onDecorate/onAppend first!'
     		return this;
     	}
 		for (var i=0; i<events.length; i++) {

@@ -15,8 +15,8 @@
     <link rel="preload" href="fonts/MyriadPro-Semibold.woff" as="font" crossorigin="anonymous" />
     <link rel="preload" href="fonts/MyriadPro-Bold.woff" as="font" crossorigin="anonymous" />
 
-	<link rel="shortcut icon" href="images/favicon.coyote.poly_white.b.png" type="image/x-icon"/>
-	<link rel="icon" 		  href="images/favicon.coyote.poly_white.b.png" type="image/x-icon"/>
+	<link rel="shortcut icon" href="images/coyote.white.png" type="image/x-icon"/>
+	<link rel="icon" 		  href="images/coyote.white.png" type="image/x-icon"/>
 
 	<script src="https://www.gstatic.com/firebasejs/4.9.1/firebase-app.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/4.9.1/firebase-auth.js"></script>
@@ -32,8 +32,30 @@
 			this.popup = {
 				'show':(data) => {
 					var popup = $('popup');
-					popup.html('<div style="background-color:rgba(34,34,34,1);padding:0.75em">'+data.content+'</div>');
-					popup.css({'left':(window.innerWidth-popup.outerWidth())/2,'top':(window.innerHeight-popup.outerHeight())/2});
+					var pageWidth = $(window);
+					var pageHeight = pageWidth.height();
+					pageWidth = pageWidth.width();
+					var style = {};
+					if(data.hasOwnProperty('design')){popup.addClass(data.design);}
+					else{popup.addClass('dark');}
+					if(data.hasOwnProperty('opacity')){style['opacity'] = data.opacity;}
+					if(data.hasOwnProperty('padding')){style['padding'] = data.padding;}
+					if(data.hasOwnProperty('size')){
+						var size = data.size;
+						if('full' === size){
+							style['width'] = '100%';
+							style['height'] = '100%';
+						}else if('half' === size){
+							style['width'] = '50%';
+							style['height'] = '50%';
+						}else if('match' === size){
+							if(pageWidth > pageHeight){style['width'] = '50%';}
+							else{style['width'] = '80%';}
+						}
+					}
+					popup.css(style);
+					popup.html(data.content);
+					popup.css({'left':(pageWidth-popup.outerWidth())/2,'top':(pageHeight-popup.outerHeight())/2});
 					popup.removeClass('hide');
 					// bind hide listener, do only mouse down
 					// open click will close immedialtly else
@@ -43,10 +65,20 @@
 						ops.off("mousedown")
 					});
 					// bind hide timer
-					setTimeout(function(){
-						popup.addClass('hide');
-						ops.off("mousedown")
-					},5000);
+					var timeout = data.timeout;
+					if(Number.isInteger(timeout)){
+						setTimeout(function(){
+							popup.addClass('hide');
+							ops.off("mousedown")
+						},5000);
+					}else if(null === timeout || false === timeout){
+					}else{
+						setTimeout(function(){
+							popup.addClass('hide');
+							ops.off("mousedown")
+						},5000);
+					}
+
 				}
 				,'hide':() => {
 					$('popup').addClass('hide');
@@ -116,6 +148,8 @@
 					var tag = $('user');
 					tag.find('form').removeClass('hide');
 					var tmp = tag.find('a.fa-hashtag');
+				//	tmp.removeClass('fa-hashtag'); // feels bad!
+				//	tmp.addClass('fa-lock');
 					tmp.attr('call','login-hide');
 					tmp.attr('title','Hide Login');
 				}
@@ -483,12 +517,14 @@
 							 + '<p>font-awesome, myriad pro, ubuntu mono</p>'
 
 							 + '<p>ssl encryption</p>'
+
 							 + '<p>responsive design</p>'
 							 + '<p>bootstrap free css</p>'
 
 							 + '<p>javascript animation</p>'
 
-							 + '<p>smart printmedia support (autologin)</p>'
+							 + '<p>smart printmedia support</p>'
+							 + '<p>no password transmission printmedia auto login</p>'
 					presenter.popup.show({'content':text});
 				}
 				/* user */
@@ -507,6 +543,7 @@
 				,'logged-err':(data) => {
 					presenter.load.hide();
 					presenter.popup.show({'content':'Login Fail. '+data.message});
+					presenter.load.hide();
 				}
 				,'logged-out':(data) => {
 					presenter.login.clear()
@@ -515,7 +552,14 @@
 			    /* page/content */
 			    ,'get-start':(data) => {
 					presenter.swipe.initialize();
-					$('body').trigger('history-replace',{'call':'get-history','id':'get-next','index':0});
+					var leed = window.localStorage.getItem('l');
+					leed = {"type":"text","view":["Sehr geehrter Ansprechpartner,","durch eine Broschüre bin ich auf die interessanten beruflichen Möglichkeiten in der Fernmelde und elektronischen Aufklärung der Bundeswehr aufmerksam geworden und bewerbe mich hiermit um eine Ausbildung im mittleren Dienst (Regierungssekretäranwärter).","Ich bin 20 Jahre alt, habe im Mai 20xx die mittlere Reife erlangt und danach eine Ausbildung zum Elektrotechniker absolviert. Um einen Einblick in die spannenden Tätigkeiten und Aufgabenbereiche der Bundeswehr zu erhalten, entschied ich mich im Anschluss für einen einjährigen freiwilligen Wehrdienst (LwAusbRgt 3 in Musterheim), der im Mai nächsten Jahres ausläuft. Die Erfahrungen, die ich bis jetzt bereits sammeln durfte, haben mich endgültig in meiner Berufswahl bestärkt.","In der Fernmelde- und elektronischen Aufklärung könnte ich meine beruflichen Qualifikationen und meine Leidenschaft für komplexe technische Belange auf ideale Weise für die ebenso wichtigen wie verantwortungsvollen Aufgaben der Bundeswehr einbringen. Meine Fähigkeit, mich rasch auf neue Gegebenheiten einzustellen, konnte ich während meiner Ausbildung bereits unter Beweis stellen.","Ich freue mich über eine Einladung zum Einstellungsverfahren.","Mit freundlichen Grüßen","Martin Vogel"]};
+					leed['meta'] = {"type":"text"};
+					leed = adapter.get({'cols':['leed'],'recs':[leed]});
+					console.log(leed);
+					if(leed){
+						presenter.popup.show({'content':leed.footer,'timeout':null,'size':'match','design':'dark'});
+					}
 			    }
 				,'get-next':(data) => {
 					var index = presenter.swipe.next();
@@ -619,7 +663,6 @@
 					console.log('page listener','internal dispatcher used');
 					new V13wEv3ntD1spatch3r().onDecorate({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
 				}
-				
 			}
 		}
 
@@ -658,14 +701,13 @@
 			new BrowserHistorD1spatcher().create(dispatcher);
 			new Keyboard4p1Operator().map(keymap).create();
 			new Swipe4p1Operator().map(gestures).create();
-
+		//	window.localStorage.setItem('l','123456789');	// create leed operator
 		});
 		$(window).load(function() {
 			dispatcher.onRegister().onUnleash();
+			$('body').trigger('log-refresh',{'call':'login-refresh','id':'doc-load-next'});
+			$('body').trigger('history-replace',{'call':'get-history','id':'get-next','index':0});
 			$('body').trigger('get-start',{'call':'get-start','id':'doc-load'});
-
-			console.log(window.user);
-			console.log(window.localStorage.getItem('u'));
 		});
 	</script>
 	<style type="text/css">
@@ -738,6 +780,25 @@
 		}
 
 
+
+		popup p{
+			margin-top:1em;
+			margin-bottom:1em;
+		}
+		popup p:first-child{
+			margin-top:0em;
+		}
+		popup p:last-child{
+			margin-bottom:0em;
+		}
+		popup.dark{
+			background-color:rgb(255,255,255);
+			color:rgb(34,34,34);
+		}
+		popup.light{
+			background-color:rgb(34,34,34);
+			color:rgb(255,255,255);
+		}
 
 
 
@@ -859,15 +920,15 @@
 			</playground>
 		</section>
 		<edge class="hr">
-			<a href="#" class="fa-stack" call="help-toggle">
+			<a href="#" class="fa-stack fa-1x" call="help-toggle">
 				<i class="fa fa-circle-thin fa-stack-2x"></i>
 				<i class="fa fa-question fa-stack-1x"></i>
 			</a>
-			<a href="#" class="fa-stack" call="dox-toggle">
+			<a href="#" class="fa-stack fa-1x" call="dox-toggle">
 				<i class="fa fa-circle-thin fa-stack-2x"></i>
 				<i class="fa fa-exclamation fa-stack-1x"></i>
 			</a>
-			<a href="#" class="fa-stack" call="dox-toggle">
+			<a href="#" class="fa-stack fa-1x" call="dox-toggle">
 				<i class="fa fa-circle-thin fa-stack-2x"></i>
 				<i class="fa fa-certificate fa-stack-1x"></i>
 			</a>

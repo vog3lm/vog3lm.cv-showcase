@@ -159,11 +159,16 @@ exports.qr = functions.https.onRequest((req,res)=>{
 		+ '<link rel="shortcut icon" href="'+qrDomain+'/images/favicon.coyote.poly_white.b.png" type="image/x-icon">'
 		+ '<link rel="icon" ref="'+qrDomain+'/images/favicon.coyote.poly_white.b.png" type="image/x-icon">[INJ:SCRIPT]'
 		+ '</head><body></body></html>';
+	/* check data dependencies */
 	if(0 === Object.keys(db)){
 		error.noQrIdBase('qr(req,res)')
-		return res.status(200).send(qrPage.replace('[INJ:SCRIPT]','</script><script type="text/javascript">window.location.replace("'+qrDomain+'/404")</script>'));
+		return res.status(200).send(qrPage.replace('[INJ:SCRIPT]','</script><script type="text/javascript">window.localStorage.setItem("e","Authentication error. Missing data dependencies.");window.location.replace("'+qrDomain+'/503")</script>'));
 	}
-
+	if(0 === Object.keys(lb)){
+		error.noLeedBase('qr(req,res)')
+		return res.status(200).send(qrPage.replace('[INJ:SCRIPT]','</script><script type="text/javascript">window.localStorage.setItem("e","Authentication error. Missing data dependencies.");window.location.replace("'+qrDomain+'/503")</script>'));
+	}
+	/* check qr id */
 	if(req.originalUrl.indexOf('?') !== -1){
 		qrId = req.query.qR1D;
 	}else if('/' !== req.originalUrl){
@@ -175,31 +180,39 @@ exports.qr = functions.https.onRequest((req,res)=>{
 			qrId = null;
 		}
 	}else{qrId = null;}
-
 	if(null === qrId){
 		error.noQrId('qr(req,res)');
-		return res.status(200).send(qrPage.replace('[INJ:SCRIPT]','</script><script type="text/javascript">window.location.replace("'+qrDomain+'/404")</script>'));
+		return res.status(200).send(qrPage.replace('[INJ:SCRIPT]','</script><script type="text/javascript">window.localStorage.setItem("e","No qR1D found. Pass a content token!");window.location.replace("'+qrDomain+'/403")</script>'));
 	}
 	if(!db.hasOwnProperty(qrId)){
 		error.invalidQrId('qr(req,res)',qrId);
-		return res.status(200).send(qrPage.replace('[INJ:SCRIPT]','</script><script type="text/javascript">window.location.replace("'+qrDomain+'/404")</script>'));
+		return res.status(200).send(qrPage.replace('[INJ:SCRIPT]','</script><script type="text/javascript">window.localStorage.setItem("e","Invalid qR1D found. Pass valid content tokens!");window.location.replace("'+qrDomain+'/403")</script>'));
 	}
 	var qrCreds = db[qrId];
+	/* check qr leed */
+	var qrLeed = qrCreds.leed;
+	if(!db.hasOwnProperty(qrLeed)){
+		error.invalidLeedToken('qr(req,res)',qrId);
+		qrLeed = 'O2FNkkqqE';
+	}
+	qrLeed = lb[qrLeed];
 	console.log('qr login done',qrCreds.mail,qrCreds.pass);
 	var passUserByWindow = 'window.user = u;';
 	var passUserByStorage = 'window.localStorage.setItem("u",u);';
-	var logLoginSuccess = 'console.log("login ok","'+qrDomain+'",window.user,window.localStorage.getItem("u"));alert("success");';
-	var logLoginFailure = 'console.error("login fail","'+qrDomain+'/404",u);alert("failure");';
-	var logLoginError = 'console.error("login error","'+qrDomain+'/404",error);alert("error");';
+	var passLeedByStorage = 'window.localStorage.setItem("l",'+qrLeed+');'
 	return res.status(200).send(qrPage.replace('[INJ:SCRIPT]',
 		  '<script type="text/javascript" src="https://www.gstatic.com/firebasejs/4.9.1/firebase-app.js"></script>'
 		+ '<script type="text/javascript" src="https://www.gstatic.com/firebasejs/4.9.1/firebase-auth.js">'
 		+ '</script><script type="text/javascript">'
 			+ 'firebase.initializeApp({apiKey:"AIzaSyDmXSkwOam-aQ37z8-3d5aH-X257lIVS34",authDomain:"vog3lm-0x1.firebaseapp.com",projectId:"vog3lm-0x1"});const a=firebase.auth();'
-			+ 'a.onAuthStateChanged(function(u){if(u){'+passUserByWindow+passUserByStorage+logLoginSuccess+'window.location.replace("'+qrDomain+'");}else{'+logLoginFailure+'window.location.replace("'+qrDomain+'/404");}});'
-			+ 'a.signInWithEmailAndPassword("'+qrCreds.mail+'","'+qrCreds.pass+'").catch(function(error){'+logLoginError+'window.location.replace("'+qrDomain+'/404");});'
+			+ 'a.onAuthStateChanged(function(u){if(u){'+passUserByWindow+passUserByStorage+passLeedByStorage+'window.location.replace("'+qrDomain+'");}else{window.localStorage.setItem("e","Invalid authentication. Access Denied");window.location.replace("'+qrDomain+'/403");}});'
+			+ 'a.signInWithEmailAndPassword("'+qrCreds.mail+'","'+qrCreds.pass+'").catch(function(error){window.localStorage.setItem("e","Authentication Error. "error.code+"-"+error.message);window.location.replace("'+qrDomain+'/503");});'
 		+ '</script>'));
 });
+
+exports.fly = functions.https.onRequest((req,res)=>{
+	return res.status(503).send('not implemented');
+}
 
 
 exports.pdf = functions.https.onRequest((req,res) => {
@@ -324,7 +337,7 @@ exports.mvp = functions.https.onRequest((req,res) => {
 			console.error(error);
 			return res.status(401).send(error);
 		});
-		return res.status(500).send('default return. never reached.')
+	//	return res.status(500).send('default return. never reached. keep warning. fail instead due to headers set problem')
 	});
 	return res.status(500).send('default return. never reached.')
 });

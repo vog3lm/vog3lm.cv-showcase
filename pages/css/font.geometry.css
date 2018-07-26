@@ -34,10 +34,10 @@ a.fa 					  { vertical-align:middle; text-align:center; }
 .center {text-align:center;}
 
 .fa-0-5x	{font-size:0.5rem;} /* defaults *//* delete */
-.fa-1x		{font-size:1rem;}
-.fa-1-25x	{font-size:1.75rem;}
-.fa-1-5x	{font-size:1.5rem;}
-.fa-1-75x	{font-size:1.75rem;}
+.fa-1x		{font-size:1rem !important;}
+.fa-1-25x	{font-size:1.25rem !important;}
+.fa-1-5x	{font-size:1.5rem !important;}
+.fa-1-75x	{font-size:1.75rem !important;}
 .fa-2x		{font-size:2rem;}
 .fa-2-5x	{font-size:2.5rem;}
 .fa-3-5x	{font-size:3.5rem;}

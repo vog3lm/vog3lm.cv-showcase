@@ -66,6 +66,7 @@ function F1rebas3Auth4p1Operator(firebase){
 	    ,'log-out':(data) => {this.logout();}
 	  /*,'log-in-custom':(token) => {base.signInWithCustomToken(token).catch(function(error){console.log(error)});}*/
 	    ,'log-decorate':(data) => {this.decorate(data.opts);}
+	    ,'log-refresh':(data) => {this.refresh();}
 	    ,'log-create':(data) => {this.create();}
 	};
 	var args = {'events':events,'user':'unset','token':'unset','firebase':'unset'
@@ -94,6 +95,23 @@ function F1rebas3Auth4p1Operator(firebase){
 			});
 		}).catch((error) => {console.error(error);});
 	}
+	this.refresh = function(){
+		if('unset' !== args.user){
+			var u = args.user
+			$('body').trigger('got-token',{'call':'got-token','id':'log-refresh','token':args.token});
+			$('body').trigger('logged-in',{
+				 'call':'logged-in'
+				,'id':'log-refresh'
+				,'name':u.displayName
+				,'mail':u.email
+				,'verified':u.emailVerified
+				,'anonym':u.isAnonymous
+			});
+		}else{
+			$('body').trigger('logged-out',{'call':'logged-out','id':'auth-state-listener'});
+			$('body').trigger('got-token',{'call':'got-token','id':'log-refresh','token':args.token});
+		}
+	}
 	this.logout = function(){base.signOut().catch((error) => {console.error('login error',error)});}
 	this.create = function(d){
 		if('unset' !== args.firebase){base = firebase.auth();}
@@ -117,7 +135,7 @@ function F1rebas3Auth4p1Operator(firebase){
 			args.user = u;
 			u.getIdToken(/* forceRefresh */true).then((userToken) => {
 				args.token = userToken;
-				$('body').trigger('got-token',{'call':'got-token','id':'auth-change','token':args.token});
+				$('body').trigger('got-token',{'call':'got-token','id':'auth-state-listener','token':args.token});
 			}).catch((error) => {console.error(error);});
 			$('body').trigger('logged-in',{
 				 'call':'logged-in'
@@ -131,7 +149,7 @@ function F1rebas3Auth4p1Operator(firebase){
 			args.user = 'unset';
 			args.token = 'unset';
 			$('body').trigger('logged-out',{'call':'logged-out','id':'auth-state-listener'});
-			$('body').trigger('got-token',{'call':'got-token','id':'auth-change','token':args.token});
+			$('body').trigger('got-token',{'call':'got-token','id':'auth-state-listener','token':args.token});
 		}
 	});
 }

@@ -4,8 +4,8 @@
 	<meta charset='utf-8'/>
 	<meta name="theme-color" content="#222222"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-	<title>vog3lm.aoa</title>
-    <link rel="stylesheet" href="css/font.awesome.min.css"/>
+	<title>vog3lm.soe</title>
+	<link rel="stylesheet" href="css/font.awesome.min.css"/>
     <link rel="stylesheet" href="css/font.geometry.css"/>
     <link rel="stylesheet" href="css/design.geometry.css"/>
 
@@ -58,7 +58,6 @@
 			}
 		}
 
-
 		var audios = ['http://broadcast.infomaniak.ch/jazz-wr04-128.mp3','http://sender.eldoradio.de:8000/128.mp3'];
 		var videos = ['https://vog3lm-0x1.firebaseapp.com/images/player.a.mp4']
 
@@ -73,9 +72,7 @@
 		$(document).ready(function(){
 			new PageEventListener().create(dispatcher);
 			new D3s1gn4p1Operator().create(dispatcher);
-			// merge to two in one!
-		//	var audio = new Med1aPlay3r4p1Operator().decorate({'tracks':audios,'tag':'header audio','id':'audio'}).create(dispatcher);
-		//	var video = new Med1aPlay3r4p1Operator().decorate({'tracks':videos,'tag':'header video','id':'video'}).create(dispatcher);
+			new Fl4chM3ss4g34piOperator().create(dispatcher);
 		});
 		$(window).load(function() {
 			dispatcher.onRegister().onUnleash();
@@ -84,6 +81,8 @@
 			var element = $('img#error');
 			var viewport = $(window);
 			element.css({'left':(viewport.width()-element.width())/2,'top':(viewport.height()-element.height())/2});
+
+			$('body').trigger('error-flash',{'call':'error-flash','id':'doc-load','message':'Error Flash: Message'});
 		});
 	</script>
 	<style type="text/css">
@@ -115,7 +114,6 @@
 			font-size:1.5rem;
 		    font-family:monospace;
 		}
-
 	</style>
 </head>
 <body>
@@ -139,7 +137,7 @@
 			<edge id="powerband" class="bl">
 				<img src="/images/logos/firebase.png"><span> Powered by Firebase</span>
 			</edge>
-			<img id="error" src="images/steal.data.png" alt="404" style="position:absolute;">
+			<img id="error" src="images/hate.google.png" alt="503" style="position:absolute;">
 			<edge class="br">
 				<a href="#" class="fa fa-cog" call="cfg-toggle"></a>
 			</edge>
@@ -152,6 +150,7 @@
 				<a href="#" class="fa fa-wrench fa-1-5x" call="animation-refresh"></a>
 			</nav>
 			<a href="#" id="footer-toggle" class="fa fa-chevron-up" call="footer-toggle"></a>
+			<flash class=""></flash>
 		</section>
 	</header>
 	<footer>

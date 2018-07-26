@@ -29,7 +29,7 @@ const validateFirebaseIdToken = (req, res, next) => {
 		if (req.headers.authorization && req.headers.authorization.startsWith('CONTENT_ID_TOKEN::')) {
 			console.log('Found "Authorization" header');
 			idToken = req.headers.authorization.split('CONTENT_ID_TOKEN::')[1];
-		} else if(null != req.cookies.__session) {
+		} else if(null !== req.cookies.__session) {
 			console.log('Found "__session" cookie');
 			idToken = req.cookies.__session;
 		}
@@ -138,17 +138,22 @@ gcs.bucket(bucketUrl).file('w3b.cv.c3rt/store.leeds.js').download({'destination'
 var dto = {"cols":[],"recs":[],"meta":{"state":"error","type":"dto","id":null,"tag":""}};
 var vto = {"view":null,"meta":{"state":"error","type":null,"q":null,"tag":""}};
 /*	/qr/?qR1D=id	*//* !
-	qR client -> https://vog3lm-0x1.firebaseapp.com -> https://us-central1-vog3lm-0x1.cloudfunctions.net/test/?qR1D=id&v=view
-	qR client    									<- login page
+	qR client -> https://vog3lm-0x1.firebaseapp.com/qr/qR1D=id -> req = {path=/qr/id
+																		 query={}
+																		 originalUrl=/qr/id
+																		 params={0:id}}
+	qR client -> https://us-central1-vog3lm-0x1.cloudfunctions.net/qr/?qR1D=id&v=view -> req = {path=/
+																								query={qR1D:id}
+																								originalUrl=/?qR1D=id
+																								params={0:'/'}}
+	qR client    												<- login page
 	qR client -> google auth domain
 	qR client -> redirect content page
 	qR client <- logged content view
 */
 exports.qr = functions.https.onRequest((req,res)=>{
 	var qrDomain = 'https://vog3lm-0x1.firebaseapp.com'
-	if('PXHTajCVg' === req.query.qR1D){
-		qrDomain = 'http://192.168.178.28:5000'
-	}
+	var qrId = null;
 	var qrPage = ''
 		+ '<!DOCTYPE html><html lang="de"><head><title>vog3lm.cv.redirect</title>'
 		+ '<link rel="shortcut icon" href="'+qrDomain+'/images/favicon.coyote.poly_white.b.png" type="image/x-icon">'
@@ -158,38 +163,47 @@ exports.qr = functions.https.onRequest((req,res)=>{
 		error.noQrIdBase('qr(req,res)')
 		return res.status(200).send(qrPage.replace('[INJ:SCRIPT]','</script><script type="text/javascript">window.location.replace("'+qrDomain+'/404")</script>'));
 	}
-	if (!req.query.qR1D){
+
+	if(req.originalUrl.indexOf('?') !== -1){
+		qrId = req.query.qR1D;
+	}else if('/' !== req.originalUrl){
+		var tmp = req.originalUrl;
+		tmp = tmp.substring(tmp.indexOf('/qr/')+4,tmp.length);
+		if(9 === tmp.length){qrId = tmp;}
+		else{
+			error.invalidQrId('qr(req,res)',tmp);
+			qrId = null;
+		}
+	}else{qrId = null;}
+
+	if(null === qrId){
 		error.noQrId('qr(req,res)');
 		return res.status(200).send(qrPage.replace('[INJ:SCRIPT]','</script><script type="text/javascript">window.location.replace("'+qrDomain+'/404")</script>'));
 	}
-	if(!db.hasOwnProperty(req.query.qR1D)){
-		error.invalidQrId('qr(req,res)',req.query.q);
+	if(!db.hasOwnProperty(qrId)){
+		error.invalidQrId('qr(req,res)',qrId);
 		return res.status(200).send(qrPage.replace('[INJ:SCRIPT]','</script><script type="text/javascript">window.location.replace("'+qrDomain+'/404")</script>'));
 	}
-	var qrCreds = db[req.query.qR1D];
-	var qrRedirect = qrDomain;
+	var qrCreds = db[qrId];
 	console.log('qr login done',qrCreds.mail,qrCreds.pass);
+	var passUserByWindow = 'window.user = u;';
+	var passUserByStorage = 'window.localStorage.setItem("u",u);';
+	var logLoginSuccess = 'console.log("login ok","'+qrDomain+'",window.user,window.localStorage.getItem("u"));alert("success");';
+	var logLoginFailure = 'console.error("login fail","'+qrDomain+'/404",u);alert("failure");';
+	var logLoginError = 'console.error("login error","'+qrDomain+'/404",error);alert("error");';
 	return res.status(200).send(qrPage.replace('[INJ:SCRIPT]',
 		  '<script type="text/javascript" src="https://www.gstatic.com/firebasejs/4.9.1/firebase-app.js"></script>'
 		+ '<script type="text/javascript" src="https://www.gstatic.com/firebasejs/4.9.1/firebase-auth.js">'
 		+ '</script><script type="text/javascript">'
 			+ 'firebase.initializeApp({apiKey:"AIzaSyDmXSkwOam-aQ37z8-3d5aH-X257lIVS34",authDomain:"vog3lm-0x1.firebaseapp.com",projectId:"vog3lm-0x1"});const a=firebase.auth();'
-			//+ 'a.onAuthStateChanged(function(u){if(u){window.user = u;console.log("login ok","'+qrRedirect+'",window.user);}else{console.error("login fail","'+qrDomain+'/404");}});'
-			//+ 'a.signInWithEmailAndPassword("'+qrCreds.mail+'","'+qrCreds.pass+'").catch(function(error){console.error("login error","'+qrDomain+'/404",error);});'
-			/* pass user by url */
-			//+ 'a.onAuthStateChanged(function(u){if(u){window.location.replace("'+qrRedirect+'/?u="+JSON.stringify(u));alert("stop")}else{window.location.replace("'+qrDomain+'/404");}});'
-			//+ 'a.signInWithEmailAndPassword("'+qrCreds.mail+'","'+qrCreds.pass+'").catch(function(error){console.error("login error","'+qrDomain+'/404",error);});'
-			/* pass user by window *//* same-origin policy (same host, same port) */
-			+ 'a.onAuthStateChanged(function(u){if(u){window.user = u;window.localStorage.setItem("u",u);window.location.replace("'+qrRedirect+'");}else{window.location.replace("'+qrDomain+'/404");}});'
-			+ 'a.signInWithEmailAndPassword("'+qrCreds.mail+'","'+qrCreds.pass+'").catch(function(error){window.location.replace("'+qrDomain+'/404");});'
+			+ 'a.onAuthStateChanged(function(u){if(u){'+passUserByWindow+passUserByStorage+logLoginSuccess+'window.location.replace("'+qrDomain+'");}else{'+logLoginFailure+'window.location.replace("'+qrDomain+'/404");}});'
+			+ 'a.signInWithEmailAndPassword("'+qrCreds.mail+'","'+qrCreds.pass+'").catch(function(error){'+logLoginError+'window.location.replace("'+qrDomain+'/404");});'
 		+ '</script>'));
 });
 
 
 exports.pdf = functions.https.onRequest((req,res) => {
-
     cors(req, res, () => {
-
 		if((!req.headers.authorization || !req.headers.authorization.startsWith('CONTENT_ID_TOKEN::')) /*&& !req.cookies.__session*/) {
 			error.noToken('pdf(req,res)');
 			return res.status(401).send('Invalid user authorization.');
@@ -197,7 +211,7 @@ exports.pdf = functions.https.onRequest((req,res) => {
 		let idToken;
 		if(req.headers.authorization && req.headers.authorization.startsWith('CONTENT_ID_TOKEN::')) {
 			idToken = req.headers.authorization.split('CONTENT_ID_TOKEN::')[1];
-		} else if(null != req.cookies.__session) {
+		} else if(null !== req.cookies.__session) {
 			idToken = req.cookies.__session;
 		} else {
 			error.noAuth('pdf(req,res)');
@@ -216,7 +230,6 @@ exports.pdf = functions.https.onRequest((req,res) => {
 				error.invalidQ('pdf(req,res)',req.query.q);
 				return res.redirect(404);
 			}
-
 			var pdfName = pb[req.query.q]
 	 		var pdfUrl = path.join(os.tmpdir(),'file.pdf')
 	 		var pdf = gcs.bucket(bucketUrl).file('w3b.cv.p6fs/'+pdfName).download({'destination':pdfUrl}).then(()=>{
@@ -227,10 +240,14 @@ exports.pdf = functions.https.onRequest((req,res) => {
 				error.noStorage('load(file.pdf)',e);
 				return res.status(500).send(e);
 			});
-
+			return res.status(500).send('default return. never reached.');
+		}).catch((e) => {
+			error.errorAuth('load(file.pdf)',e);
+			return res.status(500).send(e);
 		});
-
+		return res.status(500).send('default return. never reached.');
     });
+	return res.status(500).send('default return. never reached.');
 });
 
 
@@ -252,7 +269,7 @@ exports.mvp = functions.https.onRequest((req,res) => {
 		let idToken;
 		if(req.headers.authorization && req.headers.authorization.startsWith('CONTENT_ID_TOKEN::')) {
 			idToken = req.headers.authorization.split('CONTENT_ID_TOKEN::')[1];
-		} else if(null != req.cookies.__session) {
+		} else if(null !== req.cookies.__session) {
 			idToken = req.cookies.__session;
 		} else {
 			error.noAuth('mvp(req,res)');
@@ -274,7 +291,7 @@ exports.mvp = functions.https.onRequest((req,res) => {
 
 			var dataRecord = JSON.parse(JSON.stringify(dto)); // clone data transfer object
 			var viewRecord = cb[vb[req.query.q]];
-			if(null != viewRecord){
+			if(null !== viewRecord){
 				for(var i=0; i < viewRecord.length; i++){
 					console.log("for all view records",i);
 					var data = JSON.parse(JSON.stringify(vto)); // clone view transfer object
@@ -295,19 +312,19 @@ exports.mvp = functions.https.onRequest((req,res) => {
 					data.meta = meta;
 					dataRecord['cols'].push(req.query.q);
 					dataRecord['recs'].push(data);
-				};
+				}
 			}else{
 				console.error('fuck something went wrong!')
 			}
-			var meta = dataRecord.meta;
-			meta.id = req.query.q;
-			meta.state = 'success';
+			dataRecord.meta.id = req.query.q;
+			dataRecord.meta.state = 'success';
 			console.log('mvp dto build',dataRecord)
 			return res.status(200).send(dataRecord);
 		}).catch((error) => {
 			console.error(error);
 			return res.status(401).send(error);
 		});
-
+		return res.status(500).send('default return. never reached.')
 	});
+	return res.status(500).send('default return. never reached.')
 });

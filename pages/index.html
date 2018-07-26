@@ -663,6 +663,9 @@
 		$(window).load(function() {
 			dispatcher.onRegister().onUnleash();
 			$('body').trigger('get-start',{'call':'get-start','id':'doc-load'});
+
+			console.log(window.user);
+			console.log(window.localStorage.getItem('u'));
 		});
 	</script>
 	<style type="text/css">

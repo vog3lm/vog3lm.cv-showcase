@@ -9,8 +9,11 @@ module.exports = {
 	,'noAuth':(method) => {
 		console.error(method,': Invalid authentication method! Make sure to pass a valid authentication token in header or "__session" cookie.');
 	}
-	,'invalieAuth':(method,user,pass) => {
+	,'invalidAuth':(method,user,pass) => {
 		console.error(method,': Unauthorized access credentials.',user,pass);
+	}
+	,'errorAuth':(method,error) => {
+		console.error(method,': Authentication Error.',error);
 	}
 
 
@@ -33,11 +36,11 @@ module.exports = {
 	}
 
 
-	,'noStorage':(method,err) => {
-		console.error(method,': Failed to load GCS dependencies!','Error:',err.error,'Code:',err.code,'Errors:',err.errors);
+	,'noStorage':(method,error) => {
+		console.error(method,': Failed to load GCS dependencies!','Error:',error.error,'Code:',error.code,'Errors:',error.errors);
 	}
-	,'failStorage':(method,err) => {
-		console.error(method,': Failed to parse local dependencies!','Error:',err);
+	,'failStorage':(method,error) => {
+		console.error(method,': Failed to parse local dependencies!','Error:',error);
 	}
 
 
@@ -48,16 +51,11 @@ module.exports = {
 		console.error(method,': No qR ID token was passed as a content ID token in the request parameters.'
 			,'Make sure you authorize your request by providing the following parameter pair: qR1D=token');
 	}
-	,'invalidQrId':(method) => {
+	,'invalidQrId':(method,qrid) => {
 		console.error(method,': No user was found for this qR ID token.'
-			, 'Make sure you pass existing qR ID tokens as parameter pair: qR1D=token');
+			, 'Make sure you pass existing qR ID tokens as parameter pair: qR1D='+qrid);
 	}
 
-
-
-	,'aaaa':(method) => {
-		console.error(method,aaaaaaaaaa);
-	}
 };
 
 

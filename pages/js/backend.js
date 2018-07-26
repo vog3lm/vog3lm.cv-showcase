@@ -117,7 +117,7 @@ function F1rebas3Auth4p1Operator(firebase){
 			args.user = u;
 			u.getIdToken(/* forceRefresh */true).then((userToken) => {
 				args.token = userToken;
-				$('body').trigger('got-token',{'call':'got-token','id':'auth-change','token':args.token})
+				$('body').trigger('got-token',{'call':'got-token','id':'auth-change','token':args.token});
 			}).catch((error) => {console.error(error);});
 			$('body').trigger('logged-in',{
 				 'call':'logged-in'
@@ -130,7 +130,8 @@ function F1rebas3Auth4p1Operator(firebase){
 		} else {
 			args.user = 'unset';
 			args.token = 'unset';
-			$('body').trigger('logged-out',{'call':'logged-out','id':'auth-state-listener'})
+			$('body').trigger('logged-out',{'call':'logged-out','id':'auth-state-listener'});
+			$('body').trigger('got-token',{'call':'got-token','id':'auth-change','token':args.token});
 		}
 	});
 }
@@ -139,8 +140,7 @@ function F1rebas3Auth4p1Operator(firebase){
 
 function Mvp4p1Operator(){
 	var dispatcher = null;
-	// 'https://us-central1-vog3lm-0x1.cloudfunctions.net'
-	var args = {'url':'unset','token':'unset'};
+	var args = {'url':'https://us-central1-vog3lm-0x1.cloudfunctions.net','token':'unset'};
 	var events = {
 		'call-mvp':(data) => {this.call(data);}
 	    ,'decorate-mvp':(data) => {this.decorate(data.opts);}

@@ -55,6 +55,10 @@ module.exports = {
 		console.error(method,': No user was found for this qR ID token.'
 			, 'Make sure you pass existing qR ID tokens as parameter pair: qR1D='+qrid);
 	}
+	,'noQrFly':(method) => {
+		console.error(method,': No view ID token was passed as a content ID token in the request parameters.'
+			,'Make sure you authorize your request by providing the following parameter pair: q=token');
+	}
 	,'invalidQrFly':(method,q) => {
 		console.error(method,': No content was found for this view ID token.'
 			, 'Make sure you pass existing view ID tokens as parameter pair: view='+q);

@@ -68,6 +68,7 @@ header user{ /* user auth form */
 }
 header user form,
 header user card{
+	display:inline-block;
 	width:calc(100% - 32px);
 	height:100%;
 	padding:0px;

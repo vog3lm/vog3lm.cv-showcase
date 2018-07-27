@@ -550,9 +550,11 @@
 			    /* page/content */
 			    ,'get-start':(data) => {
 					presenter.swipe.initialize();
-					// leed extract
-					// leed = adapter.get(leed);
-					// presenter.popup.show({'content':leed.footer,'timeout':null,'size':'match','design':'dark'});
+					let leed = window.localStorage.getItem('l');
+					if(null != leed){
+						leed = adapter.get(leed);
+						presenter.popup.show({'content':leed.footer,'timeout':null,'size':'match','design':'dark'});
+					}
 			    }
 				,'get-next':(data) => {
 					var index = presenter.swipe.next();
@@ -578,14 +580,14 @@
 				,'got-mvp':(data) => {
 					data = adapter.get(data);
 					data.index = presenter.swipe.index();
-					presenter.page.show(data); // show elements
-					presenter.load.hide(); // hide loading
+					presenter.page.show(data);
+					presenter.load.hide();
 				}
 				,'fail-mvp':(data) => {
 					data = adapter.get(data);
 					data['id'] = 'smart.cv.og3lm';
-					presenter.page.show(data); // show elements
-					presenter.load.hide(); // hide loading
+					presenter.page.show(data);
+					presenter.load.hide();
 				}
 				,'got-pdf':(data) => {
 					// window.open("data:application/pdf;base64, "+data.pdf,'_blank');
@@ -641,18 +643,6 @@
 					one.operator.resume();
 					// two.operator.resume();
 				}
-
-
-				/* test stuff */
-				,'test':(data) => {
-					console.log('test-event',data)
-				}
-				,'content-header-request':(data) => {
-					authenicate.reqHeader('https://us-central1-vog3lm-0x1.cloudfunctions.net');
-				}
-				,'content-cookie-request':(data) => {
-					authenicate.reqCookie('https://us-central1-vog3lm-0x1.cloudfunctions.net');
-				}
 			}
 
 			this.create = function(d){
@@ -695,8 +685,6 @@
 			new BrowserHistorD1spatcher().create(dispatcher);
 			new Keyboard4p1Operator().map(keymap).create();
 			new Swipe4p1Operator().map(gestures).create();
-
-		//	window.localStorage.setItem('l','123456789');	// create leed operator
 		});
 		$(window).load(function() {
 			dispatcher.onRegister().onUnleash();
@@ -794,7 +782,6 @@
 			background-color:rgb(34,34,34);
 			color:rgb(255,255,255);
 		}
-
 
 
 		@media screen and (min-width:1024px){
@@ -941,6 +928,7 @@
 		</nav>
 		<edge class="bl">
 			<user>
+				<a href="#" class="fa fa-1-25x fa-hashtag" call="login-show" title="Show Login"></a>
 				<card class='hide'>
 					<a href="#" class="fa fa-user" call="user-data" title="Show User Data"></a>
 					<id></id>
@@ -949,7 +937,6 @@
 					<input type="text" id="mail" name="mail" placeholder="mail" value="">
 					<input type="text" id="pass" name="pass" placeholder="pass" value="">				
 				</form>
-				<a href="#" class="fa fa-hashtag" call="login-show" title="Show Login"></a>
 			</user>
 		</edge>
 		<a href="#" id="get-next" class="fa fa-chevron-right" call="get-next"></a>

@@ -32,7 +32,7 @@ function HtmlCancasTool(animation){
 }
 
 
-
+/*
 function F1rebas3Storage4p1Operator(firebase){
 	var dispatcher = null;
 	var base = firebase.storage();
@@ -42,7 +42,7 @@ function F1rebas3Storage4p1Operator(firebase){
 			var reference = base.ref(data.url);
 			reference.getDownloadURL().then(function(url) {
 				console.log(url)
-			}).catch(function(error) {	/* https://firebase.google.com/docs/storage/web/handle-errors */
+			}).catch(function(error) {	// https://firebase.google.com/docs/storage/web/handle-errors 
 				console.error(error)
 			});
 		}
@@ -58,6 +58,7 @@ function F1rebas3Storage4p1Operator(firebase){
 		return this;
 	}
 }
+*/
 function F1rebas3Auth4p1Operator(firebase){
 	var base = firebase.auth();
 	var dispatcher = null;
@@ -155,9 +156,7 @@ function F1rebas3Auth4p1Operator(firebase){
 }
 
 
-function W1ndowS7orage4p1Operator(){
-	
-}
+
 function Mvp4p1Operator(){
 	var dispatcher = null;
 	var args = {'url':'https://us-central1-vog3lm-0x1.cloudfunctions.net','token':'unset'};

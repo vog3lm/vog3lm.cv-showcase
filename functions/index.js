@@ -82,7 +82,7 @@ gcs.bucket(bucketUrl).file('w3b.cv.c3rt/'+secretFile).download({'destination':se
 	fs.readFile(secretUrl,'utf8',(err,data) => {
 		try{
 			if(!err){
-				var json = JSON.parse(data);
+				let json = JSON.parse(data);
 				db = json.credStore;
 				vb = json.viewStore;
 				pb = json.pdfStore;
@@ -160,8 +160,8 @@ let vto = {"view":null,"meta":{"state":"error","type":null,"q":null,"tag":""}};
 	qR client <- logged content page
 */
 exports.qr = functions.https.onRequest((req,res)=>{
-	var qrDomain = 'https://vog3lm-0x1.firebaseapp.com';
-	var qrPage = ''
+	let qrDomain = 'https://vog3lm-0x1.firebaseapp.com';
+	let qrPage = ''
 		+ '<!DOCTYPE html><html lang="de"><head><title>vog3lm.cv.redirect</title>'
 		+ '<link rel="shortcut icon" href="'+qrDomain+'/images/fox.white.png" type="image/x-icon">'
 		+ '<link rel="icon" ref="'+qrDomain+'/images/fox.white.png" type="image/x-icon">[INJ:SCRIPT]'
@@ -178,11 +178,11 @@ exports.qr = functions.https.onRequest((req,res)=>{
 		return res.status(200).send(qrPage.replace('[INJ:SCRIPT]','<script type="text/javascript">window.localStorage.setItem("e","Authentication error. Missing data dependencies.");window.location.replace("'+qrDomain+'/503")</script>'));
 	}
 	/* check qr id */
-	var qrId = null;
+	let qrId = null;
 	if(req.originalUrl.indexOf('?') !== -1){
 		qrId = req.query.qR1D;
 	}else if('/' !== req.originalUrl){
-		var tmp = req.originalUrl;
+		let tmp = req.originalUrl;
 		tmp = tmp.substring(tmp.indexOf('/qr/')+4,tmp.length);
 		if(9 === tmp.length){qrId = tmp;}
 		else{
@@ -200,17 +200,17 @@ exports.qr = functions.https.onRequest((req,res)=>{
 		// return res.status(200).send(qrLogin.page(qrLogin.fail('Invalid qR1D. Pass valid content tokens!')));
 		return res.status(200).send(qrPage.replace('[INJ:SCRIPT]','<script type="text/javascript">window.localStorage.setItem("e","Invalid qR1D found. Pass valid content tokens!");window.location.replace("'+qrDomain+'/403")</script>'));
 	}
-	var qrCreds = db[qrId];
+	let qrCreds = db[qrId];
 	/* check qr leed */
-	var qrLeed = qrCreds.leed;
+	let qrLeed = qrCreds.leed;
 	if(!db.hasOwnProperty(qrLeed)){
 		logError.invalidLeedToken('qr(req,res)',qrId,qrLeed);
 		qrLeed = 'O2FNkkqqE';
 	}
 	console.log('qr login done',qrCreds.mail,qrCreds.pass,'qr leed done',qrLeed);
-	var passUserByWindow = 'window.user = u;';
-	var passUserByStorage = 'window.localStorage.setItem("u",u);';
-	var passLeedByStorage = 'window.localStorage.setItem("l","'+lb[qrLeed]+'");'
+	let passUserByWindow = 'window.user = u;';
+	let passUserByStorage = 'window.localStorage.setItem("u",u);';
+	let passLeedByStorage = 'window.localStorage.setItem("l","'+lb[qrLeed]+'");'
 	// return res.status(200).send(qrLogin.page(qrLogin.script(qrCreds.mail,qrCreds.pass,lb[qrLeed])));
 	return res.status(200).send(qrPage.replace('[INJ:SCRIPT]',
 		  '<script type="text/javascript" src="https://www.gstatic.com/firebasejs/4.9.1/firebase-app.js"></script>'
@@ -227,16 +227,16 @@ exports.qr = functions.https.onRequest((req,res)=>{
 																		 query={}
 																		 originalUrl=/fly/id/view
 																		 params={0:/fly/id/view}}
-	qR client -> https://us-central1-vog3lm-0x1.cloudfunctions.net/qr/?qR1D=id&v=view -> req = {path=/
+	qR client -> https://us-central1-vog3lm-0x1.cloudfunctions.net/qr/?qR1D=id&v=view -> req = {path=?qR1D=id&q=view
 																								query={qR1D:id,q=view}
-																								originalUrl=/?qR1D=id&q=view
+																								originalUrl=?qR1D=id&q=view
 																								params={0:'/'}}
 	qR client    												<- login page
 	qR client -> google auth domain
 	qR client -> redirect content page
 	qR client <- logged content page, open view on the fly
 */
-exports.fly = functions.https.onRequest((req,res)=>{
+exports.flyer = functions.https.onRequest((req,res)=>{
 	/* check data dependencies */
 	if(0 === Object.keys(db)){
 		logError.noQrIdBase('qr(req,res)');
@@ -250,45 +250,52 @@ exports.fly = functions.https.onRequest((req,res)=>{
 	/*
 
 	/* check qr id */
-	var qrId = null;
-	var flyId = null;
-	if(req.originalUrl.indexOf('?') !== -1){
+	let qrId = null;
+	let flyId = null;
+	console.log(req.originalUrl)
+	console.log(req.path)
+	if(req.originalUrl.indexOf('?') !== -1 && '/' === req.path){
 		if(!req.query.qR1D){
-			logError.invalidQrId('qr(req,res)',tmp);
+			logError.noQrId('fly(req,res) 1');
 			return res.status(200).send(qrLogin.page(qrLogin.fail('No login token found. Pass a login token!')));
 		}
 		if(!req.query.q){
-			logError.invalidQrFly('qr(req,res)',tmp);
+			logError.noQrFly('fly(req,res) 1');
 			return res.status(200).send(qrLogin.page(qrLogin.fail('No view token found. Pass a view token!')));
 		}
 		qrId = req.query.qR1D;
 		flyId = req.query.q;
-	}else if('/' !== req.originalUrl){
-		var tmp = req.originalUrl;
-		tmp = tmp.substring(tmp.indexOf('/fly/')+4,tmp.length);
+	}else if('/' !== req.path && -1 !== req.originalUrl.indexOf('/flyer/')){
+		let tmp = req.originalUrl;
+		tmp = tmp.substring(tmp.indexOf('/flyer/')+4,tmp.length);
 		if(9 !== tmp.length){
-			logError.invalidQrId('qr(req,res)',tmp);
+			logError.invalidQrId('fly(req,res) 1',tmp);
 			return res.status(200).send(qrLogin.page(qrLogin.fail('No login token found. Pass a login token!')));
 		}
 		qrId = tmp;
-		tmp = tmp.substring(tmp.indexOf('/fly/'+qrId+'/')+14,tmp.length);
+		tmp = tmp.substring(tmp.indexOf('/flyer/'+qrId+'/')+14,tmp.length);
 		if(9 !== tmp.length){
-			logError.invalidQrFly('qr(req,res)',tmp);
+			logError.invalidQrFly('fly(req,res) 1',tmp);
 			return res.status(200).send(qrLogin.page(qrLogin.fail('No view token found. Pass a view token!')));
 		}
 		flyId = tmp;
 	}else{
-		logError.noQrId('qr(req,res)');
+		logError.noQrId('fly(req,res) 2');
 		return res.status(200).send(qrLogin.page(qrLogin.fail('No query parameter found. Pass query parameter!')));
 	}
 
 	if(!db.hasOwnProperty(qrId)){
-		logError.invalidQrId('qr(req,res)',qrId);
-		return res.status(200).send(qrLogin.page(qrLogin.fail('Invalid qR1D. Pass valid content tokens!')));
+		logError.invalidQrId('fly(req,res) 2',qrId);
+		return res.status(200).send(qrLogin.page(qrLogin.fail('Invalid id token. Pass a valid login token!')));
 	}
-	var qrCreds = db[qrId];
+	if(!vb.hasOwnProperty(flyId)){
+		logError.invalidQrFly('fly(req,res) 2',flyId);
+		return res.status(200).send(qrLogin.page(qrLogin.fail('Invalid view token. Pass a valid view token!')));
+	}
+	let qrCreds = db[qrId];
 
 	// mybe leed ?
+	let qrLeed = 'O2FNkkqqE';
 
 	return res.status(200).send(qrLogin.page(qrLogin.script(qrCreds.mail,qrCreds.pass,lb[qrLeed])));
 });
@@ -322,12 +329,12 @@ exports.pdf = functions.https.onRequest((req,res) => {
 				logError.invalidQ('pdf(req,res)',req.query.q);
 				return res.redirect(404);
 			}
-			var pdfName = pb[req.query.q]
-	 		var pdfUrl = path.join(os.tmpdir(),'file.pdf')
+			let pdfName = pb[req.query.q]
+	 		let pdfUrl = path.join(os.tmpdir(),'file.pdf')
 	 		// warn nested promisse
-	 		var pdf = gcs.bucket(bucketUrl).file('w3b.cv.p6fs/'+pdfName).download({'destination':pdfUrl}).then(()=>{
-	 			var pdf = fs.readFileSync(pdfUrl)
-	 			var tmp = {'pdf':pdf.toString('base64'),'name':pdfName}
+	 		let pdf = gcs.bucket(bucketUrl).file('w3b.cv.p6fs/'+pdfName).download({'destination':pdfUrl}).then(()=>{
+	 			let pdf = fs.readFileSync(pdfUrl)
+	 			let tmp = {'pdf':pdf.toString('base64'),'name':pdfName}
 	 			return res.status(200).send(tmp);
 			}).catch((e) => {
 				logError.noStorage('load(file.pdf)',e);
@@ -377,20 +384,20 @@ exports.mvp = functions.https.onRequest((req,res) => {
 				logError.noQ('mvp(req,res)');
 				return res.status(404).send('No content query parameter found!');
 			}
-			var qId = req.query.q;
+			let qId = req.query.q;
 			if(!vb.hasOwnProperty(qId)){
 				logError.invalidQ('mvp(req,res)',qId);
 				return res.status(403).send('Invalid content token!');
 			}
 
-			var dataRecord = JSON.parse(JSON.stringify(dto)); // clone data transfer object
-			var viewRecord = cb[vb[qId]];
+			let dataRecord = JSON.parse(JSON.stringify(dto)); // clone data transfer object
+			let viewRecord = cb[vb[qId]];
 			if(viewRecord){
 				console.log("for all view records build");
 				for(var i=0; i < viewRecord.length; i++){
 					
-					var data = JSON.parse(JSON.stringify(vto)); // clone view transfer object
-					var meta = data.meta;
+					let data = JSON.parse(JSON.stringify(vto)); // clone view transfer object
+					let meta = data.meta;
 
 					meta.type = viewRecord[i].type; // text|table|html
 					data.view = viewRecord[i].view;

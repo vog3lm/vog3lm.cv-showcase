@@ -8,7 +8,7 @@
     ],
     "rewrites": [
       {"source":"/qr/*","function":"qr"}
-     ,{"source":"/fly/*/*","function":"fly"}
+     ,{"source":"/fly/*/*","function":"flyer"} // http://mywiki.wooledge.org/glob
      ,{"source":"/mvp","function":"mvp"}
      ,{"source":"/mvc","function":"mvc"}
     ],

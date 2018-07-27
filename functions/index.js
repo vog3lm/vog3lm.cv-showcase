@@ -31,10 +31,10 @@ const validateFirebaseIdToken = (req, res, next) => {
 		res.status(403).send('Unauthorized - No token found!');
 	} else {
 		let idToken;
-		if (req.headers.authorization && req.headers.authorization.startsWith('CONTENT_ID_TOKEN::')) {
+		if(req.headers.authorization && req.headers.authorization.startsWith('CONTENT_ID_TOKEN::')) {
 			console.log('Found "Authorization" header');
 			idToken = req.headers.authorization.split('CONTENT_ID_TOKEN::')[1];
-		} else if(null !== req.cookies.__session) {
+		}else if(null !== req.cookies.__session) {
 			console.log('Found "__session" cookie');
 			idToken = req.cookies.__session;
 		}
@@ -313,8 +313,9 @@ exports.mvp = functions.https.onRequest((req,res) => {
 			var dataRecord = JSON.parse(JSON.stringify(dto)); // clone data transfer object
 			var viewRecord = cb[vb[qId]];
 			if(viewRecord){
+				console.log("for all view records build");
 				for(var i=0; i < viewRecord.length; i++){
-					console.log("for all view records",i);
+					
 					var data = JSON.parse(JSON.stringify(vto)); // clone view transfer object
 					var meta = data.meta;
 

@@ -550,6 +550,9 @@
 			    /* page/content */
 			    ,'get-start':(data) => {
 					presenter.swipe.initialize();
+					// leed extract
+					// leed = adapter.get(leed);
+					// presenter.popup.show({'content':leed.footer,'timeout':null,'size':'match','design':'dark'});
 			    }
 				,'get-next':(data) => {
 					var index = presenter.swipe.next();
@@ -678,11 +681,6 @@
 
 		var dispatcher = new V13wEv3ntD1spatch3r();
 		$(document).ready(function(){
-			
-	    	/* var parameter = window.location.href.toString().replace(/%22/g,'"');
-	    	parameter = parameter.substring(parameter.indexOf('?u=')+3,parameter.length);
-	    	window.user = JSON.parse(parameter); */
-
 			var config = {
 			    apiKey:"AIzaSyDmXSkwOam-aQ37z8-3d5aH-X257lIVS34",
 			    authDomain:"vog3lm-0x1.firebaseapp.com",
@@ -697,6 +695,7 @@
 			new BrowserHistorD1spatcher().create(dispatcher);
 			new Keyboard4p1Operator().map(keymap).create();
 			new Swipe4p1Operator().map(gestures).create();
+
 		//	window.localStorage.setItem('l','123456789');	// create leed operator
 		});
 		$(window).load(function() {

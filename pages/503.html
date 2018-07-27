@@ -9,8 +9,8 @@
     <link rel="stylesheet" href="css/font.geometry.css"/>
     <link rel="stylesheet" href="css/design.geometry.css"/>
 
-	<link rel="shortcut icon" href="images/coyote.white.png" type="image/x-icon"/>
-	<link rel="icon" 		  href="images/coyote.white.png" type="image/x-icon"/>
+	<link rel="shortcut icon" href="images/logos/fox.white.png" type="image/x-icon"/>
+	<link rel="icon" 		  href="images/logos/fox.white.png" type="image/x-icon"/>
 
 	<script type="text/javascript" src="js/jq.min.js"></script>
 	<script type="text/javascript" src="js/error.js"></script>
@@ -81,8 +81,10 @@
 			var element = $('img#error');
 			var viewport = $(window);
 			element.css({'left':(viewport.width()-element.width())/2,'top':(viewport.height()-element.height())/2});
-
-			$('body').trigger('error-flash',{'call':'error-flash','id':'doc-load','message':'Error Flash: Message'});
+			var em = window.localStorage.getItem("e");
+			window.localStorage.setItem("e",null);
+			console.log(em);
+			$('body').trigger('error-flash',{'call':'error-flash','id':'doc-load','message':em});
 		});
 	</script>
 	<style type="text/css">

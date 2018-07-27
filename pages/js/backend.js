@@ -155,7 +155,9 @@ function F1rebas3Auth4p1Operator(firebase){
 }
 
 
-
+function W1ndowS7orage4p1Operator(){
+	
+}
 function Mvp4p1Operator(){
 	var dispatcher = null;
 	var args = {'url':'https://us-central1-vog3lm-0x1.cloudfunctions.net','token':'unset'};
@@ -197,7 +199,6 @@ function Mvp4p1Operator(){
 			  	crossDomain: true,
 			  	headers:{'Authorization':'CONTENT_ID_TOKEN::'+args.token},
 			  	context: document.body,
-	  	  		statusCode: {404:() => {alert( "page not found" );}}
 			}).done(function(response){
 				if(data.hasOwnProperty('promise')){
 					data.promise(response);
@@ -207,10 +208,13 @@ function Mvp4p1Operator(){
 					response['type'] = 'text';
 					$('body').trigger('got-'+api,response);	
 				}
+			}).fail(function(xhr,status){
+				console.error('Mvp data error.',xhr.responseText);
+				$('body').trigger('fail-'+api,{'id':'fail'+api,'call':'fail'+api,'message':xhr.responseText});
 			});
 		}catch(error){
 			console.error(error);
-			$('body').trigger('got-mvp',{'recs':error,'cols':['error'],'meta':{'state':'error'}});
+			$('body').trigger('fail-'+api,{'id':'fail'+api,'call':'fail'+api,'message':error});
 		}		
 	}
 	this.pdf = function(data){
@@ -222,13 +226,15 @@ function Mvp4p1Operator(){
 				  	crossDomain: true,
 				  	headers:{'Authorization':'CONTENT_ID_TOKEN::'+args.token},
 				  	context: document.body,
-		  	  		statusCode: {404:() => {alert( "page not found" );}}
 				}).done(function(response){
 					if(data.hasOwnProperty('promise')){
 						data.promise(response);
 					} else {
 						$('body').trigger('got-pdf',response);	
 					}
+				}).fail(function(xhr,status){
+					console.error('Mvp download error.',xhr.responseText);
+					$('body').trigger('fail-'+api,{'id':'fail'+api,'call':'fail'+api,'message':xhr.responseText});
 				});
 			}else{
 				errors.push('no token found.');
@@ -236,7 +242,7 @@ function Mvp4p1Operator(){
 			if(0 < errors.length){throw errors}
 		}catch(error){
 			console.error(error);
-			$('body').trigger('got-pdf',{'recs':error,'cols':['error'],'meta':{'state':'error'}});
+			$('body').trigger('fail-'+api,{'id':'fail'+api,'call':'fail'+api,'message':error});
 		}		
 	}
 

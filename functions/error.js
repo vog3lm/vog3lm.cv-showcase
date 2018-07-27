@@ -36,11 +36,11 @@ module.exports = {
 	}
 
 
-	,'noStorage':(method,error) => {
-		console.error(method,': Failed to load GCS dependencies!','Error:',error.error,'Code:',error.code,'Errors:',error.errors);
+	,'noStorage':(fn,error) => {
+		console.error('gcs.bucket(w3b.cv.c3rt/'+fn+')',': Failed to load GCS dependencies!','Error:',error,'Code:',error.code,'Errors:',error.errors);
 	}
-	,'failStorage':(method,error) => {
-		console.error(method,': Failed to parse local dependencies!','Error:',error);
+	,'failStorage':(fn,error) => {
+		console.error('gcs.bucket(w3b.cv.c3rt/'+fn+')',': Failed to parse local dependencies!','Error:',error);
 	}
 
 
@@ -60,7 +60,7 @@ module.exports = {
 		console.error(method,': No qR leed database was found. Make sure you preload qR leed reference database!');
 	}
 	,'invalidLeedToken':(method,qrid,leed) => {
-		console.error(method,': No leed was found for qR leed token '+leed+'. Default token is used!'
+		console.warn(method,': No leed was found for qR leed token '+leed+'. Default token is used!'
 			, 'Make sure you connect existing qR leed tokens to parameter pair: qR1D='+qrid);
 	}
 

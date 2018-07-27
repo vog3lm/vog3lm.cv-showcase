@@ -9,8 +9,8 @@
     <link rel="stylesheet" href="css/font.geometry.css"/>
     <link rel="stylesheet" href="css/design.geometry.css"/>
 
-	<link rel="shortcut icon" href="images/coyote.white.png" type="image/x-icon"/>
-	<link rel="icon" 		  href="images/coyote.white.png" type="image/x-icon"/>
+	<link rel="shortcut icon" href="images/logos/fox.white.png" type="image/x-icon"/>
+	<link rel="icon" 		  href="images/logos/fox.white.png" type="image/x-icon"/>
 
 	<script type="text/javascript" src="js/jq.min.js"></script>
 	<script type="text/javascript" src="js/error.js"></script>
@@ -73,6 +73,7 @@
 		$(document).ready(function(){
 			new PageEventListener().create(dispatcher);
 			new D3s1gn4p1Operator().create(dispatcher);
+			new Fl4chM3ss4g34piOperator().create(dispatcher);
 			// merge to two in one!
 		//	var audio = new Med1aPlay3r4p1Operator().decorate({'tracks':audios,'tag':'header audio','id':'audio'}).create(dispatcher);
 		//	var video = new Med1aPlay3r4p1Operator().decorate({'tracks':videos,'tag':'header video','id':'video'}).create(dispatcher);
@@ -84,6 +85,10 @@
 			var element = $('img#error');
 			var viewport = $(window);
 			element.css({'left':(viewport.width()-element.width())/2,'top':(viewport.height()-element.height())/2});
+			var em = window.localStorage.getItem("e");
+			window.localStorage.setItem("e",null);
+			console.log(em);
+			$('body').trigger('error-flash',{'call':'error-flash','id':'doc-load','message':em});
 		});
 	</script>
 	<style type="text/css">

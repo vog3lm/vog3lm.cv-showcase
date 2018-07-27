@@ -15,8 +15,8 @@
     <link rel="preload" href="fonts/MyriadPro-Semibold.woff" as="font" crossorigin="anonymous" />
     <link rel="preload" href="fonts/MyriadPro-Bold.woff" as="font" crossorigin="anonymous" />
 
-	<link rel="shortcut icon" href="images/coyote.white.png" type="image/x-icon"/>
-	<link rel="icon" 		  href="images/coyote.white.png" type="image/x-icon"/>
+	<link rel="shortcut icon" href="images/logos/fox.white.png" type="image/x-icon"/>
+	<link rel="icon" 		  href="images/logos/fox.white.png" type="image/x-icon"/>
 
 	<script src="https://www.gstatic.com/firebasejs/4.9.1/firebase-app.js"></script>
 	<script src="https://www.gstatic.com/firebasejs/4.9.1/firebase-auth.js"></script>
@@ -386,22 +386,20 @@
 			this.get = (data) => {
 				// {cols: [q,q], recs: [vto,vto], meta: {…}, call: "got-mvp", id: "hello", …}call: "got-mvp"cols: (2) ["6PW2gsYzD", "6PW2gsYzD"]id: "hello"meta: {state: "success", type: "dto", id: "6PW2gsYzD", tag: ""}recs: (2) [{…}, {…}]type: "text"view: "hello↵"__proto__: Object
 				var adaption = '';
-				for(var i=0; i < data.recs.length; i++) {
-					var vto = data.recs[i];
-					if(vto.meta){
-							 if('text' === vto.meta.type){adaption = adaption+text(vto.view);}
-						else if('table' === vto.meta.type){adaption = adaption+table(vto.view,vto.meta);}
-						else if('html' === vto.meta.type){adaption = adaption+html(vto.view);}
-					}
-				};
+				if(data.hasOwnProperty('recs')){
+					for(var i=0; i < data.recs.length; i++) {
+						var vto = data.recs[i];
+						if(vto.meta){
+								 if('text' === vto.meta.type){adaption = adaption+text(vto.view);}
+							else if('table' === vto.meta.type){adaption = adaption+table(vto.view,vto.meta);}
+							else if('html' === vto.meta.type){adaption = adaption+html(vto.view);}
+						}
+					};
+				}
 				if('' === adaption){
 					adaption = '<p>Restricted Access! Request Login.</p>';
 				}
-				adaption = {
-					 'title':data.id
-					,'footer':adaption
-				};
-				return adaption; 
+				return {'title':data.id,'footer':adaption}; 
 			};
 			function text(lines){
 				var adaption = '';
@@ -552,14 +550,6 @@
 			    /* page/content */
 			    ,'get-start':(data) => {
 					presenter.swipe.initialize();
-					var leed = window.localStorage.getItem('l');
-					leed = {"type":"text","view":["Sehr geehrter Ansprechpartner,","durch eine Broschüre bin ich auf die interessanten beruflichen Möglichkeiten in der Fernmelde und elektronischen Aufklärung der Bundeswehr aufmerksam geworden und bewerbe mich hiermit um eine Ausbildung im mittleren Dienst (Regierungssekretäranwärter).","Ich bin 20 Jahre alt, habe im Mai 20xx die mittlere Reife erlangt und danach eine Ausbildung zum Elektrotechniker absolviert. Um einen Einblick in die spannenden Tätigkeiten und Aufgabenbereiche der Bundeswehr zu erhalten, entschied ich mich im Anschluss für einen einjährigen freiwilligen Wehrdienst (LwAusbRgt 3 in Musterheim), der im Mai nächsten Jahres ausläuft. Die Erfahrungen, die ich bis jetzt bereits sammeln durfte, haben mich endgültig in meiner Berufswahl bestärkt.","In der Fernmelde- und elektronischen Aufklärung könnte ich meine beruflichen Qualifikationen und meine Leidenschaft für komplexe technische Belange auf ideale Weise für die ebenso wichtigen wie verantwortungsvollen Aufgaben der Bundeswehr einbringen. Meine Fähigkeit, mich rasch auf neue Gegebenheiten einzustellen, konnte ich während meiner Ausbildung bereits unter Beweis stellen.","Ich freue mich über eine Einladung zum Einstellungsverfahren.","Mit freundlichen Grüßen","Martin Vogel"]};
-					leed['meta'] = {"type":"text"};
-					leed = adapter.get({'cols':['leed'],'recs':[leed]});
-					console.log(leed);
-					if(leed){
-						presenter.popup.show({'content':leed.footer,'timeout':null,'size':'match','design':'dark'});
-					}
 			    }
 				,'get-next':(data) => {
 					var index = presenter.swipe.next();
@@ -585,6 +575,12 @@
 				,'got-mvp':(data) => {
 					data = adapter.get(data);
 					data.index = presenter.swipe.index();
+					presenter.page.show(data); // show elements
+					presenter.load.hide(); // hide loading
+				}
+				,'fail-mvp':(data) => {
+					data = adapter.get(data);
+					data['id'] = 'smart.cv.og3lm';
 					presenter.page.show(data); // show elements
 					presenter.load.hide(); // hide loading
 				}
@@ -693,7 +689,7 @@
 			    projectId:"vog3lm-0x1",
 			};
 			firebase.initializeApp(config);
-			new Mvp4p1Operator().create(dispatcher);
+			new Mvp4p1Operator()/*.decorate({'url':'http://192.168.178.80:5001/vog3lm-0x1/us-central1'})*/.create(dispatcher);
 			new PageEventListener().create(dispatcher);
 			new D3s1gn4p1Operator().create(dispatcher);
 			new F1rebas3Auth4p1Operator(firebase).create(dispatcher);

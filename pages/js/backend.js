@@ -132,6 +132,9 @@ function F1rebas3Auth4p1Operator(firebase){
 		return this;
 	}
 	base.onAuthStateChanged((u) => {
+		var tmp = window.localStorage.getItem('u');
+		if(tmp && 'null' !== tmp){u = tmp;}
+		else if(window.user){u = window.user;}
 		if(u){
 			args.user = u;
 			u.getIdToken(/* forceRefresh */true).then((userToken) => {

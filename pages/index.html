@@ -550,8 +550,9 @@
 			    /* page/content */
 			    ,'get-start':(data) => {
 					presenter.swipe.initialize();
-					let leed = window.localStorage.getItem('l');
-					if(null != leed){
+					var leed = window.localStorage.getItem('l');
+					window.localStorage.setItem('l',null);
+					if(leed && 'null' !== leed){
 						leed = adapter.get(leed);
 						presenter.popup.show({'content':leed.footer,'timeout':null,'size':'match','design':'dark'});
 					}

@@ -20,8 +20,6 @@ module.exports = {
 	,'noContentBase': (method) => {
 		console.error(method,': No view ID database was found. Make sure you preload view content database!');
 	}
-
-
 	,'noViewBase': (method) => {
 		console.error(method,': No view ID database was found. Make sure you preload view content database!');
 	}
@@ -37,10 +35,12 @@ module.exports = {
 
 
 	,'noStorage':(fn,error) => {
-		console.error('gcs.bucket(w3b.cv.c3rt/'+fn+')',': Failed to load GCS dependencies!','Error:',error,'Code:',error.code,'Errors:',error.errors);
+		console.error('gcs.bucket(w3b.cv.c3rt/'+fn+')',': Failed to load GCS dependencies!'
+					 ,'Error:',error,'Code:',error.code,'Errors:',error.errors);
 	}
 	,'failStorage':(fn,error) => {
-		console.error('gcs.bucket(w3b.cv.c3rt/'+fn+')',': Failed to parse local dependencies!','Error:',error);
+		console.error('gcs.bucket(w3b.cv.c3rt/'+fn+')',': Failed to parse local dependencies!'
+					 ,'Error:',error);
 	}
 
 
@@ -55,6 +55,11 @@ module.exports = {
 		console.error(method,': No user was found for this qR ID token.'
 			, 'Make sure you pass existing qR ID tokens as parameter pair: qR1D='+qrid);
 	}
+	,'invalidQrFly':(method,q) => {
+		console.error(method,': No content was found for this view ID token.'
+			, 'Make sure you pass existing view ID tokens as parameter pair: view='+q);
+	}
+
 
 	,'noLeedBase':(method) => {
 		console.error(method,': No qR leed database was found. Make sure you preload qR leed reference database!');
@@ -63,7 +68,6 @@ module.exports = {
 		console.warn(method,': No leed was found for qR leed token '+leed+'. Default token is used!'
 			, 'Make sure you connect existing qR leed tokens to parameter pair: qR1D='+qrid);
 	}
-
 };
 
 

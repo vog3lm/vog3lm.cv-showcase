@@ -17,6 +17,7 @@ const pdfkit = require('pdfkit')
 /* local script imports */
 const logError = require('./error');
 const logInfo = require('./info');
+const qrLogin = require('./login');
 
 const bootSleepTime = 2000;
 logInfo.bootSleep(bootSleepTime);
@@ -148,7 +149,7 @@ let vto = {"view":null,"meta":{"state":"error","type":null,"q":null,"tag":""}};
 	qR client -> https://vog3lm-0x1.firebaseapp.com/qr/qR1D=id -> req = {path=/qr/id
 																		 query={}
 																		 originalUrl=/qr/id
-																		 params={0:id}}
+																		 params={0:/qr/id}}
 	qR client -> https://us-central1-vog3lm-0x1.cloudfunctions.net/qr/?qR1D=id&v=view -> req = {path=/
 																								query={qR1D:id}
 																								originalUrl=/?qR1D=id
@@ -156,11 +157,10 @@ let vto = {"view":null,"meta":{"state":"error","type":null,"q":null,"tag":""}};
 	qR client    												<- login page
 	qR client -> google auth domain
 	qR client -> redirect content page
-	qR client <- logged content view
+	qR client <- logged content page
 */
 exports.qr = functions.https.onRequest((req,res)=>{
-	var qrDomain = 'https://vog3lm-0x1.firebaseapp.com'
-	var qrId = null;
+	var qrDomain = 'https://vog3lm-0x1.firebaseapp.com';
 	var qrPage = ''
 		+ '<!DOCTYPE html><html lang="de"><head><title>vog3lm.cv.redirect</title>'
 		+ '<link rel="shortcut icon" href="'+qrDomain+'/images/fox.white.png" type="image/x-icon">'
@@ -168,14 +168,17 @@ exports.qr = functions.https.onRequest((req,res)=>{
 		+ '</head><body></body></html>';
 	/* check data dependencies */
 	if(0 === Object.keys(db)){
-		logError.noQrIdBase('qr(req,res)')
-		return res.status(200).send(qrPage.replace('[INJ:SCRIPT]','</script><script type="text/javascript">window.localStorage.setItem("e","Authentication error. Missing data dependencies.");window.location.replace("'+qrDomain+'/503")</script>'));
+		logError.noQrIdBase('qr(req,res)');
+		// return res.status(200).send(qrLogin.page(qrLogin.error('Authentication error. Missing dependencies.')));
+		return res.status(200).send(qrPage.replace('[INJ:SCRIPT]','<script type="text/javascript">window.localStorage.setItem("e","Authentication error. Missing data dependencies.");window.location.replace("'+qrDomain+'/503")</script>'));
 	}
 	if(0 === Object.keys(lb)){
-		logError.noLeedBase('qr(req,res)')
-		return res.status(200).send(qrPage.replace('[INJ:SCRIPT]','</script><script type="text/javascript">window.localStorage.setItem("e","Authentication error. Missing data dependencies.");window.location.replace("'+qrDomain+'/503")</script>'));
+		logError.noLeedBase('qr(req,res)');
+		// return res.status(200).send(qrLogin.page(qrLogin.error('Leed error. Missing dependencies.')));
+		return res.status(200).send(qrPage.replace('[INJ:SCRIPT]','<script type="text/javascript">window.localStorage.setItem("e","Authentication error. Missing data dependencies.");window.location.replace("'+qrDomain+'/503")</script>'));
 	}
 	/* check qr id */
+	var qrId = null;
 	if(req.originalUrl.indexOf('?') !== -1){
 		qrId = req.query.qR1D;
 	}else if('/' !== req.originalUrl){
@@ -189,11 +192,13 @@ exports.qr = functions.https.onRequest((req,res)=>{
 	}else{qrId = null;}
 	if(null === qrId){
 		logError.noQrId('qr(req,res)');
-		return res.status(200).send(qrPage.replace('[INJ:SCRIPT]','</script><script type="text/javascript">window.localStorage.setItem("e","No qR1D found. Pass a content token!");window.location.replace("'+qrDomain+'/403")</script>'));
+		// return res.status(200).send(qrLogin.page(qrLogin.fail('No qR1D found. Pass a content token!')));
+		return res.status(200).send(qrPage.replace('[INJ:SCRIPT]','<script type="text/javascript">window.localStorage.setItem("e","No qR1D found. Pass a content token!");window.location.replace("'+qrDomain+'/403")</script>'));
 	}
 	if(!db.hasOwnProperty(qrId)){
 		logError.invalidQrId('qr(req,res)',qrId);
-		return res.status(200).send(qrPage.replace('[INJ:SCRIPT]','</script><script type="text/javascript">window.localStorage.setItem("e","Invalid qR1D found. Pass valid content tokens!");window.location.replace("'+qrDomain+'/403")</script>'));
+		// return res.status(200).send(qrLogin.page(qrLogin.fail('Invalid qR1D. Pass valid content tokens!')));
+		return res.status(200).send(qrPage.replace('[INJ:SCRIPT]','<script type="text/javascript">window.localStorage.setItem("e","Invalid qR1D found. Pass valid content tokens!");window.location.replace("'+qrDomain+'/403")</script>'));
 	}
 	var qrCreds = db[qrId];
 	/* check qr leed */
@@ -206,19 +211,87 @@ exports.qr = functions.https.onRequest((req,res)=>{
 	var passUserByWindow = 'window.user = u;';
 	var passUserByStorage = 'window.localStorage.setItem("u",u);';
 	var passLeedByStorage = 'window.localStorage.setItem("l","'+lb[qrLeed]+'");'
+	// return res.status(200).send(qrLogin.page(qrLogin.script(qrCreds.mail,qrCreds.pass,lb[qrLeed])));
 	return res.status(200).send(qrPage.replace('[INJ:SCRIPT]',
 		  '<script type="text/javascript" src="https://www.gstatic.com/firebasejs/4.9.1/firebase-app.js"></script>'
-		+ '<script type="text/javascript" src="https://www.gstatic.com/firebasejs/4.9.1/firebase-auth.js">'
-		+ '</script><script type="text/javascript">'
+		+ '<script type="text/javascript" src="https://www.gstatic.com/firebasejs/4.9.1/firebase-auth.js"></script>'
+		+ '<script type="text/javascript">'
 			+ 'firebase.initializeApp({apiKey:"AIzaSyDmXSkwOam-aQ37z8-3d5aH-X257lIVS34",authDomain:"vog3lm-0x1.firebaseapp.com",projectId:"vog3lm-0x1"});const a=firebase.auth();'
 			+ 'a.onAuthStateChanged(function(u){if(u){'+passUserByWindow+passUserByStorage+passLeedByStorage+'window.location.replace("'+qrDomain+'");}else{window.localStorage.setItem("e","Invalid authentication. Access Denied");window.location.replace("'+qrDomain+'/503");}});'
 			+ 'a.signInWithEmailAndPassword("'+qrCreds.mail+'","'+qrCreds.pass+'").catch(function(error){window.localStorage.setItem("e","Authentication Error. "+error.code+". "+error.message);window.location.replace("'+qrDomain+'/503");});'
 		+ '</script>'));
 });
 
-// exports.fly = functions.https.onRequest((req,res)=>{
-// 	return res.status(503).send('not implemented');
-// });
+/*	/fly/?qR1D=id&q=view	*//* !
+	qR client -> https://vog3lm-0x1.firebaseapp.com/fly/qR1D/q -> req = {path=/fly/id/view
+																		 query={}
+																		 originalUrl=/fly/id/view
+																		 params={0:/fly/id/view}}
+	qR client -> https://us-central1-vog3lm-0x1.cloudfunctions.net/qr/?qR1D=id&v=view -> req = {path=/
+																								query={qR1D:id,q=view}
+																								originalUrl=/?qR1D=id&q=view
+																								params={0:'/'}}
+	qR client    												<- login page
+	qR client -> google auth domain
+	qR client -> redirect content page
+	qR client <- logged content page, open view on the fly
+*/
+exports.fly = functions.https.onRequest((req,res)=>{
+	/* check data dependencies */
+	if(0 === Object.keys(db)){
+		logError.noQrIdBase('qr(req,res)');
+		return res.status(200).send(qrLogin.page(qrLogin.error('Authentication error. Missing dependencies.')));
+	}
+	/*
+	if(0 === Object.keys(lb)){
+		logError.noLeedBase('qr(req,res)');
+		return res.status(200).send(qrLogin.page(qrLogin.error('Leed error. Missing dependencies.')));
+	}
+	/*
+
+	/* check qr id */
+	var qrId = null;
+	var flyId = null;
+	if(req.originalUrl.indexOf('?') !== -1){
+		if(!req.query.qR1D){
+			logError.invalidQrId('qr(req,res)',tmp);
+			return res.status(200).send(qrLogin.page(qrLogin.fail('No login token found. Pass a login token!')));
+		}
+		if(!req.query.q){
+			logError.invalidQrFly('qr(req,res)',tmp);
+			return res.status(200).send(qrLogin.page(qrLogin.fail('No view token found. Pass a view token!')));
+		}
+		qrId = req.query.qR1D;
+		flyId = req.query.q;
+	}else if('/' !== req.originalUrl){
+		var tmp = req.originalUrl;
+		tmp = tmp.substring(tmp.indexOf('/fly/')+4,tmp.length);
+		if(9 !== tmp.length){
+			logError.invalidQrId('qr(req,res)',tmp);
+			return res.status(200).send(qrLogin.page(qrLogin.fail('No login token found. Pass a login token!')));
+		}
+		qrId = tmp;
+		tmp = tmp.substring(tmp.indexOf('/fly/'+qrId+'/')+14,tmp.length);
+		if(9 !== tmp.length){
+			logError.invalidQrFly('qr(req,res)',tmp);
+			return res.status(200).send(qrLogin.page(qrLogin.fail('No view token found. Pass a view token!')));
+		}
+		flyId = tmp;
+	}else{
+		logError.noQrId('qr(req,res)');
+		return res.status(200).send(qrLogin.page(qrLogin.fail('No query parameter found. Pass query parameter!')));
+	}
+
+	if(!db.hasOwnProperty(qrId)){
+		logError.invalidQrId('qr(req,res)',qrId);
+		return res.status(200).send(qrLogin.page(qrLogin.fail('Invalid qR1D. Pass valid content tokens!')));
+	}
+	var qrCreds = db[qrId];
+
+	// mybe leed ?
+
+	return res.status(200).send(qrLogin.page(qrLogin.script(qrCreds.mail,qrCreds.pass,lb[qrLeed])));
+});
 
 
 exports.pdf = functions.https.onRequest((req,res) => {

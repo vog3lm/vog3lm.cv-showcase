@@ -451,6 +451,8 @@
 			var presenter = new PagePagePresenter();
 			var adapter = new PagePresentationAdapter();
 
+			var args = {'token':'unset','authenicate':'unset'};
+
 			var events = {
 				'footer-toggle':(data) => {
 					presenter.footer.toggle();
@@ -473,7 +475,17 @@
 							 + '<p>user login</p>'
 					presenter.popup.show({'content':text});
 				}
-				,'token-toggle':(data) => {presenter.popup.show({'content':authenicate.getToken()});}
+				,'user-toggle':(data) => {
+					$('body').trigger('log-state',{'call':'log-state','id':'user-toggle','promise':function(response){
+						var content = '<p>Name: '+response.name+'</p><p>Email: '
+										   +response.email+'</p><p>Phone: '
+										   +response.phone+'</p><p>User Id: '
+										   +response.uid+'</p><p>User Token: '
+										   +response.token+'</p>';
+						presenter.popup.show({'content':content,'timeout':null,'size':'match','design':'dark'});
+					}});
+
+				}
 				,'popup-toggle':(data) => {presenter.popup.hide();}
 				,'dox-toggle':(data) => {
 					var text = '<p>full stack application mvp architecture</p>'
@@ -577,7 +589,11 @@
 						else{console.log('get history went wrong.',data.id,data.direction);}
 					}
 				}
-				,'got-token':(data) => {$('body').trigger('call-mvp',{'id':'hello','q':'6PW2gsYzD'});}
+				,'got-token':(data) => {
+					console.log('got token');
+					args.token = data.token;
+					$('body').trigger('call-mvp',{'id':'hello','q':'6PW2gsYzD'});
+				}
 				,'got-mvp':(data) => {
 					data = adapter.get(data);
 					data.index = presenter.swipe.index();
@@ -903,15 +919,15 @@
 			</playground>
 		</section>
 		<edge class="hr">
-			<a href="#" class="fa-stack fa-1x" call="help-toggle">
+			<a href="#" class="fa-stack" call="help-toggle">
 				<i class="fa fa-circle-thin fa-stack-2x"></i>
 				<i class="fa fa-question fa-stack-1x"></i>
 			</a>
-			<a href="#" class="fa-stack fa-1x" call="dox-toggle">
+			<a href="#" class="fa-stack" call="dox-toggle">
 				<i class="fa fa-circle-thin fa-stack-2x"></i>
 				<i class="fa fa-exclamation fa-stack-1x"></i>
 			</a>
-			<a href="#" class="fa-stack fa-1x" call="dox-toggle">
+			<a href="#" class="fa-stack" call="dox-toggle">
 				<i class="fa fa-circle-thin fa-stack-2x"></i>
 				<i class="fa fa-certificate fa-stack-1x"></i>
 			</a>
@@ -929,9 +945,9 @@
 		</nav>
 		<edge class="bl">
 			<user>
-				<a href="#" class="fa fa-1-25x fa-hashtag" call="login-show" title="Show Login"></a>
+				<a href="#" class="fa fa-hashtag" call="login-show" title="Show Login"></a>
 				<card class='hide'>
-					<a href="#" class="fa fa-user" call="user-data" title="Show User Data"></a>
+					<a href="#" class="fa fa-user" call="user-toggle" title="Show User Data"></a>
 					<id></id>
 				</card>
 				<form class="hide" call="login-validate">

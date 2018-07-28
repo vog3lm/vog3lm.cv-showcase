@@ -69,6 +69,7 @@ function F1rebas3Auth4p1Operator(firebase){
 	    ,'log-decorate':(data) => {this.decorate(data.opts);}
 	    ,'log-refresh':(data) => {this.refresh();}
 	    ,'log-create':(data) => {this.create();}
+	    ,'log-state':(data) => {this.state(data);}
 	};
 	var args = {'events':events,'user':'unset','token':'unset','firebase':'unset'
 			   ,'scope':firebase.auth.Auth.Persistence.LOCAL}; // scopes LOCAL|SESSION|None
@@ -96,18 +97,27 @@ function F1rebas3Auth4p1Operator(firebase){
 			});
 		}).catch((error) => {console.error(error);});
 	}
+	this.state = function(data){
+		var state = {'id':'log-state','token':args.token};
+		if('unset' !== args.user){
+			var user = args.user;
+			state['email'] = user.email;
+			state['name'] = user.displayName;
+			state['uid'] = user.uid;
+			state['domain'] = user.w;
+			state['phone'] = user.phoneNumber;
+			state['photo'] = user.photoUrl;
+			state['last'] = user.metadata.lastSignInTime;
+			state['created'] = user.metadata.creationTime;
+		}
+		if(data.hasOwnProperty('promise')){data.promise(state);}
+		return state;
+	}
 	this.refresh = function(){
 		if('unset' !== args.user){
 			var u = args.user
 			$('body').trigger('got-token',{'call':'got-token','id':'log-refresh','token':args.token});
-			$('body').trigger('logged-in',{
-				 'call':'logged-in'
-				,'id':'log-refresh'
-				,'name':u.displayName
-				,'mail':u.email
-				,'verified':u.emailVerified
-				,'anonym':u.isAnonymous
-			});
+			$('body').trigger('logged-in',{'call':'logged-in','id':'log-refresh','name':u.displayName,'mail':u.email,'verified':u.emailVerified,'anonym':u.isAnonymous});
 		}else{
 			$('body').trigger('logged-out',{'call':'logged-out','id':'auth-state-listener'});
 			$('body').trigger('got-token',{'call':'got-token','id':'log-refresh','token':args.token});
@@ -116,12 +126,17 @@ function F1rebas3Auth4p1Operator(firebase){
 	this.logout = function(){base.signOut().catch((error) => {console.error('login error',error)});}
 	this.create = function(d){
 		if('unset' !== args.firebase){base = firebase.auth();}
-		if('unset' !== args.user){conslole.log(window.user);} /* same-origin policy (host=host,port=port)*/
 		switch(args.scope) {
 			case 'none':args.scope = firebase.auth.Auth.Persistence.NONE; break;
 			case 'session':args.scope = firebase.auth.Auth.Persistence.SESSION; break;
 			default:args.scope = firebase.auth.Auth.Persistence.LOCAL; break;
 		}
+		if('unset' !== args.user){
+			var tmp = window.localStorage.getItem('u');
+			if(tmp && 'null' !== tmp){u = tmp;}
+			else if(window.user){u = window.user;}
+			
+		} /* same-origin policy (host=host,port=port)*/
 		if(d){
 			dispatcher = d;
 			dispatcher.onAppend({'events':Object.keys(events),'issues':Object.values(events)});
@@ -132,9 +147,6 @@ function F1rebas3Auth4p1Operator(firebase){
 		return this;
 	}
 	base.onAuthStateChanged((u) => {
-		var tmp = window.localStorage.getItem('u');
-		if(tmp && 'null' !== tmp){u = tmp;}
-		else if(window.user){u = window.user;}
 		if(u){
 			args.user = u;
 			u.getIdToken(/* forceRefresh */true).then((userToken) => {
@@ -634,8 +646,10 @@ function Keyboard4p1Operator(){
 	    		e.preventDefault();
 	    		var tmp = mapping[e.which];
 	    		$('body').trigger(tmp.call,{'call':tmp.call,'id':'onKeydown'});
+	    		alert(tmp)
 	    		return;
 			}
+
 	        // if(e.which == 116){ //F5
 	        // 	location.reload();
 	        // }

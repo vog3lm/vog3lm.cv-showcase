@@ -27,20 +27,22 @@ body, a, h1, h2, h3, h4, h5, h6,
 input, span, p, pre { font-family:'mp-light',serif; white-space:normal; word-break:normal; word-wrap:break-word; white-space:normal; text-align:left; }
 
 a, h1, h2, h3, h4, h5, h6 { vertical-align:middle; text-align:left; }
-a.fa 					  { vertical-align:middle; text-align:center; }
+a.fa 					  { vertical-align:middle; text-align:center; font-size:1rem; }
+a.fa-stack				  { vertical-align:middle; text-align:center; font-size:0.8rem; }
 
 .left {text-align:left;}
 .right {text-align:right;}
 .center {text-align:center;}
 
-.fa-0-5x	{font-size:0.5rem;} /* defaults *//* delete */
+.fa-0-5x	{font-size:0.5rem !important;} /* defaults *//* delete */
+.fa-0-8x	{font-size:0.8rem !important;} /* defaults *//* delete */
 .fa-1x		{font-size:1rem !important;}
 .fa-1-25x	{font-size:1.25rem !important;}
 .fa-1-5x	{font-size:1.5rem !important;}
 .fa-1-75x	{font-size:1.75rem !important;}
-.fa-2x		{font-size:2rem;}
-.fa-2-5x	{font-size:2.5rem;}
-.fa-3-5x	{font-size:3.5rem;}
+.fa-2x		{font-size:2rem !important;}
+.fa-2-5x	{font-size:2.5rem !important;}
+.fa-3-5x	{font-size:3.5rem !important;}
 
 /* mobile screens */
 @media screen and (min-width:  0px) and (orientation:portrait){}
@@ -55,11 +57,13 @@ a.fa 					  { vertical-align:middle; text-align:center; }
 
 /* tablet screens */
 @media screen and (min-width:800px) and (orientation:landscape){
-	a.fa{font-size:1.25rem;}
+	a.fa-stack{font-size:0.8rem;}
+	a.fa{font-size:1rem;}
 }
 /* desktop screens */
 @media screen and (min-width:1024px) and (orientation:landscape){
-	a.fa{font-size:1.5rem;}
+	a.fa-stack{font-size:0.8rem;}
+	a.fa{font-size:1.25rem;}
 }
 
 /* LANDSCAPE SCREEN */

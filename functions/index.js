@@ -2,28 +2,16 @@
 
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
-
-admin.initializeApp(functions.config().firebase); // used in all dependent firebase stuff
-const gcs = require('@google-cloud/storage')();
-const spawn = require('child-process-promise').spawn;
+/* admin.initializeApp({}) *//* fast */
+admin.initializeApp(functions.config().firebase);
 const auth = admin.auth();
+const database = admin.database();
 const express = require('express');
-const cookieParser = require('cookie-parser')();
 const cors = require('cors')({origin:true});
-const path = require('path');
-const os = require('os');
-const fs = require('fs');
-const pdfkit = require('pdfkit')
 /* local script imports */
 const logError = require('./error');
 const logInfo = require('./info');
 const qrLogin = require('./login');
-
-const bootSleepTime = 2000;
-logInfo.bootSleep(bootSleepTime);
-const start = new Date().getTime();
-for (var i = 0; i < 1e7; i++){if((new Date().getTime()-start) > bootSleepTime){break;}}
-logInfo.bootGo(bootSleepTime);
 
 /* validate received token */
 const validateFirebaseIdToken = (req, res, next) => {
@@ -65,82 +53,36 @@ const validateFirebaseIdToken = (req, res, next) => {
 	return;
 };
 
+/* pre load data *//* async */
+let credentials = {}
+database.ref('credData').on("value",(snapshot) => {
+	credentials = snapshot.val();
+	console.log('credentials',credentials);
+},(errorObject) => {logError.noStorage('credentials',errorObject)});
 
-/* custom in memory db */
-let db = {};
-let vb = {};
-let pb = {};
-let cb = {};
-let lb = {};
+let leeds = {}
+database.ref('leedData').on("value",(snapshot) => {
+	leeds = snapshot.val();
+	console.log('leeds',leeds);
+},(errorObject) => {logError.noStorage('leeds',errorObject)});
 
-const bucketUrl = 'vog3lm-0x1.appspot.com';
-/*  pre load credentials from bucketUrl */
-const secretFile = 'store.secret.js';
-const secretUrl = path.join(os.tmpdir(),secretFile)
-gcs.bucket(bucketUrl).file('w3b.cv.c3rt/'+secretFile).download({'destination':secretUrl}).then(()=>{
-	logInfo.loadGcs(secretFile,secretUrl);
-	fs.readFile(secretUrl,'utf8',(err,data) => {
-		try{
-			if(!err){
-				let json = JSON.parse(data);
-				db = json.credStore;
-				vb = json.viewStore;
-				pb = json.pdfStore;
-			} else {throw err}
-			logInfo.loadLocal(secretFile,'creds: '+Object.keys(db).length+' views: '+Object.keys(vb).length+' pdfs:'+Object.keys(pb).length);
-		}catch(e){
-			logError.failStorage(secretFile,e);
-			db = {};
-			vb = {};
-			pb = {};
-		}
-	});
-	return;
-}).catch((e) => {	/* https://firebase.google.com/docs/storage/web/handle-errors */
-	logError.noStorage(secretFile,e)
-	db = {};
-	vb = {};
-	pb = {};
-});
-/*  pre load content from bucketUrl */
-const contentFile = 'store.content.js';
-const contentUrl = path.join(os.tmpdir(),contentFile);
-gcs.bucket(bucketUrl).file('w3b.cv.c3rt/'+contentFile).download({'destination':contentUrl}).then(()=>{
-	logInfo.loadGcs(contentFile,contentUrl);
-	fs.readFile(contentUrl,'utf8',(err,data) => {
-		try{if(!err){cb = JSON.parse(data);} 
-			else{throw err;}
-			logInfo.loadLocal(secretFile,'content: '+Object.keys(cb).length);
-		}catch(e){
-			logError.failStorage(contentFile,e);
-			cb = {};
-		}
-	});
-	return;
-}).catch((e) => {
-	logError.noStorage(contentFile,e)
-	cb = {}
-});
-/*  pre load leeds from bucketUrl */
-const leedFile = 'store.leeds.js';
-const leedUrl = path.join(os.tmpdir(),leedFile)
-gcs.bucket(bucketUrl).file('w3b.cv.c3rt/'+leedFile).download({'destination':leedUrl}).then(()=>{
-	logInfo.loadGcs(leedFile,leedUrl);
-	fs.readFile(leedUrl,'utf8',(err,data) => {
-		try{if(!err){lb = JSON.parse(data);} 
-			else{throw err;}
-			logInfo.loadLocal(leedFile,'leeds: '+Object.keys(lb).length);
-		}catch(e){
-			logError.failStorage(leedFile,e);
-			lb = {};
-		}
-	});
-	return;
-}).catch((e) => {
-	logError.noStorage(leedFile,e)
-	lb = {}
-});
+let views = {}
+database.ref('viewStore').on("value",(snapshot) => {
+	views = snapshot.val();
+	console.log('views',views);
+},(errorObject) => {logError.noStorage('views',errorObject)});
 
+let contents = {}
+database.ref('viewData').on("value",(snapshot) => {
+	contents = snapshot.val();
+	console.log('contents',contents);
+},(errorObject) => {logError.noStorage('contents',errorObject)});
+
+let pdfs = {}
+database.ref('pdfStore').on("value",(snapshot) => {
+	pdfs = snapshot.val();
+	console.log('pdfs',pdfs);
+},(errorObject) => {logError.noStorage('pdfs',errorObject)});
 
 /* data transfer */
 let dto = {"cols":[],"recs":[],"meta":{"state":"error","type":"dto","id":null,"tag":""}};
@@ -160,18 +102,12 @@ let vto = {"view":null,"meta":{"state":"error","type":null,"q":null,"tag":""}};
 	qR client <- logged content page
 */
 exports.qr = functions.https.onRequest((req,res)=>{
-	let qrDomain = 'https://vog3lm-0x1.firebaseapp.com';
-	let qrPage = ''
-		+ '<!DOCTYPE html><html lang="de"><head><title>vog3lm.cv.redirect</title>'
-		+ '<link rel="shortcut icon" href="'+qrDomain+'/images/fox.white.png" type="image/x-icon">'
-		+ '<link rel="icon" ref="'+qrDomain+'/images/fox.white.png" type="image/x-icon">[INJ:SCRIPT]'
-		+ '</head><body></body></html>';
 	/* check data dependencies */
-	if(0 === Object.keys(db)){
+	if(0 === Object.keys(credentials)){
 		logError.noQrIdBase('qr(req,res)');
 		return res.status(200).send(qrLogin.page(qrLogin.error('Authentication error. Missing dependencies.')));
 	}
-	if(0 === Object.keys(lb)){
+	if(0 === Object.keys(leeds)){
 		logError.noLeedBase('qr(req,res)');
 		return res.status(200).send(qrLogin.page(qrLogin.error('Leed error. Missing dependencies.')));
 	}
@@ -196,22 +132,22 @@ exports.qr = functions.https.onRequest((req,res)=>{
 		logError.noQrId('qr(req,res) 2');
 		return res.status(200).send(qrLogin.page(qrLogin.fail('No query parameter found. Pass query parameter!')));
 	}
-	if(!db.hasOwnProperty(qrId)){
+	if(!credentials.hasOwnProperty(qrId)){
 		logError.invalidQrId('qr(req,res) 2',qrId);
 		return res.status(200).send(qrLogin.page(qrLogin.fail('Invalid id token. Pass a valid login token!')));
 	}
-	let qrCreds = db[qrId];
+	let qrCreds = credentials[qrId];
 	/* check qr leed */
 	let qrLeed = qrCreds.leed;
-	if(!lb.hasOwnProperty(qrLeed)){
+	if(!leeds.hasOwnProperty(qrLeed)){
 		logError.invalidLeedToken('qr(req,res)',qrId,qrLeed);
 		qrLeed = 'O2FNkkqqE';
 	}
 	console.log('qr login done',qrCreds.mail,qrCreds.pass,'qr leed done',qrLeed);
 	let passUserByWindow = 'window.user = u;';
 	let passUserByStorage = 'window.localStorage.setItem("u",u);';
-	let passLeedByStorage = 'window.localStorage.setItem("l","'+lb[qrLeed]+'");'
-	const scr = qrLogin.script(qrCreds.mail,qrCreds.pass,lb[qrLeed]); 
+	let passLeedByStorage = 'window.localStorage.setItem("l","'+leeds[qrLeed]+'");'
+	const scr = qrLogin.script(qrCreds.mail,qrCreds.pass,leeds[qrLeed]); 
 	return res.status(200).send(qrLogin.page(scr));
 });
 
@@ -231,12 +167,12 @@ exports.qr = functions.https.onRequest((req,res)=>{
 */
 exports.flyer = functions.https.onRequest((req,res)=>{
 	/* check data dependencies */
-	if(0 === Object.keys(db)){
+	if(0 === Object.keys(credentials)){
 		logError.noQrIdBase('qr(req,res)');
 		return res.status(200).send(qrLogin.page(qrLogin.error('Authentication error. Missing dependencies.')));
 	}
 	/*
-	if(0 === Object.keys(lb)){
+	if(0 === Object.keys(leeds)){
 		logError.noLeedBase('qr(req,res)');
 		return res.status(200).send(qrLogin.page(qrLogin.error('Leed error. Missing dependencies.')));
 	}
@@ -277,20 +213,20 @@ exports.flyer = functions.https.onRequest((req,res)=>{
 		return res.status(200).send(qrLogin.page(qrLogin.fail('No query parameter found. Pass query parameter!')));
 	}
 
-	if(!db.hasOwnProperty(qrId)){
+	if(!credentials.hasOwnProperty(qrId)){
 		logError.invalidQrId('fly(req,res) 2',qrId);
 		return res.status(200).send(qrLogin.page(qrLogin.fail('Invalid id token. Pass a valid login token!')));
 	}
-	if(!vb.hasOwnProperty(flyId)){
+	if(!views.hasOwnProperty(flyId)){
 		logError.invalidQrFly('fly(req,res) 2',flyId);
 		return res.status(200).send(qrLogin.page(qrLogin.fail('Invalid view token. Pass a valid view token!')));
 	}
-	let qrCreds = db[qrId];
+	let qrCreds = credentials[qrId];
 
 	// mybe leed ?
 	let qrLeed = 'O2FNkkqqE';
 
-	return res.status(200).send(qrLogin.page(qrLogin.script(qrCreds.mail,qrCreds.pass,lb[qrLeed])));
+	return res.status(200).send(qrLogin.page(qrLogin.script(qrCreds.mail,qrCreds.pass,leeds[qrLeed])));
 });
 
 
@@ -310,7 +246,7 @@ exports.pdf = functions.https.onRequest((req,res) => {
 			return res.status(401).send('Invalid user authorization method.');
 		}
 		admin.auth().verifyIdToken(idToken).then((user) => {
-			if(0 === Object.keys(pb)){
+			if(0 === Object.keys(pdfs)){
 				logError.noPdfBase('pdf(req,res)');
 				return res.redirect(500);
 			}
@@ -318,14 +254,14 @@ exports.pdf = functions.https.onRequest((req,res) => {
 				logError.noQ('pdf(req,res)');
 				return res.redirect(404);
 			}
-			if(!pb.hasOwnProperty(req.query.q)){
+			if(!pdfs.hasOwnProperty(req.query.q)){
 				logError.invalidQ('pdf(req,res)',req.query.q);
 				return res.redirect(404);
 			}
-			let pdfName = pb[req.query.q]
+			let pdfName = pdfs[req.query.q]
 	 		let pdfUrl = path.join(os.tmpdir(),'file.pdf')
 	 		// warn nested promisse
-	 		let pdf = gcs.bucket(bucketUrl).file('w3b.cv.p6fs/'+pdfName).download({'destination':pdfUrl}).then(()=>{
+	 		let pdf = bucket.file('w3b.cv.p6fs/'+pdfName).download({'destination':pdfUrl}).then(()=>{
 	 			let pdf = fs.readFileSync(pdfUrl)
 	 			let tmp = {'pdf':pdf.toString('base64'),'name':pdfName}
 	 			return res.status(200).send(tmp);
@@ -342,9 +278,6 @@ exports.pdf = functions.https.onRequest((req,res) => {
     });
 	//return res.status(500).send('default return. never reached.');
 });
-
-
-
 
 
 /*	/mvp/?q=view	*//* dev
@@ -369,7 +302,7 @@ exports.mvp = functions.https.onRequest((req,res) => {
 			return res.status(401).send('Invalid user authorization method.');
 		}
 		admin.auth().verifyIdToken(idToken).then((user) => {
-			if(0 === Object.keys(vb)){
+			if(0 === Object.keys(views)){
 				logError.noViewBase('mvp(req,res)');
 				return res.status(503).send('No data dependencies available!');
 			}
@@ -378,13 +311,13 @@ exports.mvp = functions.https.onRequest((req,res) => {
 				return res.status(404).send('No content query parameter found!');
 			}
 			let qId = req.query.q;
-			if(!vb.hasOwnProperty(qId)){
+			if(!views.hasOwnProperty(qId)){
 				logError.invalidQ('mvp(req,res)',qId);
 				return res.status(403).send('Invalid content token!');
 			}
 
 			let dataRecord = JSON.parse(JSON.stringify(dto)); // clone data transfer object
-			let viewRecord = cb[vb[qId]];
+			let viewRecord = contents[views[qId]];
 			if(viewRecord){
 				console.log("for all view records build");
 				for(var i=0; i < viewRecord.length; i++){
@@ -409,7 +342,7 @@ exports.mvp = functions.https.onRequest((req,res) => {
 					dataRecord['recs'].push(data);
 				}
 			}else{
-				console.error('Invalid content data!',qId,'viewStore',vb,'contentBase',cb)
+				console.error('Invalid content data!',qId,'viewStore',views,'contentBase',contents)
 			}
 			dataRecord.meta.id = qId;
 			dataRecord.meta.state = 'success';

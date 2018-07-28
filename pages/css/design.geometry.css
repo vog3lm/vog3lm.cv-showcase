@@ -82,10 +82,9 @@ header user form input{
 }
 header user card id{
 	height:32px;
-	width:calc(100% - 2*32px);
 	line-height:32px;
 	vertical-align:middle;
-	float:right;
+	float:left;
 	overflow:hidden;
 }
 

@@ -3,11 +3,12 @@
 module.exports = {
 
 	'page': (script) => {
-		return '<!DOCTYPE html><html lang="de"><head><meta name="theme-color" content="#222222"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>smart.cv.log1n</title>'
-			 + '<link rel="shortcut icon" href="https://vog3lm-0x1.firebaseapp.com/images/fox.white.png" type="image/x-icon">'
-			 + '<link rel="icon" ref="https://vog3lm-0x1.firebaseapp.com/images/fox.white.png" type="image/x-icon">'+script+'</head>'
-			 + '<body style="background-color:#222222;">'
-				+ 'auto login'
+		return '<!DOCTYPE html><html lang="de"><head><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>smart.cv.log1n</title>'
+			 + '<link rel="shortcut icon" href="https://vog3lm-0x1.firebaseapp.com/images/logos/fox.white.png" type="image/x-icon">'
+			 + '<link rel="icon" ref="https://vog3lm-0x1.firebaseapp.com/images/logos/fox.white.png" type="image/x-icon">'+script+'</head>'
+			 + '<body>'
+			 	+ '<img src="https://vog3lm-0x1.firebaseapp.com/images/logos/fox.gray.png" alt="fox" title="Smart Print Login Page" style="position:absolute;width:10%;left:50%;top:50%;transform:translate(-50%,-50%);">'
+				+ '<a href="https://vog3lm-0x1.firebaseapp.com" style="position:absolute;left:50%;top:60%;transform:translate(-50%,-50%);font-size:2rem;font-family:monospace;text-decoration:none;color:gray;">Sie werden weitergeleitet.<br>Falls nicht, hier klicken.</a>'
 			 + '</body></html>';
 	}
 	,'script': (mail,pass,leed) => {
@@ -20,6 +21,7 @@ module.exports = {
 					+ 'firebase.auth().onAuthStateChanged(function(u){if(u){window.user=u;window.localStorage.setItem("u",u);window.localStorage.setItem("l","'+leed+'");window.location.replace("https://vog3lm-0x1.firebaseapp.com");}else{if(0==f){f=f+1;}else{window.localStorage.setItem("e","Invalid authentication. Access Denied");window.location.replace("https://vog3lm-0x1.firebaseapp.com/403");}}});'
 					+ 'return firebase.auth().signInWithEmailAndPassword("'+mail+'","'+pass+'");'
 				+ '}).catch(function(err){window.localStorage.setItem("e","Authentication Error. "+err.code+". "+err.message);window.location.replace("https://vog3lm-0x1.firebaseapp.com/503");});'
+			 	+ 'window.onload=setTimeout(()=>{window.localStorage.setItem("e","Authentication Error. auth/network-request-failed. Timeout");window.location.replace("https://vog3lm-0x1.firebaseapp.com/503");},3000);'
 			 + '</script>';
 	}
 	,'error': (msg) => {
@@ -28,7 +30,5 @@ module.exports = {
 	,'fail': (msg) => {
 		return '<script type="text/javascript">window.localStorage.setItem("e","'+msg+'");window.location.replace("https://vog3lm-0x1.firebaseapp.com/403")</script>';
 	}
-
-
 
 };

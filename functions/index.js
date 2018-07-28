@@ -20,12 +20,12 @@ const validateFirebaseIdToken = (req, res, next) => {
 		res.status(403).send('Unauthorized - No token found!');
 	} else {
 		let idToken;
-		if(req.headers.authorization && req.headers.authorization.startsWith('CONTENT_ID_TOKEN::')) {
-			console.log('Found "Authorization" header');
+		if(req.headers.authorization && req.headers.authorization.startsWith('CONTENT_ID_TOKEN::')){
 			idToken = req.headers.authorization.split('CONTENT_ID_TOKEN::')[1];
+			logInfo.headerAuth('',idToken);
 		}else if(null !== req.cookies.__session) {
-			console.log('Found "__session" cookie');
 			idToken = req.cookies.__session;
+			logInfo.headerAuth('',idToken);
 		}
 		auth.verifyIdToken(idToken).then((decodedIdToken) => {
 			/*{
@@ -57,31 +57,31 @@ const validateFirebaseIdToken = (req, res, next) => {
 let credentials = {}
 database.ref('credData').on("value",(snapshot) => {
 	credentials = snapshot.val();
-	console.log('credentials',credentials);
+	logInfo.loadGdb('credData',Object.keys(credentials).length,'credentials');
 },(errorObject) => {logError.noStorage('credentials',errorObject)});
 
 let leeds = {}
 database.ref('leedData').on("value",(snapshot) => {
 	leeds = snapshot.val();
-	console.log('leeds',leeds);
+	logInfo.loadGdb('leedData',Object.keys(leeds).length,'leeds');
 },(errorObject) => {logError.noStorage('leeds',errorObject)});
 
 let views = {}
 database.ref('viewStore').on("value",(snapshot) => {
 	views = snapshot.val();
-	console.log('views',views);
+	logInfo.loadGdb('viewStore',Object.keys(views).length,'views');
 },(errorObject) => {logError.noStorage('views',errorObject)});
 
 let contents = {}
 database.ref('viewData').on("value",(snapshot) => {
 	contents = snapshot.val();
-	console.log('contents',contents);
+	logInfo.loadGdb('viewData',Object.keys(contents).length,'contents');
 },(errorObject) => {logError.noStorage('contents',errorObject)});
 
 let pdfs = {}
 database.ref('pdfStore').on("value",(snapshot) => {
 	pdfs = snapshot.val();
-	console.log('pdfs',pdfs);
+	logInfo.loadGdb('pdfStore',Object.keys(pdfs).length,'pdfs');
 },(errorObject) => {logError.noStorage('pdfs',errorObject)});
 
 /* data transfer */
@@ -111,7 +111,6 @@ exports.qr = functions.https.onRequest((req,res)=>{
 		logError.noLeedBase('qr(req,res)');
 		return res.status(200).send(qrLogin.page(qrLogin.error('Leed error. Missing dependencies.')));
 	}
-
 	/* check qr id */
 	let qrId = null;
 	if(req.originalUrl.indexOf('?') !== -1 && '/' === req.path){
@@ -143,12 +142,28 @@ exports.qr = functions.https.onRequest((req,res)=>{
 		logError.invalidLeedToken('qr(req,res)',qrId,qrLeed);
 		qrLeed = 'O2FNkkqqE';
 	}
-	console.log('qr login done',qrCreds.mail,qrCreds.pass,'qr leed done',qrLeed);
-	let passUserByWindow = 'window.user = u;';
-	let passUserByStorage = 'window.localStorage.setItem("u",u);';
-	let passLeedByStorage = 'window.localStorage.setItem("l","'+leeds[qrLeed]+'");'
-	const scr = qrLogin.script(qrCreds.mail,qrCreds.pass,leeds[qrLeed]); 
-	return res.status(200).send(qrLogin.page(scr));
+	/* create leed dto */
+	let dataRecord = JSON.parse(JSON.stringify(dto)); // clone data transfer object
+	let data = JSON.parse(JSON.stringify(vto)); // clone view transfer object
+	let meta = data.meta;
+	let view = leeds[qrLeed];
+	meta.type = view.type;
+	data.view = view.view;
+	if(view.hasOwnProperty('meta')){
+		for(var key in view.meta){
+			meta[key] = view.meta[key];
+		}
+	}
+	meta.q = qrLeed;
+	meta.state = 'success';
+	data.meta = meta;
+	dataRecord['cols'].push(qrLeed);
+	dataRecord['recs'].push(data);
+	dataRecord.meta.id = qrLeed;
+	dataRecord.meta.state = 'success';
+	dataRecord = JSON.stringify(dataRecord).replace(new RegExp('"','g'),'\\"');
+	logInfo.smartAuth('qr(req,res)','user: '+qrCreds.mail+' leed: '+qrLeed);
+	return res.status(200).send(qrLogin.page(qrLogin.script(qrCreds.mail,qrCreds.pass,dataRecord)));
 });
 
 /*	/fly/?qR1D=id&q=view	*//* !
@@ -171,18 +186,13 @@ exports.flyer = functions.https.onRequest((req,res)=>{
 		logError.noQrIdBase('qr(req,res)');
 		return res.status(200).send(qrLogin.page(qrLogin.error('Authentication error. Missing dependencies.')));
 	}
-	/*
 	if(0 === Object.keys(leeds)){
 		logError.noLeedBase('qr(req,res)');
 		return res.status(200).send(qrLogin.page(qrLogin.error('Leed error. Missing dependencies.')));
 	}
-	/*
-
-	/* check qr id */
+	/* check qr id and view */
 	let qrId = null;
 	let flyId = null;
-	console.log(req.originalUrl)
-	console.log(req.path)
 	if(req.originalUrl.indexOf('?') !== -1 && '/' === req.path){
 		if(!req.query.qR1D){
 			logError.noQrId('fly(req,res) 1');
@@ -212,7 +222,6 @@ exports.flyer = functions.https.onRequest((req,res)=>{
 		logError.noQrId('fly(req,res) 2');
 		return res.status(200).send(qrLogin.page(qrLogin.fail('No query parameter found. Pass query parameter!')));
 	}
-
 	if(!credentials.hasOwnProperty(qrId)){
 		logError.invalidQrId('fly(req,res) 2',qrId);
 		return res.status(200).send(qrLogin.page(qrLogin.fail('Invalid id token. Pass a valid login token!')));
@@ -222,10 +231,13 @@ exports.flyer = functions.https.onRequest((req,res)=>{
 		return res.status(200).send(qrLogin.page(qrLogin.fail('Invalid view token. Pass a valid view token!')));
 	}
 	let qrCreds = credentials[qrId];
-
-	// mybe leed ?
-	let qrLeed = 'O2FNkkqqE';
-
+	/* check qr leed */
+	let qrLeed = qrCreds.leed;
+	if(!leeds.hasOwnProperty(qrLeed)){
+		logError.invalidLeedToken('qr(req,res)',qrId,qrLeed);
+		qrLeed = 'O2FNkkqqE';
+	}
+	logInfo.smartAuth('fly(req,res)','user: '+qrCreds.mail+' view: '+flyId+' leed: '+qrLeed);
 	return res.status(200).send(qrLogin.page(qrLogin.script(qrCreds.mail,qrCreds.pass,leeds[qrLeed])));
 });
 

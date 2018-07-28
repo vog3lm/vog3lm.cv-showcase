@@ -565,6 +565,7 @@
 					var leed = window.localStorage.getItem('l');
 					window.localStorage.setItem('l',null);
 					if(leed && 'null' !== leed){
+						leed = JSON.parse(leed);
 						leed = adapter.get(leed);
 						presenter.popup.show({'content':leed.footer,'timeout':null,'size':'match','design':'dark'});
 					}

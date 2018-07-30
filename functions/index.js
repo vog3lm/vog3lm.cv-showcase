@@ -1,5 +1,11 @@
 'use strict';
 
+let coldStartCredentials = true;
+let coldStartLeeds = true;
+let coldStartViews = true;
+let coldStartContents = true;
+let coldStartPdfs = true;
+
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 /* admin.initializeApp({}) *//* fast */
@@ -12,6 +18,43 @@ const cors = require('cors')({origin:true});
 const logError = require('./error');
 const logInfo = require('./info');
 const qrLogin = require('./login');
+
+/* pre load data *//* async */
+let credentials = {}
+database.ref('credData').on("value",(snapshot) => {
+	credentials = snapshot.val();
+	coldStartCredentials = false;
+	logInfo.loadGdb('credData',Object.keys(credentials).length,'credentials'+coldStartCredentials);
+},(errorObject) => {logError.noStorage('credentials',errorObject)});
+
+let leeds = {}
+database.ref('leedData').on("value",(snapshot) => {
+	leeds = snapshot.val();
+	coldStartLeeds = false;
+	logInfo.loadGdb('leedData',Object.keys(leeds).length,'leeds');
+},(errorObject) => {logError.noStorage('leeds',errorObject)});
+
+let views = {}
+database.ref('viewStore').on("value",(snapshot) => {
+	views = snapshot.val();
+	coldStartViews = false;
+	logInfo.loadGdb('viewStore',Object.keys(views).length,'views');
+},(errorObject) => {logError.noStorage('views',errorObject)});
+
+let contents = {}
+database.ref('viewData').on("value",(snapshot) => {
+	contents = snapshot.val();
+	coldStartContents = false;
+	logInfo.loadGdb('viewData',Object.keys(contents).length,'contents');
+},(errorObject) => {logError.noStorage('contents',errorObject)});
+
+let pdfs = {}
+database.ref('pdfStore').on("value",(snapshot) => {
+	pdfs = snapshot.val();
+	coldStartPdfs = false;
+	logInfo.loadGdb('pdfStore',Object.keys(pdfs).length,'pdfs');
+},(errorObject) => {logError.noStorage('pdfs',errorObject)});
+/* pre load data *//* async */
 
 /* validate received token */
 const validateFirebaseIdToken = (req, res, next) => {
@@ -53,37 +96,6 @@ const validateFirebaseIdToken = (req, res, next) => {
 	return;
 };
 
-/* pre load data *//* async */
-let credentials = {}
-database.ref('credData').on("value",(snapshot) => {
-	credentials = snapshot.val();
-	logInfo.loadGdb('credData',Object.keys(credentials).length,'credentials');
-},(errorObject) => {logError.noStorage('credentials',errorObject)});
-
-let leeds = {}
-database.ref('leedData').on("value",(snapshot) => {
-	leeds = snapshot.val();
-	logInfo.loadGdb('leedData',Object.keys(leeds).length,'leeds');
-},(errorObject) => {logError.noStorage('leeds',errorObject)});
-
-let views = {}
-database.ref('viewStore').on("value",(snapshot) => {
-	views = snapshot.val();
-	logInfo.loadGdb('viewStore',Object.keys(views).length,'views');
-},(errorObject) => {logError.noStorage('views',errorObject)});
-
-let contents = {}
-database.ref('viewData').on("value",(snapshot) => {
-	contents = snapshot.val();
-	logInfo.loadGdb('viewData',Object.keys(contents).length,'contents');
-},(errorObject) => {logError.noStorage('contents',errorObject)});
-
-let pdfs = {}
-database.ref('pdfStore').on("value",(snapshot) => {
-	pdfs = snapshot.val();
-	logInfo.loadGdb('pdfStore',Object.keys(pdfs).length,'pdfs');
-},(errorObject) => {logError.noStorage('pdfs',errorObject)});
-
 /* data transfer */
 let dto = {"cols":[],"recs":[],"meta":{"state":"error","type":"dto","id":null,"tag":""}};
 let vto = {"view":null,"meta":{"state":"error","type":null,"q":null,"tag":""}};
@@ -101,16 +113,18 @@ let vto = {"view":null,"meta":{"state":"error","type":null,"q":null,"tag":""}};
 	qR client -> redirect content page
 	qR client <- logged content page
 */
-exports.qr = functions.https.onRequest((req,res)=>{
-	/* check data dependencies */
-	if(0 === Object.keys(credentials)){
-		logError.noQrIdBase('qr(req,res)');
-		return res.status(200).send(qrLogin.page(qrLogin.error('Authentication error. Missing dependencies.')));
-	}
-	if(0 === Object.keys(leeds)){
-		logError.noLeedBase('qr(req,res)');
-		return res.status(200).send(qrLogin.page(qrLogin.error('Leed error. Missing dependencies.')));
-	}
+exports.qr = functions.https.onRequest((req,res) => {
+	/* 	check data dependencies *//*
+		wait for cold start dependencies */
+	let proceed = false;
+	const start = new Date().getTime();
+	do{
+		const now = new Date().getTime();
+		if(5000 < (now - start)){
+			return res.status(200).send(qrLogin.page(qrLogin.error('Firebase Cold Start Timeout. Try again in a minute!')));
+		}
+		if(!coldStartCredentials && !coldStartLeeds){proceed = true;}
+	}while(!proceed);
 	/* check qr id */
 	let qrId = null;
 	if(req.originalUrl.indexOf('?') !== -1 && '/' === req.path){
@@ -181,15 +195,17 @@ exports.qr = functions.https.onRequest((req,res)=>{
 	qR client <- logged content page, open view on the fly
 */
 exports.flyer = functions.https.onRequest((req,res)=>{
-	/* check data dependencies */
-	if(0 === Object.keys(credentials)){
-		logError.noQrIdBase('qr(req,res)');
-		return res.status(200).send(qrLogin.page(qrLogin.error('Authentication error. Missing dependencies.')));
-	}
-	if(0 === Object.keys(leeds)){
-		logError.noLeedBase('qr(req,res)');
-		return res.status(200).send(qrLogin.page(qrLogin.error('Leed error. Missing dependencies.')));
-	}
+	/* 	check data dependencies *//*
+		wait for cold start dependencies */
+	let proceed = false;
+	const start = new Date().getTime();
+	do{
+		const now = new Date().getTime();
+		if(5000 < (now - start)){
+			return res.status(200).send(qrLogin.page(qrLogin.error('Firebase Cold Start Timeout. Try again in a minute!')));
+		}
+		if(!coldStartCredentials && !coldStartLeeds && !coldStartViews){proceed = true;}
+	}while(!proceed);
 	/* check qr id and view */
 	let qrId = null;
 	let flyId = null;
@@ -237,13 +253,35 @@ exports.flyer = functions.https.onRequest((req,res)=>{
 		logError.invalidLeedToken('qr(req,res)',qrId,qrLeed);
 		qrLeed = 'O2FNkkqqE';
 	}
+	/* create leed dto */
+	let dataRecord = JSON.parse(JSON.stringify(dto)); // clone data transfer object
+	let data = JSON.parse(JSON.stringify(vto)); // clone view transfer object
+	let meta = data.meta;
+	let view = leeds[qrLeed];
+	meta.type = view.type;
+	data.view = view.view;
+	if(view.hasOwnProperty('meta')){
+		for(var key in view.meta){
+			meta[key] = view.meta[key];
+		}
+	}
+	meta.q = qrLeed;
+	meta.state = 'success';
+	data.meta = meta;
+	dataRecord['cols'].push(qrLeed);
+	dataRecord['recs'].push(data);
+	dataRecord.meta.id = qrLeed;
+	dataRecord.meta.state = 'success';
+	dataRecord = JSON.stringify(dataRecord).replace(new RegExp('"','g'),'\\"');
+	logInfo.smartAuth('qr(req,res)','user: '+qrCreds.mail+' leed: '+qrLeed);
 	logInfo.smartAuth('fly(req,res)','user: '+qrCreds.mail+' view: '+flyId+' leed: '+qrLeed);
-	return res.status(200).send(qrLogin.page(qrLogin.script(qrCreds.mail,qrCreds.pass,leeds[qrLeed])));
+	return res.status(200).send(qrLogin.page(qrLogin.script(qrCreds.mail,qrCreds.pass,dataRecord)));
 });
 
 
 exports.pdf = functions.https.onRequest((req,res) => {
-    cors(req, res, () => {
+	cors(req, res, () => { // cross-origin policy
+		/* check authentication */
 		if((!req.headers.authorization || !req.headers.authorization.startsWith('CONTENT_ID_TOKEN::')) /*&& !req.cookies.__session*/) {
 			logError.noToken('pdf(req,res)');
 			return res.status(401).send('Invalid user authorization.');
@@ -257,38 +295,48 @@ exports.pdf = functions.https.onRequest((req,res) => {
 			logError.noAuth('pdf(req,res)');
 			return res.status(401).send('Invalid user authorization method.');
 		}
+		/* TODO nested promise :: still not solved, changed eslint rules instead */
 		admin.auth().verifyIdToken(idToken).then((user) => {
-			if(0 === Object.keys(pdfs)){
-				logError.noPdfBase('pdf(req,res)');
-				return res.redirect(500);
+			if(!user){
+				return res.status(401).send('Unauthorized Access! Pass a valid user token.');
 			}
+			/* 	check data dependencies *//*
+				wait for cold start dependencies and authentication */
+			let proceed = false;
+			const start = new Date().getTime();
+			do{
+				const now = new Date().getTime();
+				if(5000 < (now - start)){
+					return res.status(500).send('Firebase Cold Start Timeout. Try again in a minute!');
+				}
+				if(!coldStartPdfs){proceed = true;}
+			}while(!proceed);
+			/* check query */
 			if(!req.query.q){
 				logError.noQ('pdf(req,res)');
-				return res.redirect(404);
+				return res.status(404).send('No query parameter found.');
 			}
 			if(!pdfs.hasOwnProperty(req.query.q)){
 				logError.invalidQ('pdf(req,res)',req.query.q);
-				return res.redirect(404);
+				return res.status(404).send('Invalid query parameter. Pass a valid query token');
 			}
-			let pdfName = pdfs[req.query.q]
-	 		let pdfUrl = path.join(os.tmpdir(),'file.pdf')
-	 		// warn nested promisse
-	 		let pdf = bucket.file('w3b.cv.p6fs/'+pdfName).download({'destination':pdfUrl}).then(()=>{
-	 			let pdf = fs.readFileSync(pdfUrl)
-	 			let tmp = {'pdf':pdf.toString('base64'),'name':pdfName}
-	 			return res.status(200).send(tmp);
-			}).catch((e) => {
-				logError.noStorage('load(file.pdf)',e);
-				return res.status(500).send(e);
+			const gcs = require('@google-cloud/storage')();
+			const spawn = require('child-process-promise').spawn;
+			const path = require('path');
+			const os = require('os');
+			let pdfName = pdfs[req.query.q];
+	 		let pdfUrl = path.join(os.tmpdir(),'file.pdf');
+			let pdfRes = gcs.bucket('vog3lm-0x1.appspot.com').file('w3b.cv.p6fs/'+pdfName).download({'destination':pdfUrl}).then(() => {
+				console.log('download origin',pdfName);
+				const fs = require('fs');
+	 			return res.status(200).send({'pdf':fs.readFileSync(pdfUrl).toString('base64'),'name':pdfName});
 			});
-			return res.status(500).send('default return. never reached.');
 		}).catch((e) => {
 			logError.errorAuth('load(file.pdf)',e);
 			return res.status(500).send(e);
 		});
-		//return res.status(500).send('default return. never reached.');
-    });
-	//return res.status(500).send('default return. never reached.');
+		/* TODO nested promise :: still not solved, changed eslint rules instead */
+	});
 });
 
 
@@ -297,9 +345,7 @@ exports.pdf = functions.https.onRequest((req,res) => {
 	qR client    									<- content
 */
 exports.mvp = functions.https.onRequest((req,res) => {
-
 	cors(req, res, () => { // cross-origin policy
-
 		if((!req.headers.authorization || !req.headers.authorization.startsWith('CONTENT_ID_TOKEN::')) /*&& !req.cookies.__session*/) {
 			logError.noToken('mvp(req,res)');
 			return res.status(401).send('Invalid user authorization.');
@@ -314,10 +360,21 @@ exports.mvp = functions.https.onRequest((req,res) => {
 			return res.status(401).send('Invalid user authorization method.');
 		}
 		admin.auth().verifyIdToken(idToken).then((user) => {
-			if(0 === Object.keys(views)){
-				logError.noViewBase('mvp(req,res)');
-				return res.status(503).send('No data dependencies available!');
+			if(!user){
+				return res.status(401).send('fail');
 			}
+			/* 	check data dependencies *//*
+				wait for cold start dependencies */
+			let proceed = false;
+			const start = new Date().getTime();
+			do{
+				const now = new Date().getTime();
+				if(5000 < (now - start)){
+					return res.status(500).send('Firebase Cold Start Timeout. Try again in a minute!');
+				}
+				if(!coldStartViews && !coldStartContents){proceed = true;}
+			}while(!proceed);
+			/* check query */
 			if(!req.query.q){
 				logError.noQ('mvp(req,res)');
 				return res.status(404).send('No content query parameter found!');
@@ -364,7 +421,5 @@ exports.mvp = functions.https.onRequest((req,res) => {
 			console.error(error);
 			return res.status(401).send(error);
 		});
-		//return res.status(500).send('default return. never reached. keep warning. fail instead due to headers set problem')
-	});
-	//return res.status(500).send('default return. never reached.')
+	}); // remove cors iwann mal
 });

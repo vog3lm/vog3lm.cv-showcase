@@ -462,7 +462,7 @@
 						presenter.load.hide();
 					} else {
 						presenter.load.footer(data);
-						$('body').trigger('call-mvp',{'id':data.id,'q':data.q});
+						$('body').trigger('call-mvp',{'call':'call-mvp','id':data.id,'q':data.q});
 						presenter.page.rearrange(data);
 					}
 				}
@@ -616,10 +616,14 @@
 					a.href = pdfAsDataUri;
 					a.click();
 				}
+				,'fail-pdf':(data) => {
+					console.log(data);
+				}
 				/* origins/sources */
 				,'origin-download':(data) => {
 					var q = $('footer edge.hr a.fa-download').attr('q');
-					if('unset' !== q){remote.call({'id':data.id,'q':q},'pdf');}
+					console.log('hello',data.id,q)
+					if('unset' !== q){$('body').trigger('call-pdf',{'id':'origin-download','call':'call-pdf','q':q});}
 					else{console.log('q=pdf not found',q);}
 				}
 				,'origin-print':(data) => {

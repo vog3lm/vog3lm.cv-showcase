@@ -174,9 +174,12 @@ function F1rebas3Auth4p1Operator(firebase){
 
 function Mvp4p1Operator(){
 	var dispatcher = null;
-	var args = {'url':'https://us-central1-vog3lm-0x1.cloudfunctions.net','token':'unset'};
+	var develop = 'http://192.168.178.28:5001/vog3lm-0x1/us-central1'
+	var product = 'https://us-central1-vog3lm-0x1.cloudfunctions.net'
+	var args = {'url':product,'token':'unset'};
 	var events = {
-		'call-mvp':(data) => {this.call(data);}
+		'call-mvp':(data) => {this.call(data,'mvp');}
+		,'call-pdf':(data) => {this.call(data,'pdf');}
 	    ,'decorate-mvp':(data) => {this.decorate(data.opts);}
 	    ,'create-mvp':(data) => {this.create(data.d);}
 		,'got-token':(data) => {args.token = data.token;}
@@ -208,6 +211,7 @@ function Mvp4p1Operator(){
 			if('unset' === args.token){errors.push('no token found.');}
 			if('unset' === args.url){errors.push('no url found.');}
 			if(0 < errors.length){throw errors}
+			console.log(args.url+'/'+api+'/?q='+data.q)
 			$.ajax({
 			  	url:args.url+'/'+api+'/?q='+data.q,
 			  	crossDomain: true,
@@ -231,34 +235,7 @@ function Mvp4p1Operator(){
 			$('body').trigger('fail-'+api,{'id':'fail'+api,'call':'fail'+api,'message':error});
 		}		
 	}
-	this.pdf = function(data){
-		try{
-			var errors = [];
-			if('unset' !== args.token){
-				$.ajax({
-				  	url:args.url+'/pdf/?q='+data.q,
-				  	crossDomain: true,
-				  	headers:{'Authorization':'CONTENT_ID_TOKEN::'+args.token},
-				  	context: document.body,
-				}).done(function(response){
-					if(data.hasOwnProperty('promise')){
-						data.promise(response);
-					} else {
-						$('body').trigger('got-pdf',response);	
-					}
-				}).fail(function(xhr,status){
-					console.error('Mvp download error.',xhr.responseText);
-					$('body').trigger('fail-'+api,{'id':'fail'+api,'call':'fail'+api,'message':xhr.responseText});
-				});
-			}else{
-				errors.push('no token found.');
-			}
-			if(0 < errors.length){throw errors}
-		}catch(error){
-			console.error(error);
-			$('body').trigger('fail-'+api,{'id':'fail'+api,'call':'fail'+api,'message':error});
-		}		
-	}
+
 
 	/* move to content request js... */
 	this.header = function(view,type="GET"){

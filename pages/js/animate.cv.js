@@ -1,6 +1,6 @@
-function CvLabelHolder(animation,id){
+function CvLabelHolder(animation,e){
 	var holder = animation;
-	var element = $('img#'+id);
+	var element = e;
 	var parent = element.parent();
 	var position = parent.get(0).getBoundingClientRect();
     this.loc = {
@@ -116,6 +116,7 @@ function CvAnimationSetting(){
     this.rad = 2 * Math.PI;
     this.args = {
        'paneParent':'body'
+       ,'paneInject':'unset'
        ,'paneId':'cv-'+(Math.random()*(99999-10000)+10000)
        ,'paneColor':'rgba(0,0,0,0)'
        ,'paneWidth':window.innerWidth
@@ -170,9 +171,9 @@ function CvAnimationOperator(animation){
 
         var args = holder.setting.args;
 
-        $("img.label").each(function(index){	// load label images
-        	var id = $(this).attr('id');
-			holder.objects.labels[id] = new CvLabelHolder(holder,id)
+        $("header section#content img.label").each(function(index){	// load label images
+        	var element = $(this);
+			holder.objects.labels[element.attr('id')] = new CvLabelHolder(holder,element)
 		});
 
         return this;

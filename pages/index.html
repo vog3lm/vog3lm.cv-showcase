@@ -14,7 +14,7 @@
     <link rel="preload" href="fonts/MyriadPro-Light.woff" as="font" crossorigin="anonymous" />
     <link rel="preload" href="fonts/MyriadPro-Semibold.woff" as="font" crossorigin="anonymous" />
     <link rel="preload" href="fonts/MyriadPro-Bold.woff" as="font" crossorigin="anonymous" />
-
+    <!-- PRELOAD FONTS -->
 	<link rel="shortcut icon" href="images/logos/fox.white.png" type="image/x-icon"/>
 	<link rel="icon" 		  href="images/logos/fox.white.png" type="image/x-icon"/>
 
@@ -28,7 +28,8 @@
 	<script type="text/javascript" src="js/animate.cv.js"></script>
 	<script type="text/javascript" src="js/animate.dots.js"></script>
 	<script type="text/javascript">
-		function PagePagePresenter(){
+		function PageContentPresenter(){
+			this.interval = null; /* cold start relevant */
 			this.popup = {
 				'show':(data) => {
 					var popup = $('popup');
@@ -152,6 +153,7 @@
 				//	tmp.addClass('fa-lock');
 					tmp.attr('call','login-hide');
 					tmp.attr('title','Hide Login');
+					tag.find('input#mail').focus();
 				}
 				,'hide':() => {
 					var tag = $('user');
@@ -193,9 +195,9 @@
 			this.load = {
 				'show':(data) => {
 					var overlay = $('overlay');
-					overlay.html('<div style="height:100%;width:100%;color:black;background-color:rgba(255,255,255,0.75);">'
-							+'<span">'+data.id+'</span>'
-							+'<a style="line-height:96px;position:absolute;top:calc(50% - 48px);left:calc(50% - 48px); width:96px;height:96px;font-size:7em;" class="fa fa-spinner fa-spin"></a>'
+					overlay.html('<div style="height:100%;width:100%;color:black;">'
+								+'<img style="position:absolute;height:25%;left:50%;top:50%;transform:translate(-50%,-50%);" src="images/logos/fox.gray.png">'
+								+'<p style="position:absolute;left:50%;top:65%;transform:translate(-50%,0%);">Seite lädt...</p>'
 							+'</div>');
 					overlay.removeClass('hide');
 				}
@@ -206,27 +208,53 @@
 				}
 				,'page':() => {
 					var overlay = $('<overlay></overlay>');
-					overlay.html('<div style="height:100%;width:100%;color:black;background-color:rgba(255,255,255,0.75);">'
-							+'<span">'+data.id+'</span>'
-							+'<a style="line-height:96px;position:absolute;top:calc(50% - 48px);left:calc(50% - 48px); width:96px;height:96px;font-size:7em;" class="fa fa-spinner fa-spin"></a>'
+					overlay.html('<div style="height:100%;width:100%;color:black;">'
+								+'<img style="position:absolute;height:25%;left:50%;top:50%;transform:translate(-50%,-50%);" src="images/logos/fox.gray.png">'
+								+'<p style="position:absolute;left:50%;top:65%;transform:translate(-50%,0%);">Seite lädt...</p>'
 							+'</div>');
 					overlay.appendTo('body');
 				}
 				,'header':() => {
 					var overlay = $('<overlay></overlay>');
-					overlay.html('<div style="height:100%;width:100%;color:black;background-color:rgba(255,255,255,0.75);">'
-							+'<span">'+data.id+'</span>'
-							+'<a style="line-height:96px;position:absolute;top:calc(50% - 48px);left:calc(50% - 48px); width:96px;height:96px;font-size:7em;" class="fa fa-spinner fa-spin"></a>'
+					overlay.html('<div style="height:100%;width:100%;color:black;">'
+								+'<img style="position:absolute;height:25%;left:50%;top:50%;transform:translate(-50%,-50%);" src="images/logos/fox.gray.png">'
+								+'<p style="position:absolute;left:50%;top:65%;transform:translate(-50%,0%);">Seite lädt...</p>'
 							+'</div>');
 					overlay.appendTo('header');
 				}
 				,'footer':(data) => {
 					var overlay = $('<overlay></overlay>');
-					overlay.html('<div style="height:100%;width:100%;color:black;background-color:rgba(255,255,255,0.75);">'
-							+'<span">'+data.id+'</span>'
-							+'<a style="line-height:96px;position:absolute;top:calc(50% - 48px);left:calc(50% - 48px); width:96px;height:96px;font-size:7em;" class="fa fa-spinner fa-spin"></a>'
+					overlay.html('<div style="height:100%;width:100%;color:black;">'
+								+'<img style="position:absolute;height:25%;left:50%;top:50%;transform:translate(-50%,-50%);" src="images/logos/fox.gray.png">'
+								+'<p style="position:absolute;left:50%;top:65%;transform:translate(-50%,0%);text-align:center;">'+data.load+'</p>'
 							+'</div>');
 					overlay.appendTo('footer');
+				}
+				,'cold':(data)=>{
+					var overlay = $('<overlay></overlay>');
+					overlay.html('<div style="height:100%;width:100%;color:black;">'
+								+'<img style="position:absolute;height:25%;left:50%;top:50%;transform:translate(-50%,-50%);" src="images/logos/fox.gray.png">'
+								+'<p style="position:absolute;left:50%;top:65%;transform:translate(-50%,0%);text-align:center;">Firebase Cold Start Timeout<br>Auto retry in <cnt>'+data.load+'</cnt></p>'
+							+'</div>');
+					overlay.appendTo('footer');
+					var e=$("overlay cnt");
+					interval=setInterval(function(){
+						var c=parseInt(e.text());
+						if(0!=c){e.text((c-1));}
+						else{
+							clearInterval(i);
+							$('body overlay').each(function(){
+								$(this).remove();
+							})
+							var overlay = $('<overlay></overlay>');
+							overlay.html('<div style="height:100%;width:100%;color:black;">'
+										+'<img style="position:absolute;height:25%;left:50%;top:50%;transform:translate(-50%,-50%);" src="images/logos/fox.gray.png">'
+										+'<p style="position:absolute;left:50%;top:65%;transform:translate(-50%,0%);text-align:center;">'+data.id+' lädt...</p>'
+									+'</div>');
+							overlay.appendTo('footer');
+							$("body").trigger("call-mvp",{"call":"call-mvp","id":data.id,"q":data.q});
+						}
+					},1000);
 				}
 			}
 			/* swipe args */
@@ -329,8 +357,6 @@
 				}
 				,'clear':() => {
 					document.title = 'smart.cv.og3lm';
-					var header = $('header section#content');
-					header.html('')
 					var footer = $('footer section#content');
 					footer.html('')
 				}
@@ -384,7 +410,6 @@
 		}
 		function PagePresentationAdapter(){
 			this.get = (data) => {
-				// {cols: [q,q], recs: [vto,vto], meta: {…}, call: "got-mvp", id: "hello", …}call: "got-mvp"cols: (2) ["6PW2gsYzD", "6PW2gsYzD"]id: "hello"meta: {state: "success", type: "dto", id: "6PW2gsYzD", tag: ""}recs: (2) [{…}, {…}]type: "text"view: "hello↵"__proto__: Object
 				var adaption = '';
 				if(data.hasOwnProperty('recs')){
 					for(var i=0; i < data.recs.length; i++) {
@@ -395,12 +420,19 @@
 							else if('html' === vto.meta.type){adaption = adaption+html(vto.view);}
 						}
 					};
+				} else if(data.hasOwnProperty('errors')){
+					console.log(data.errors)
+					// if('Firebase Cold Start Error' in data.errors):
+					// ...
+					// data['id'] = 'smart.cv.og3lm';
+				} else {
+					data['id'] = 'smart.cv.og3lm';
 				}
 				if('' === adaption){
-					adaption = '<p>Restricted Access! Request Login.</p>';
+					return null
 				}
 				return {'title':data.id,'footer':adaption}; 
-			};
+			}
 			function text(lines){
 				var adaption = '';
 				for(var i=0; i<lines.length; i++){
@@ -416,7 +448,6 @@
 			function table(records,meta){
 				var adaption = '';
 				var index = 0;
-				console.log('table','recs',records,'meta',meta)
 				if(meta.hasOwnProperty('title')){
 					adaption = adaption+'<p><b>'+records[meta.title]+'</b></p>';
 					records.shift();
@@ -441,38 +472,67 @@
 		}
 		function PageEventListener(){
 
-			var one = new DotNetHolder()
+			var one = new DotNetHolder() // moving background dots
 			one.operator.decorate(animations.one).create().start();
 			var dots = one.objects.dots;
+			//	var two = new DotNetHolder()
+			//	two.operator.decorate(animations.two).create().start();
 			var fox = new FoxNetHolder().operator.decorate(animations.fox).interlink(dots).create().start();
+			var cv = new CvAnimationHolder().operator.decorate(animations.cv).create().start(); // moving labels
 
-			var cv = new CvAnimationHolder().operator.decorate(animations.cv).create().start(); // mvoing labels
-
-			var presenter = new PagePagePresenter();
+			var presenter = new PageContentPresenter();
 			var adapter = new PagePresentationAdapter();
 
 			var args = {'token':'unset','authenicate':'unset'};
 
 			var events = {
-				'footer-toggle':(data) => {
+				'rating-toggle':(data) => {
 					presenter.footer.toggle();
 					data['q'] = $('img#'+data.id).attr('q');
 					if(cv.toggle()){
 						presenter.page.arrange(data);
 						presenter.load.hide();
 					} else {
+						presenter.page.clear()
+						data.load = data.id+' lädt...';
 						presenter.load.footer(data);
 						$('body').trigger('call-mvp',{'call':'call-mvp','id':data.id,'q':data.q});
 						presenter.page.rearrange(data);
 					}
 				}
+				,'hello-toggle':(data) => { /* bilder, views zusammenbauen */
+					presenter.footer.toggle();
+					data['q'] = $('img#'+data.id).attr('q');
+					if(cv.toggle()){
+						$('img.label').css({'visibility':'visible'}); // show all labels
+						$('a.fa-chevron-right').css({'visibility':'visible'}); // show ui chevrons
+						$('a.fa-chevron-left').css({'visibility':'visible'});
+						presenter.load.hide();
+					} else {
+						presenter.page.clear()
+						data.load = data.id+' lädt...'
+						presenter.load.footer(data);
+						$('body').trigger('call-mvp',{'call':'call-mvp','id':data.id,'q':data.q});
+						$('img.label').css({'visibility':'hidden'}); // hide other labels
+						$('a.fa-chevron-right').css({'visibility':'hidden'}); // hide ui chevrons
+						$('a.fa-chevron-left').css({'visibility':'hidden'});
+						$('#'+data.id).css({'visibility':'visible'});
+					}
+				}
 				,'cfg-toggle':(data) => {presenter.cfg.toggle();}
-				// popups
+				/* popups */
 				,'help-toggle':(data) => {
 					var text = '<p>swipe left/right</p>'
 							 + '<p>foldable footer</p>'
 							 + '<p>realtime animation control</p>'
 							 + '<p>user login</p>'
+					presenter.popup.show({'content':text});
+				}
+				,'project-toggle':(data) => {
+					var text = '<a href="">smart application</a>'
+							 + '<a href="">kleiner MUK</a>'
+							 + '<a href="">torcs race client</a>'
+							 + '<a href="">stalker rc</a>'
 					presenter.popup.show({'content':text});
 				}
 				,'user-toggle':(data) => {
@@ -486,7 +546,6 @@
 					}});
 
 				}
-				,'popup-toggle':(data) => {presenter.popup.hide();}
 				,'dox-toggle':(data) => {
 					var text = '<p>full stack application mvp architecture</p>'
 
@@ -591,21 +650,35 @@
 					}
 				}
 				,'got-token':(data) => {
-					console.log('got token');
 					args.token = data.token;
 					$('body').trigger('call-mvp',{'id':'hello','q':'6PW2gsYzD'});
 				}
 				,'got-mvp':(data) => {
+					/* append test icons */
+					// image 
+					// timeperiod
+					// icons	e.g. study, graduate, award, 
+					//								  | -->  cum laude (gut), magna cum laude (sehr gut), summa cum laude (sehr gut mit Auszeichnung)
+					// links	e.g. informatikprojekt, bachelor arbeit | projekte & samples muk,stalker,chr app, outlaw, ...? | Studieninhalte
+					//				 books read | gfs shit & prasentationen
+					// previous, next links
 					data = adapter.get(data);
 					data.index = presenter.swipe.index();
 					presenter.page.show(data);
 					presenter.load.hide();
+					if(null != presenter.interval){
+						clearInterval(presenter.interval)
+					}
 				}
 				,'fail-mvp':(data) => {
-					data = adapter.get(data);
-					data['id'] = 'smart.cv.og3lm';
-					presenter.page.show(data);
 					presenter.load.hide();
+					if(-1 !== data.errors.indexOf('Firebase Cold Start Timeout')){
+						data.load = 30;
+						data.q = data.q;
+						presenter.load.cold({'load':30,'q':data.q,'id':data.id});
+					} else {
+						presenter.load.footer({'load':'Eingeschränkter Zugang!<br>Login Beantragen.'});
+					}
 				}
 				,'got-pdf':(data) => {
 					// window.open("data:application/pdf;base64, "+data.pdf,'_blank');
@@ -618,16 +691,22 @@
 				}
 				,'fail-pdf':(data) => {
 					console.log(data);
+					console.log('do a flash')
 				}
 				/* origins/sources */
 				,'origin-download':(data) => {
 					var q = $('footer edge.hr a.fa-download').attr('q');
-					console.log('hello',data.id,q)
 					if('unset' !== q){$('body').trigger('call-pdf',{'id':'origin-download','call':'call-pdf','q':q});}
 					else{console.log('q=pdf not found',q);}
 				}
 				,'origin-print':(data) => {
-					console.log('print source document');
+					// <link rel="stylesheet" href="../../stylesheets/coloringpageprint.css" type="text/css" media="print" />
+					// window.print()
+					console.log('print document');
+				}
+				,'origin-togo':(data) => {
+					// download info graphics
+					console.log('togo document');
 				}
 				/* animation contorl */
 				,'animation-colors':(data) => {
@@ -666,8 +745,14 @@
 					// two.operator.resume();
 				}
 			}
-
 			this.create = function(d){
+				if(window.innerWidth < window.innerHeight){ // portrait
+					$('header img#after-effect').attr('src','images/after/after.head.port.dark.png');
+					$('footer img#after-effect').attr('src','images/after/after.foot.port.dark.png');
+				} else {
+					$('header img#after-effect').attr('src','images/after/after.head.land.dark.png');
+					$('footer img#after-effect').attr('src','images/after/after.foot.land.dark.png');
+				}
 				if(d){
 					d.onAppend({'events':Object.keys(events),'issues':Object.values(events)});
 				} else {
@@ -677,11 +762,11 @@
 			}
 		}
 
-		var animations = {'fox':{'lineColor':'#444','lineWidth':'1px','paneParent':'zone','paneId':'fox','scaleFactor':11,'dotLeft':25,'dotBottom':5}
-						,'cv':{'lineColor':'#444','lineWidth':7,'paneParent':'zone','paneId':'cv'}
-						,'one':{'lineColor':'#444','lineWidth':'1px','paneParent':'zone','paneId':'one'}
-						,'two':{'lineColor':'#444','lineWidth':'1px','paneParent':'zone','paneId':'two'}
-						,'tre':{'lineColor':'#444','lineWidth':'1px','paneParent':'zone','paneId':'tre'}
+		var animations = {'fox':{'lineColor':'#373737','lineWidth':'1px','paneParent':'zone','paneId':'fox','scaleFactor':11,'dotLeft':25,'dotBottom':5}
+						,'cv':{'lineColor':'#373737','lineWidth':7,'paneParent':'zone','paneId':'cv'}
+						,'one':{'lineColor':'#373737','lineWidth':'1px','paneParent':'zone','paneId':'one'}
+						,'two':{'lineColor':'#373737','lineWidth':'1px','paneParent':'zone','paneId':'two'}
+						,'tre':{'lineColor':'#373737','lineWidth':'1px','paneParent':'zone','paneId':'tre'}
 					};
 
 		var keymap = {'37':{'call':'get-prev'},'39':{'call':'get-next'}};
@@ -699,7 +784,7 @@
 			    projectId:"vog3lm-0x1",
 			};
 			firebase.initializeApp(config);
-			new Mvp4p1Operator()/*.decorate({'url':'http://192.168.178.80:5001/vog3lm-0x1/us-central1'})*/.create(dispatcher);
+			new Mvp4p1Operator()/*.decorate({'url':'http://'+window.location.hostname+'/vog3lm-0x1/us-central1'})*/.create(dispatcher);
 			new PageEventListener().create(dispatcher);
 			new D3s1gn4p1Operator().create(dispatcher);
 			new F1rebas3Auth4p1Operator(firebase).create(dispatcher);
@@ -742,7 +827,15 @@
 			right:0em;
 		}
 
-
+		header img#hello{
+			position: absolute;
+			height:50%;
+		    top:60%;
+    		left:12.5%;
+    		transform:translate(0,-50%);
+    		z-index:1;
+    		cursor:pointer;
+		}
 
 		header section#content playground{ /* moving labels */
 			position:absolute;
@@ -814,12 +907,19 @@
 			footer section table{
 				font-size:2em;
 			}
+			footer overlay p{
+				font-size:2em;
+			}
 		}
 
 
 		footer section p{
 			margin-top:1em;
 			margin-bottom:1em;
+		}
+		footer overlay p{
+			color:gray;
+			font-family:monospace;
 		}
 		footer section textarea{
 			font-size:2em;
@@ -899,28 +999,29 @@
 </head>
 <body>
 	<header id="zone">
-		<img class="after-effect" src="" alt="">
+		<img id="after-effect" class="after-effect" src="" alt="after.head.x.png">
+		<img class="label" call="hello-toggle" q="6PW2gsYzD" id="hello" src="images/labels/hello.world.png"></img>
 		<section id="content" index="0">
 			<playground index="2">
-				<img class="label m" call="footer-toggle" q="QspGcws6S" id="berufsschule" src="images/labels/ihk.bank.png"></img>
-				<img class="label m" call="footer-toggle" q="P6deO31J9" id="bank" src="images/labels/ksk.bank.png"></img>
-				<img class="label s" call="footer-toggle" q="cZ311yCvd" id="zivildienst" src="images/labels/rhk.zivi.png"></img>
-				<img class="label s" call="footer-toggle" q="oa2G72Hbz" id="grundschule" src="images/labels/grund.schule.png"></img>
-				<img class="label s" call="footer-toggle" q="OMHCIBQLa" id="realschule" src="images/labels/mittlere.reife.png"></img>
+				<img class="label m" call="rating-toggle" q="uiLT6kFBG" id="tutor" src="images/labels/hs.tutor.png"></img>
+				<img class="label m" call="rating-toggle" q="hN3EptFwt" id="konstanz" src="images/labels/uni.mathe.png"></img>
+				<img class="label s" call="rating-toggle" q="lvhPjXCTi" id="abitur" src="images/labels/wg.abi.png"></img>
+				<img class="label s" call="rating-toggle" q="mWwEH7SIG" id="service" src="images/labels/rhk.service.png"></img>
 			</playground>
 			<playground index="1">
-				<img class="label m" call="footer-toggle" q="uiLT6kFBG" id="tutor" src="images/labels/hs.tutor.png"></img>
-				<img class="label m" call="footer-toggle" q="t6a5gVVXy" id="zf" src="images/labels/zf.intern.png"></img>
-				<img class="label m" call="footer-toggle" q="hN3EptFwt" id="konstanz" src="images/labels/uni.mathe.png"></img>
-				<img class="label s" call="footer-toggle" q="lvhPjXCTi" id="abitur" src="images/labels/wg.abi.png"></img>
-				<img class="label s" call="footer-toggle" q="mWwEH7SIG" id="service" src="images/labels/rhk.service.png"></img>
+				<img class="label m" call="rating-toggle" q="QspGcws6S" id="berufsschule" src="images/labels/ihk.bank.png"></img>
+				<img class="label m" call="rating-toggle" q="P6deO31J9" id="bank" src="images/labels/ksk.bank.png"></img>
+				<img class="label s" call="rating-toggle" q="cZ311yCvd" id="zivildienst" src="images/labels/rhk.zivi.png"></img>
+				<img class="label s" call="rating-toggle" q="oa2G72Hbz" id="grundschule" src="images/labels/grund.schule.png"></img>
+				<img class="label s" call="rating-toggle" q="OMHCIBQLa" id="realschule" src="images/labels/mittlere.reife.png"></img>
 			</playground>
 			<playground index="0">
-				<img class="label m" call="footer-toggle" q="6PW2gsYzD" id="hello" src="images/labels/hello.world.png"></img>
-				<img class="label m" call="footer-toggle" q="VA0850MmS" id="bachelor" src="images/labels/hs.bachelor.png"></img>
-				<img class="label m" call="footer-toggle" q="JxR6XBz6v" id="paedagogik" src="images/labels/ph.png"></img>
-				<img class="label m" call="footer-toggle" q="W9wNjMC7p" id="wirtschaftsinformatik" src="images/labels/hs.wi.png"></img>
-				<img class="label m" call="footer-toggle" q="R59lkouIm" id="schuelerhilfe" src="images/labels/sh.png"></img>
+		<!--	<img class="label m" call="rating-toggle" q="6PW2gsYzD" id="hello" src="images/labels/hello.world.png"></img> -->
+				<img class="label m" call="rating-toggle" q="VA0850MmS" id="bachelor" src="images/labels/hs.bachelor.png"></img>
+				<img class="label m" call="rating-toggle" q="JxR6XBz6v" id="paedagogik" src="images/labels/ph.png"></img>
+				<img class="label m" call="rating-toggle" q="W9wNjMC7p" id="wirtschaftsinformatik" src="images/labels/hs.wi.png"></img>
+				<img class="label m" call="rating-toggle" q="R59lkouIm" id="schuelerhilfe" src="images/labels/sh.png"></img>
+				<img class="label m" call="rating-toggle" q="t6a5gVVXy" id="zf" src="images/labels/zf.intern.png"></img>
 			</playground>
 		</section>
 		<edge class="hr">
@@ -932,9 +1033,9 @@
 				<i class="fa fa-circle-thin fa-stack-2x"></i>
 				<i class="fa fa-exclamation fa-stack-1x"></i>
 			</a>
-			<a href="#" class="fa-stack" call="dox-toggle">
+			<a href="#" class="fa-stack" call="project-toggle">
 				<i class="fa fa-circle-thin fa-stack-2x"></i>
-				<i class="fa fa-certificate fa-stack-1x"></i>
+				<i class="fa fa-github fa-stack-1x"></i>
 			</a>
 		</edge>
 		<edge class="br">
@@ -956,8 +1057,8 @@
 					<id></id>
 				</card>
 				<form class="hide" call="login-validate">
-					<input type="text" id="mail" name="mail" placeholder="mail" value="">
-					<input type="text" id="pass" name="pass" placeholder="pass" value="">				
+					<input type="text" id="mail" name="mail" placeholder="mail" value="" autocomplete="on">
+					<input type="password" id="pass" name="pass" placeholder="pass" value="" autocomplete="off">				
 				</form>
 			</user>
 		</edge>
@@ -966,6 +1067,7 @@
 		<popup class="hide"></popup>
 	</header>
 	<footer>
+		<img id="after-effect" class="after-effect" src="" alt="after.foot.x.png">
 		<edge class="hr">
 			<a href="#" class="fa fa-download" q="unset" call="origin-download"></a>
 			<a href="#" class="fa fa-print" q="unset" call="origin-print"></a>

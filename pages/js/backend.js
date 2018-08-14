@@ -25,7 +25,7 @@ function HtmlCancasTool(animation){
             document.body.appendChild(canvas);
         } else {
             var element = document.getElementById(holder.setting.args.paneParent);
-            element.insertBefore(canvas, element.childNodes[0]);
+            element.insertBefore(canvas, element.childNodes[4]);
         }
         return canvas;
     }
@@ -174,7 +174,6 @@ function F1rebas3Auth4p1Operator(firebase){
 
 function Mvp4p1Operator(){
 	var dispatcher = null;
-	var develop = 'http://192.168.178.28:5001/vog3lm-0x1/us-central1'
 	var product = 'https://us-central1-vog3lm-0x1.cloudfunctions.net'
 	var args = {'url':product,'token':'unset'};
 	var events = {
@@ -206,38 +205,36 @@ function Mvp4p1Operator(){
 	}
 	this.call = function(data,api){
 		if(null == api){api = 'mvp';}
-		try{
-			var errors = [];
-			if('unset' === args.token){errors.push('no token found.');}
-			if('unset' === args.url){errors.push('no url found.');}
-			if(0 < errors.length){throw errors}
-			console.log(args.url+'/'+api+'/?q='+data.q)
-			$.ajax({
-			  	url:args.url+'/'+api+'/?q='+data.q,
-			  	crossDomain: true,
-			  	headers:{'Authorization':'CONTENT_ID_TOKEN::'+args.token},
-			  	context: document.body,
-			}).done(function(response){
-				if(data.hasOwnProperty('promise')){
-					data.promise(response);
-				} else {
-					response['call'] = 'got-'+api;
-					response['id'] = data.id;
-					response['type'] = 'text';
-					$('body').trigger('got-'+api,response);	
-				}
-			}).fail(function(xhr,status){
-				console.error('Mvp data error.',xhr.responseText);
-				$('body').trigger('fail-'+api,{'id':'fail'+api,'call':'fail'+api,'message':xhr.responseText});
-			});
-		}catch(error){
-			console.error(error);
-			$('body').trigger('fail-'+api,{'id':'fail'+api,'call':'fail'+api,'message':error});
-		}		
+		var errors = [];
+		if('unset' === args.token){errors.push('no token found.');}
+		if('unset' === args.url){errors.push('no url found.');}
+		if(0 < errors.length){
+			console.error('call-'+api+' error',errors);
+			$('body').trigger('fail-'+api,{'id':'fail'+api,'call':'fail'+api,'message':'call-'+api+' error','errors':errors.join(' ')});
+			return
+		}
+		$.ajax({
+		  	url:args.url+'/'+api+'/?q='+data.q,
+		  	crossDomain: true,
+		  	headers:{'Authorization':'CONTENT_ID_TOKEN::'+args.token},
+		  	context: document.body,
+		}).done(function(response){
+			if(data.hasOwnProperty('promise')){
+				data.promise(response);
+			} else {
+				response['call'] = 'got-'+api;
+				response['id'] = data.id;
+				response['type'] = 'text';
+				$('body').trigger('got-'+api,response);	
+			}
+		}).fail(function(xhr,status){
+			console.error('call-'+api+' error',xhr.responseText);
+			$('body').trigger('fail-'+api,{'id':'fail'+api,'call':'fail'+api,'q':data.q,'id':data.id,'message':'call-'+api+' error','errors':xhr.responseText});
+		});
 	}
 
 
-	/* move to content request js... */
+	/* move to content request js... *//* unused */
 	this.header = function(view,type="GET"){
 		if('unset' !== args.token){
 			console.log('Sending request to', args.url, 'with ID token in Authorization header.');
@@ -279,7 +276,7 @@ function Mvp4p1Operator(){
 		}
 		// firebase.auth().currentUser.getIdToken().then(function(token){/* call token each request */});
 	}
-	/* move to content request js... */
+	/* move to content request js... *//* unused */
 }
 function Scr1pt4p1Operator(){
 	this.decorate = function(opts){

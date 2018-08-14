@@ -222,6 +222,7 @@ function DotNetSetting(){
        ,'lineColor':'rgba(0,0,0,1)'
        ,'lineWidth':'2px'
        ,'paneParent':'body'
+       ,'paneInject':'unset'
        ,'paneId':'animation-'+(Math.random()*(99999-10000)+10000)
        ,'paneColor':'rgba(0,0,0,0)'
        ,'paneFrames':5

@@ -8,7 +8,7 @@ module.exports = {
 			 + '<link rel="icon" ref="https://vog3lm-0x1.firebaseapp.com/images/logos/fox.white.png" type="image/x-icon">'+script+'</head>'
 			 + '<body>'
 			 	+ '<img src="https://vog3lm-0x1.firebaseapp.com/images/logos/fox.gray.png" alt="fox" title="Smart Print Login Page" style="position:absolute;width:10%;left:50%;top:50%;transform:translate(-50%,-50%);">'
-				+ '<a href="https://vog3lm-0x1.firebaseapp.com" style="position:absolute;left:50%;top:60%;transform:translate(-50%,-50%);font-size:2rem;font-family:monospace;text-decoration:none;color:gray;">Sie werden weitergeleitet.<br>Falls nicht, hier klicken.</a>'
+				+ '<a href="https://vog3lm-0x1.firebaseapp.com" style="position:absolute;left:50%;top:65%;transform:translate(-50%,-50%);font-size:2rem;font-family:monospace;text-decoration:none;color:gray;text-align:center;">Proceed Autologin.<br>You\'ll be redirected.</a>'
 			 + '</body></html>';
 	}
 	,'script': (mail,pass,leed) => {
@@ -29,6 +29,17 @@ module.exports = {
 	}
 	,'fail': (msg) => {
 		return '<script type="text/javascript">window.localStorage.setItem("e","'+msg+'");window.location.replace("https://vog3lm-0x1.firebaseapp.com/403")</script>';
+	}
+	,'cold': (qr1D,timeout) => {
+		return '<!DOCTYPE html><html lang="de"><head><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>smart.cv.log1n</title>'
+			 + '<link rel="shortcut icon" href="https://vog3lm-0x1.firebaseapp.com/images/logos/fox.white.png" type="image/x-icon">'
+			 + '<link rel="icon" ref="https://vog3lm-0x1.firebaseapp.com/images/logos/fox.white.png" type="image/x-icon">'
+			 + '<script type="text/javascript">document.addEventListener("DOMContentLoaded",function(event){var e=document.getElementById("cnt");setInterval(function(){var c=parseInt(e.innerHTML);if(0!=c){e.innerHTML=(c-1);}else{window.location.replace("https://vog3lm-0x1.firebaseapp.com/qr/'+qr1D+'");}},1000);});</script>'
+			 + '</head>'
+			 + '<body>'
+			 	+ '<img src="https://vog3lm-0x1.firebaseapp.com/images/logos/fox.gray.png" alt="fox" title="Smart Print Login Page" style="position:absolute;width:10%;left:50%;top:50%;transform:translate(-50%,-50%);">'
+				+ '<a href="https://vog3lm-0x1.firebaseapp.com" style="position:absolute;left:50%;top:65%;transform:translate(-50%,-50%);font-size:2rem;font-family:monospace;text-decoration:none;color:gray;text-align:center;">Firebase Cold Start Timeout<br>Auto retry in <span id="cnt">'+timeout+'</span> sec.</a>'
+			 + '</body></html>';
 	}
 
 };

@@ -22,8 +22,7 @@
 	<script type="text/javascript" src="js/animate.dots.js"></script>
 	<script type="text/javascript">
 
-		var animations = {}
-		var dispatcher = null
+		
 
 		function ReaderContentPresenter(){
 			var head = ''		
@@ -79,12 +78,13 @@
 
 		var animations= [{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'one'}
 				  		,{'lineColor':'#777','lineWidth':'1px','paneParent':'zone','paneId':'two'}];
+
 		function ReaderEventListener(){
-			var style = new D3s1gn4p1Operator().create();
-			var authenticate = new F1rebas3Auth4p1Operator(firebase).create();
-			var storage = new F1rebas3Storage4p1Operator(firebase).create();
-			var scroller = new Scro114p1Operator().decorate({'node':'section#content'}).create();
-			var mvp = new Mvp4p1Operator().create();
+			//	var style = new D3s1gn4p1Operator().create();
+			//	var authenticate = new F1rebas3Auth4p1Operator(firebase).create();
+		//	var scroller = new Scro114p1Operator().decorate({'node':'section#content'}).create(); // !!!!!!!!!!
+			//	var mvp = new Mvp4p1Operator().create();
+
 			var content = new ReaderContentPresenter();
 
 			var one = new DotNetHolder().operator.decorate(animations[0]).create().start();
@@ -195,36 +195,43 @@
 					});
 				}
 				,'scroll-up':() => {
-					scroller.delta(-400);
+				//	scroller.delta(-400);
 				}
 				,'scroll-down':() => {
-					scroller.delta(400);
+				//	scroller.delta(400);
 				}
 
 				,'call-mvp-test':() => {
 					$('body').trigger('call-mvp',{'call':'call-mvp','id':'uiLT6kFBG','q':'uiLT6kFBG'});
 				}
 			}
-			this.getEvents = function(){
-				return {'events':Object.keys(events),'issues':Object.values(events)}
+			this.create = function(d){
+				if(d){
+					d.onAppend({'events':Object.keys(events),'issues':Object.values(events)});
+				} else {
+					console.log('page listener','internal dispatcher used');
+					new V13wEv3ntD1spatch3r().onDecorate({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
+				}
 			}
 		}
 
-		var app = null;
+		var dispatcher = new V13wEv3ntD1spatch3r()
 		$(document).ready(function(){
 			// Initialize Firebase
 			var config = {
 			    apiKey: "AIzaSyDmXSkwOam-aQ37z8-3d5aH-X257lIVS34",
 			    authDomain: "vog3lm-0x1.firebaseapp.com",
 			    projectId: "vog3lm-0x1",
-			    storageBucket: "vog3lm-0x1.appspot.com",
 			};
 			firebase.initializeApp(config);
+			new Mvp4p1Operator().create(dispatcher);
+			new ReaderEventListener().create(dispatcher);
+			new D3s1gn4p1Operator().create(dispatcher);
+			new F1rebas3Auth4p1Operator(firebase).create(dispatcher);
+			// new Scro114p1Operator().decorate({'node':'section#content'}).create();
 		});
 		$(window).load(function() {
-			dispatcher = new V13wEv3ntD1spatch3r(new ReaderEventListener().getEvents())
-			dispatcher.onRegister()
-			dispatcher.onUnleash()
+			dispatcher.onRegister().onUnleash()
 		});
 	</script>
 	<style type="text/css">
@@ -273,6 +280,7 @@
 		}
 
 
+		/* dynamically build in page content presenter */
 		section#content div.head{
 			width: calc(100%);
 		    height: calc(200px);
@@ -345,6 +353,12 @@
 			height:32px;
 			line-height:32px;
 		}
+
+		code {
+			display: block;
+			white-space: pre-wrap;
+		}
+
 	</style>
 </head>
 <body>
@@ -371,11 +385,868 @@
 				<a href="#" class="fa fa-chevron-circle-up hide" call="scroll-up"></a>
 				<a href="#" class="fa fa-chevron-circle-down" call="scroll-down"></a>
 			</nav>
-			<div class="dummy"></div>
+			<!-- content goes here -->
+			<div class="dummy" style="overflow-y:scroll;">
+				
+				<!-- KAPITEL EINS -->
+				<!-- KAPITEL EINS -->
+				<!-- KAPITEL EINS -->
+
+				<h1>Aufgabenstellung</h1>
+				<h2>Hintergründe</h2>
+				<p>Im Rahmen von Fahrerassistenzsystemen wie Automatic Cruise Control, kurz ACC, werden für PKW vermehrt Automatische Abstandskontrollsysteme angeboten. Diese sollen den Fahrer, insbesondere bei langen Strecken, dabei untersützen, den Abstand zum Vordermann ohne eigenes zutun zu wahren. Ein Radarsensor im Kühlergrill ermittelt die Distanz zum Vordermann und je nach Bedarf wie die Führungsgröße des unterlagerten Geschwindigkeitsregelkreises angepasst werden muss.</p>
+				<p>Speziell für den Einsatz in PKW's werden zur Zeit Systeme entwickelt, die völlig autonom sogar Vollbremsungen bis zum Stillstand ausführen sollen. Diese basieren weitgehend auf an Hochleistungsrechner gekoppelte Radar- und Kameratechnik.</p>
+				
+				<h2>Projektbeschreibung</h2>
+				<p>Für eine Modelleisenbahn als Versuchsstrecke soll ein ADC-System aufgebaut werden. Hierzu müssen geeignete Sensoren gefunden und getestet werden.</p>
+				<p>Die Regelung soll ein PC übernehmen. Dazu muss eine Kommunikation zwischen Lok und dem PC aufgebaut werden. Zur Visualierung sowie zur Regelung des Systems könnte bspw. LabView eingesetzt werden. Für die kabellose Datenübertragung sind Bluetoothmodule vorgesehen, die ebenfalls von Labview aus angesteuert werden können.</p>
+				<p>Das Projekt sollte als Praktische Arbeit durchgeführt werden, ein Vortrag gehört nicht dazu.</p>
+
+				<h2>Projektbeschreibung</h2>
+				<p>Für das Projekt steht die folgende Hardware zur Verfügung. Für detailiertere Informationen zu den genutzten Komponenten, sei an dieser Stelle auf die Herstellerdokumentationen verwiesen.</p>
+				<ul>
+					<li>Versuchsstrecke: Piko Start-Set Herkules ÖBB</li>
+					<li>kabellose Kommunikation: HC-05 und HC-06 Bluetoothmodule</li>
+					<li>Systemsteuerung: LPC1343 Microcontroller Boards</li>
+				</ul>
+				<p>Für die Regelung ist ein handelsüblicher Computer vorgesehen.</p>
+				<!-- KAPITEL ZWEI -->
+				<!-- KAPITEL ZWEI -->
+				<!-- KAPITEL ZWEI  %http://www.piko-shop.de/index.php?vw_type=artikel&vw_id=8421 -->
+				<h1>Piko Start-Set Herkules ÖBB</h1>
+				<p>Zum Aufbau einer Versuchsstrecke stehen 2 Piko Start-Sets in Spurbreite H0 zur Verfügung. Es handelt sich um ein Gleichstromsystem, das die Loks direkt über die Gleise mit Strom versorgt und mittels eines Protokolldekoders Befehle an diese weiterleitet.</p> 
+				<p>Neben den Lokomotiven, die auf der Herstellerseite genauer beschrieben sind, stehen zusätzliche Wagons und ausreichend Gleis bereit sodass genug Platz für einen Versuchsaufbau zur Verfügung steht.</p>
+
+
+				<img src="images/adc/modell_beschreibung.jpeg">
+				<div>Piko Start Set Hercules ÖBB mit 3 Wagons</div>
+
+				<p>Für nähere Informationen zur Modellbahn oder der Technik im System sei auf die Homepage des Herstellers verwiesen.</p>
+				<!-- KAPITEL DREI -->
+				<!-- KAPITEL DREI -->
+				<!-- KAPITEL DREI http://www.tams-online.de/htmls/produkte/b3/produkte_b3.html-->
+				<h1>Tams Booster B-3</h1>
+				<p>Die Befehlsvermittlung der Modellbahn übernimmt ein openDCC Decoder. Der verwendete Tams Booster B-3 verstärkt die Signale und versorgt die Versuchsstrecke mit Strom.</p>
+				<p>Das Gleissignal wird vom Booster vollständig symmetrisch verstärkt. Der DCC-Eingang des Boosters B-3 ist durch Optokoppler vollständig galvanisch getrennt.</p>
+
+				<img src="images/adc/decoder_a.png">
+				<div>Booster B-3 Signaldecoder</div>
+
+				<p>Die Einzelheiten zur Inbetriebnahme und zur Stromversorgung stehen im Benutzerhandbuch des Herstellers. Sie sind unbedingt zu beachten.</p>
+
+				<img src="images/adc/decoder_pin.png">
+				<div>Booster B-3 Pinbelegung</div>
+
+				<p>Der Decoder wird direkt mit Klemmen an das Olimex Board angeschlossen. Die Pins 2, Daten(-) und 3, Daten(+) aus Abbildung \ref{fig:decoderpin} werden mit dem Decoderanschluss bzw. Pin 3 mit der Stromversorugnng des Microcontrollers verbunden.</p>
+				<p>Die Diode signalisiert durch dauerhaftes Leuchten eine erfolgreiche Anmeldung des Controllers am Gerät.</p>
+				<!-- KAPTIEL VIEW -->
+				<!-- KAPTIEL VIEW -->
+				<!-- KAPTIEL VIEW https://www.olimex.com/Products/ARM/NXP/LPC-P1343/-->
+				<h1>NXP LPC 1343 Microcontorller</h1>
+				<p>Für die Steuerung des Systems bzw. zur Vermittlung zwischen den verschiedenen Hardwarekomponenten stehen NXP Microcontroller vom Typ LPC 1343 zur Verfügung. Dieser Controller bietet einerseits ausreichend Funktionalität und steht, verbaut auf verschiedensten Entwicklungsboards, zur Verfügung.</p>
+				<p>Details zum LPC 1343:</p>
+				<ul>
+					<li> LPC1343 Cortex-M3, Frequenzbereich bis zu 72 Mhz, 32 kB Flash, 8kB SRAM</li>
+					<li> ISP/IAP mittels integrierter bootloader Software</li>
+					<li> serielle Schnittsellen:</li>
+					<ul>
+						<li>[$ \blacktriangleright $] USB 2.0 Schnittstelle</li>
+						<li>[$ \blacktriangleright $] UART RS-485/EIA-485</li>
+						<li>[$ \blacktriangleright $] SSP controller</li>
+						<li>[$ \blacktriangleright $] I2C-Bus Schnittstelle</li>
+					</ul>
+					<li> weitere Schnittstellen:</li>
+					<ul>
+						<li>[$ \blacktriangleright $] 42 GPIO pins (fussnoten für details)</li>
+						<li>[$ \blacktriangleright $] 4 GPIO Timer/Counter</li>
+						<li>[$ \blacktriangleright $] programmierbarer Watch Dog Timer</li>
+						<li>[$ \blacktriangleright $] programmierbarer System Tick Timer</li>
+					</ul>
+					<li> 10-bit AD Wandler</li>
+					<li> einfache 3.3 V Spannungsversorung (2.0 V bis 3.6 V)</li>
+					<li> Serial Wire Debug</li>
+				</ul>
+
+				<img src="images/adc/mc_olimex_blockdia.png">
+				<div>LPC-1343 Block Diagramm</div>
+
+				<p>Als zentrales Steuerelement ist ein Olimex Development Board vorgesehen. Das ebenfalls vorhandene Embedded Artists' Quickstartboard, is klein genug für den Einsatz in einem Modellbahnwagon. Auf beiden ist ein LPC 1343 verbaut. Für nähere Informationen bezüglich Konfiguration und Umgang mit dem LPC 1343 sei auf das Benutzerhandbuch des Herstellers verwiesen.</p>
+				<h2>Olimex LPC-P1343 NXP Development Board</h2>
+				<p>Die Besonderheit des Olimex Boards ist der für Versuchsschaltungen vorgesehene Bereich. Bauteile können direkt auf dem Board befestigt und mit der entsprechenden Funktionalität verbunden werden. Die vorhandene USB Schnittstelle sollte ein angenehmen IAP ermöglichen.</p>
+
+				<img src="images/adc/mc_olimex.png">
+				<div>Olimex LPC-P1343 NXP Development Board</div>
+
+				<p>Details zum Olimex Board:</p>
+				<ul>
+					<li> MCU: LPC1343 Cortex-M3, 32 kB Flash, 8kB SRAM, UART RS-485, USB, SSP, I2C/Fast+, ADC</li>
+					<li> Power supply circuit</li>
+					<li> Power-on LED</li>
+					<li> USB Schnittstelle</li>
+					<li> USBC LED</li>
+					<li> SWD Schnittstelle</li>
+					<li> UEXT Schnittstelle</li>
+					<li> 8 konfigurierbare LEDS</li>
+					<li> 2 konfigurierbare Knöpfe</li>
+					<li> Reset Knopf</li>
+					<li> Bereich für Versuchsschaltungen</li>
+				</ul>
+
+				<img src="images/adc/mc_olimex_schema.png">
+				<div>Schaltplan Olimex LPC-P1343 NXP Development Board</div>
+
+				<p>Für Steuerung und Stromversorgung wird das Board über seine USB-Schnittstelle direkt mit einem PC verbunden. Der Microcontroller des Boards ist direkt mit dem Bereich für Versuchsschaltungen verbunden. Hier sind bereits Anschlussmöglichkeiten gelötet, vgl. dazu Abbildung \ref{fig:omcanschluesse}.</p>
+
+				<img src="images/adc/olimex_versuch_a.png">
+				<div>Olimex MC Versuchsschaltungen</div>
+
+				<ul>
+					<li>[1] P2\_10: Decoderanschluss</li>
+					<li>[2] P1\_6/7: UART RXD/TXD</li>
+					<li>[3] 3.3V VCC</li>
+					<li>[4] GND</li>
+				</ul>
+				<p>Für die UART Verbindung sind seitens des Microcontrollers bereits Verbindungen an den Pins P1\_6 und P1\_7 vorgesehen. Die Schnittstelle der Bluetoothmodule sowie die Stromversorgung kann mit klemmen direkt zum Microcontroller geschaltet werden, vgl. dazu Abbildung \ref{fig:omcanschluesse}.</p>
+				<p>Für die Kommunikation mit dem Decoder ist P2\_10 vorgesehen. Dieser wird am Daten(-) Pin des Boosters angeschlossen, die Stromversorgung an Daten(+). Vgl. dazu Abbildung \ref{fig:omcanschluesse}</p>
+				<h2>Embedded Artists' LPC1343 QuickStart Board</h2>
+				<p>Das Quickstart Board der Firma Embedded Systems wurde seiner Grösse wegen gewählt. Es ist klein genug, um in einem Wagon der Modellbahn verbaut zu werden. Außerdem kann der Microcontroller recht einfach mit einer externen 5V Spannungsquelle betrieben werden.</p>
+
+				<img src="images/adc/ea_board_fb+.png">
+				<div>Embedded Artists' LPC1343 QuickStart Board</div>
+
+				<p>Details zum Embedded Artists' Board:</p>
+				<ul>
+					<li> MCU: LPC1343 Cortex-M3, 32 kB Flash, 8kB SRAM, UART RS-485, USB, SSP, I2C/Fast+, ADC</li>
+					<li> USB Schnittstelle</li>
+					<li> GPIO expansion connectors</li>
+					<li> Spannungskonverter für externe Spannungsversorgung</li>
+					<li> SWD Schnittstelle</li>
+					<li> 1 konfigurierbare LED</li>
+					<li> Reset Knopf</li>
+				</ul>
+				<p>Für weitere Informationen zum Board sei auf das Benutzerhandbuch des Herstellers verwiesen.</p>
+				<!-- KAPITEL FÜNF -->
+				<!-- KAPITEL FÜNF -->
+				<!-- KAPITEL FÜNF -->
+				<h1>Bluetoothmodule HC-05/06</h1>
+				<p>Details zum Bluetoothmodul:</p>
+				<ul>
+					<li> CSR BlueCore4 Chipsatz</li>
+					<li> Bluetooth V2.0+EDR</li>
+					<li> UART Schnittstelle</li>
+					<li> Externer 8Mbit Flashspeicher</li>
+					<li> EDR Bit Rate, bis zu 3Mbps</li>
+					<li> 3.1 to 4.2VDC Spannungsversorung (40mA max)</li>
+				</ul>
+				<p>Die Bluetoothmodule der zweiten Generation haben zwei Betriebsmodi, den AT Kommando bzw. den Data Modus. Im Kommando Modus können Steuerungsbefehle an das Modul geschickt werden, während der Data Modus als Sendemodus gedacht ist.</p>
+				<p>Hinzu kommt, dass zwei verschiedene Typen von Modulen auf dem Markt verfügbar sind. Typ A Module können zwischen den beiden Modi wechseln. Typ B hingegen befindet sich nur dann im AT Modus, wenn es nicht Teil eines Netzwerks ist. Außerdem sind beim B Typ nur eingeschränkt AT Kommandos verfügbar. Sollen Kommandos während des Sendebetriebs an ein Modul abgesetzt werden, stehen AT*GAP Befehle zur Verfügung.</p>
+				<p>Für das Projekt stehen beide Typen zur Verfügung. Das genutzte HC-05 Modul entspricht einem Typ A, das HC-06 einem Typ B Modul, Sie kommunizieren über UART mit 8 Datenbits, no parity, no flow control und 1 stop bit. Das HC-05 benötigt eine Baud Rate von 38400, das HC-06 9600. Die exakte Pinbelegung ist in der Benutzeranleitung des Herstellers zu finden.</p>
+				<h2>HC-05</h2>
+
+				<!-- neben einander-->
+				<img src="images/adc/blue_typeA_master.png">
+				<div>HC-05 Modul</div>
+				<img src="images/adc/blue_typeA_master_schematics_b.png">
+				<div>HC-05 Schaltplan</div>
+
+				<table>
+					<!-- {p{0.04\textwidth}|p{0.1\textwidth}|p{0.3\textwidth} -->
+					<tr><th>Pin</th><th>ID</th><th>Beschreibung</th></tr>
+					<tr><td>1</td><td>TXD</td><td>UART Ausgang</td></tr>
+					<tr><td>2</td><td>RXD</td><td>UART Eingang</td></tr>
+					<tr><td>11</td><td>RESET</td><td></td></tr>
+					<tr><td>12</td><td>VCC</td><td>Spannungsversorung</td></tr>
+					<tr><td>13</td><td>GND</td><td></td></tr>
+					<tr><td>22</td><td>GND</td><td></td></tr>
+					<tr><td>25</td><td>PIO2</td><td>programmierbarer I/O</td></tr>
+					<tr><td>26</td><td>PIO3</td><td>programmierbarer I/O</td></tr>
+					<tr><td>27</td><td>PIO4</td><td>programmierbarer I/O</td></tr>
+					<tr><td>28</td><td>PIO5</td><td>programmierbarer I/O</td></tr>
+					<tr><td>29</td><td>PIO6</td><td>programmierbarer I/O</td></tr>
+					<tr><td>30</td><td>PIO7</td><td>programmierbarer I/O</td></tr>
+					<tr><td>33</td><td>PIO10</td><td>programmierbarer I/O</td></tr>
+					<tr><td>31</td><td>LED</td><td>LED Indikator</td></tr>
+					<tr><td>32</td><td>LED</td><td>LED Indikator</td></tr>
+					<tr><td>34</td><td>CMD</td><td>AT/Data Mode umschalten</td></tr>
+				</table>
+				<div>HC-05 Pinbelegung</div>
+				<h2>HC-06</h2>
+
+				<!-- neben einander-->
+				<img src="images/adc/blue_typeB_slave.png">
+				<div>HC-06 Modul</div>
+				<img src="images/adc/blue_typeB_slave_schematics_b.png">
+				<div>HC-06 Schaltplan</div>
+
+				<!-- \begin{tabular*}{0.5\textwidth}[]{p{0.04\textwidth}|p{0.1\textwidth}|p{0.2\textwidth}}-->
+				<table>
+					<tr><th>Pin</th><th>ID</th><th>Beschreibung</th><tr>
+					<tr><td>1</td><td>TXD</td><td>UART Ausgang</td><tr>
+					<tr><td>2</td><td>RXD</td><td>UART Eingang</td><tr>
+					<tr><td>11</td><td>RESET </td><td></td><tr>
+					<tr><td>12</td><td>VCC</td><td>Spannungsversorung</td><tr>
+					<tr><td>13</td><td>GND</td><td></td><tr>
+					<tr><td>22</td><td>GND</td><td></td><tr>
+					<tr><td>24</td><td>LED</td><td>LED Indikator</td><tr>
+				</table>
+				<div>HC-06 Pinbelegung</div>
+				<h3>Inbetriebnahme</h3>
+
+				<!-- neben einander-->
+				<img src="images/adc/blue_typeA_master_schematics_mc.png">
+				<div>HC-05 MC-UART Schaltbild</div>
+				<img src="images/adc/blue_typeB_slave_schematics_mc.png">
+				<div>HC-06 MC-UART Schaltbild</div>
+
+				<p>Die Module werden, wie in den Abbildungen \ref{fig:hc06schaltbildmc} und \ref{fig:hc05schaltbildmc} beschrieben direkt zum Microcontroller geschaltet. Die LED am Bluetoothmodul signalisiert durch blinken eine erfolgreiche Inbetriebnahme. Das Modul befindet sich zu diesem Zeitpunkt im AT Modus. Sobald eine Verbindung zu einem Netzwerk hergestellt ist, leuchtet die LED dauerhaft.</p>
+
+				<!-- KAPITEL SECHS -->
+				<!-- KAPITEL SECHS -->
+				<!-- KAPITEL SECHS -->
+
+				<h1>Protokolle</h1>
+				<h2>openDCC</h2>
+				<p>Bei DCC wird eine 1 als zwei schnelle Flankenwechsel (nach je 58$\mu$s), eine 0 als zwei langsame Flankenwechsel (nach je 116$\mu$s) übertragen.</p>
+				<p>Innerhalb des seriellen Datenstromes erfolgt das Framing mittels einer Präambel, gefolgt von 8-bit organisierter Nutzlast. Die Präambel dient zum Synchronisieren von Nachrichten und muß mind. 10 Einsbits lang sein, ein Dekoder erkennt ein Paket jedoch nach maximal 12 Einsen. Gemäß NMRA sendet die Zentrale 14 Einsbits.</p>
+				<p>Die Flanken müssen den Bereich von -4V bis +4V monoton und mit mind. 2,5V/$\mu$s Slewrate durchqueren. Das Rechtecksignal soll gleichspannungsfrei sein und Pakete sollten wiederholt gesendet werden.</p>
+				<table>
+				<!-- \begin{tabular*}{\textwidth}[]{p{0.25\textwidth}p{0.75\textwidth}} -->
+					<tr><th>Packet Start Bit</th><th>Ein 0-bit am Ende eine einwadfreien Präamble signalisiert den Beginn des ersten Nutzbytes.</th><tr>
+					<tr><td>Adress Data Byte</td><td>Als erstes Nutzbyte muss ein Addressbyte folgen. Es sind 7 Informationsbits vorgesehen, sodass sich Addressen zwischen 0 und 127 ergeben. Das Addressbyte kann auch auf 2 Bytes vergrößert werden.</td><tr>
+					<tr><td>Data Byte</td><td>Jedes weiter Nutzbyte umfasst 8 bit. Je nach Konstruktion ergeben sich verschiendene Steuerungsbefehle, mit denen der Decoder bzw. die Modellbahn gesteuert oder Fehler erkannt werden können.</td><tr>
+				</table>
+				<p>Am Ende jedes Paket steht ein 1-bit, das das Ende einer Nachricht anzeigt.</p>
+
+
+				<img src="images/adc/dcc_frame.png">
+				<div>oppenDCC Flankensignal</div>
+
+
+				<h3>openDCC Anweisungen</h3>
+				<p>Im openDCC Standart sind bereits eine Reihe von Paketen definiert mit denen allerdings nur die grundlegenden Funktionalitäten steuerbar sind. Es können auch deutlich komplexere Pakete generiert werden. Siehe dazu RP-9.2.1. An dieser Stelle soll leidglich das Speed and Direction Packet vorgestellt werden. Dieses wird zur Steuerung einer Lok verwendet. Geschwindigkeit und Fahrtrichtung können für jede Adresse indivudiell eingestellt werden.</p>
+
+				<img src="images/adc/dcc_speed.png">
+				<div>oppenDCC Speed and Direction Paket</div>
+
+				<table>
+				<!-- \begin{tabular*}{\textwidth}[]{p{0.15\textwidth}p{0.85\textwidth}} -->
+					<tr><th>Byte One</th><th>Adressbyte mit dem die gewünschte Lok angesteuert wird, es sind Werte zwischen 0 und 127 möglich.</th><tr>
+					<tr><td>Byte Two</td><td>Anweisungsbyte mit dem Fahrtrichtung und Geschwindigkeit der Lok beeinflusst werden können. die Bits 0 bis 4 sind für die Geschwindigkeitsbefehle (vgl. Abb. ) vorgesehen. Bit 5 steuert die Richtung. Hierbei heisst 1 vorwärts und 0 rückwärts. Die Bits 6 und 7 identifizieren das Anweisungsbyte.</td><tr>
+					<tr><td>Byte Three</td><td>Errorbyte mit dem auf Übertragungfehler geprüft werden kann. Das Errorbyte entsteht aus Byte One und Two, indem diese XOR verknüpft werden. </td><tr>
+				</table>
+
+				<img src="images/adc/dcc_instruction.png">
+				<div>oppenDCC Speed Instructions</div>
+
+				<h2>Bluetooth AT Standart</h2>
+				<p>Zur Steuerung bzw. Konfiguration eines Bluetoothmoduls dienen sogenannte AT Befehle. Das sind vordefinierte Kommandos, mit denen die Module im AT Modus gesteuert werden.</p>
+				<table> <!-- {\textwidth}[]{p{0.25\textwidth}|p{0.25\textwidth}|p{0.4\textwidth}} -->
+					<tr><th>Befehl </th><th> Response </th><th> Beschreibung </th><tr>
+					<tr><td><code>AT</code></td><td><code>OK</code><td></td><tr>
+					<tr><td><code>AT+Baud</code></td><td><code>OK<r></code></td><td></td><tr>
+					<tr><td><code>AT+Name?</code></td><td><code>+NAME:<name> OK</td><td></td><tr>
+					<tr><td><code>AT+Name=&ltname&gt</code></td><td><code>OK<name></code></td><td></td><tr>
+					<tr><td><code>AT+PIN=&ltnnnn&lt</code></td><td><code>OK<nnnn></code></td><td></td><tr>
+					<tr><td><code>AT+Reset</code></td><td><code>OK</code></td><td></td><tr>
+					<tr><td><code>AT+VERSION</code></td><td><code>+VERSION:<VER> OK</code></td><td></td><tr>
+					<tr><td><code>AT+Orgl</code></td><td><code>OK</code></td><td></td><tr>
+					<tr><td><code>AT+Addr?</code></td><td><code>+ADDR:nn:uu:ll OK</td><td></td><tr>
+					<tr><td><code>AT+Rname?&ltadr&gt</code></td><td><code>+NAME:<name> OK</td><td></td><tr>
+					<tr><td><code>AT+Role?</code></td><td><code>+ROLE:&ltrole&gt OK</td><td></td><tr>
+					<tr><td><code>AT+Role=&ltrole&gt</code></td><td><code>OK</td><td></td><tr>
+					<tr><td><code>AT+Class?</code></td><td><code>+CLASS:&ltcls&gt OK</code></td><td></td><tr>
+					<tr><td><code>AT+Class=&ltcls&gt</code></td><td><code>OK</code></td><td></td><tr>
+					<tr><td><code>AT+IAC?</code></td><td><code>+IAC:&ltiac&gt OK</code></td><td></td><tr>
+					<tr><td><code>AT+IAC=&ltiac&gt</code></td><td><code>OK/FAIL</code></td><td></td><tr>
+					<tr><td><code>AT+INQM?</code></td><td><code>+INQM:&ltinq1&gt,&ltinq2&gt,&ltinq3&gt OK</code></td><td></td><tr>
+					<tr><td><code>AT+INQM=&ltinq1&gt,&ltinq2&gt,&ltinq3&gt</code></td><td><code>OK/FAIL</code></td><tr>
+					<tr><td><code>AT+PSWD?</code></td><td><code>+PSWD:<pwd> OK</code></td><td></td><tr>
+					<tr><td><code>AT+PSWD=&ltpwd&gt</code></td><td><code>OK</code></td><td></td><tr>
+					<tr><td><code>AT+UART?</code></td><td><code>OK</code></td><td></td><tr>
+					<tr><td><code>AT+UART=&ltbaud&gt,&ltstop&gt&ltparity&gt</code></td><td><code>OK</code></td><tr>
+					<tr><td><code>AT+CMode?</code></td><td><code>+CMODE:&ltmode&gt OK</code></td><td></td><tr>
+					<tr><td><code>AT+CMode=&ltmode&gt</td><td><code>OK</code></td><td></td><tr>
+					<tr><td><code>AT+Bind?</code></td><td><code>+BIND:<adr> OK</code></td><td></td><tr>
+					<tr><td><code>AT+Bind=&ltadr&gt</code></td><td><code>OK</code></td><td></td><tr>
+					<tr><td><code>AT+Polar?</code></td><td><code>+POLAR:&ltled1&gt,&ltled2&gt OK</code></td><td></td><tr>
+					<tr><td><code>AT+Polar=&ltled1&gt,&ltled2&gt</code></td><td><code>OK</code></td><tr>
+					<tr><td><code>AT+PIO=&ltpn&gt,<value></code></td><td><code>OK</code></td><tr>
+					<tr><td><code>AT+MPIO=&ltiomap&gt</td><td><code>OK</code></td><td></td><tr>
+					<tr><td><code>AT+IPScan?</td><td><code>+IPSCAN:&ltint&gt,&ltdur&gt,&ltpint&gt,&ltpdur&gt OK</code></td><td></td><tr>
+					<tr><td><code>AT+IPScan=&ltint&gt,&gtldur&gt,&ltpint&gt,&ltpdur&gt</td><td><code>OK</code></td><td></td><tr>
+					<tr><td><code>AT+Sniff?</code></td><td><code>+SNIFF:&lttmax&gt,&lttmin&gt,&ltretry&gt,&lttimeout&gt OK</code></td><td></td><tr>
+					<tr><td><code>AT+Sniff=&lttmax&gt,&lttmin&gt,&ltretry&gt,&lttimeout&gt</code></td><td><code>OK</code></td><tr>
+					<tr><td><code>AT+Senm?</code></td><td><code>+SENM:&ltmode&gt,&ltencrypt&gt OK</code></td><td></td><tr>
+					<tr><td><code>AT+Senm=&ltmode&gt,&ltencrypt&gt</code></td><td><code>OK</code></td></td><tr>
+					<tr><td><code>AT+Rmsad=&ltadr&gt</code></td><td><code>OK</code></td><td></td><tr>
+					<tr><td><code>AT+Fsad=&ltadr&gt</code></td><td><code>OK</code></td><td></td><tr>
+					<tr><td><code>AT+Adcn?</code></td><td><code>+ADCN:&lttotal&gt OK</code></td><td></td><tr>
+					<tr><td><code>AT+Mrad?</code></td><td><code>+MRAD:&ltadr&gt OK</code></td><td></td><tr>
+					<tr><td><code>AT+State?</code></td><td><code>+STATE:&lts&gt OK</code></td><td></td><tr>
+					<tr><td><code>AT+Init</code></td><td><code>OK</code></td><td></td><tr>
+					<tr><td><code>AT+Inq</code></td><td><code>+INQ:&ltadr&gt,&ltclass&gt,&ltrssi&gt OK</code></td><td></td><tr>
+					<tr><td><code>AT+Inqc</code></td><td><code>OK</code></td><td></td><tr>
+					<tr><td><code>AT+Pair=&ltadr&gt,&lttimeout&gt</code></td><td><code>OK/FAIL</code></td><tr>
+					<tr><td><code>AT+Link=&ltddr&gt</code></td><td><code>OK/FAIL</code></td><td></td><tr>
+					<tr><td><code>AT+Disc</code></td><td><code>+DISC:&ltresults&gt</code></td><td></td><tr>
+					<tr><td><code>AT+Ensniff=&ltadr&gt</code><td><td><code>OK</code></td><td></td><tr>
+					<tr><td><code>AT+exsniff&ltadr&gt</code><td><td><code>OK</code></td><td></td><tr>
+				</table>
+				<div>AT Command Referenz</div>
+				<h2>MC Protokoll</h2>
+				<p>Die Microcontroller werden mithilfe eines selbst festgelegten Protokolls gesteuert. Um das Protokoll möglichst flexibel zu halten unterscheiden sich die Anweisungen bzgl. der zum einsatz kommenden Hardware.</p>
+				<p>Zu Beginn eines Befehls wird die betroffenen Systemkomponente identifiziert. Bspw. die Modellbahn mit ZUG oder das Bluetoothmodul mit UART. So kann der Kommandointerpreter des Microcontrollers die passende Kommunikationsart auswählen. Dann folgen die zu üertragenen Daten. Die Nutzdaten werden wie erwähnt individuell formatiert, allerdings ist Systembefehlen stets CMD: vorangestellt. Je nach anzusprechende Hardware sind optionale Erweiterungen möglich. Abgeschlossen wird der String mit <>.</p>
+				<table>
+				    <!-- p{0.48\textwidth}p{0.52\textwidth}} -->
+					<tr><td>\docCode ZUG ADR:00000011 CMD:01100110<></td><td> Zug mit Adresse 3 soll vorwärts fahren mit Stufe 9</td><tr>
+					<tr><td>\docCode UART CMD:AT+Name<></td><td> Abfrage des Names des angeschlossenen Bluetoothmoduls</td><tr>
+					<tr><td>\docCode AT<></td><td> AT Hello Kommando (AT Kommandos werden direkt vermittelt)</td><tr>
+				</table>
+				<div>MC Protokoll Beispiele</div>
+				<!-- KAPITEL SIEBEN -->
+				<!-- KAPITEL SIEBEN -->
+				<!-- KAPITEL SIEBEN -->
+				<h1>Projektstruktur</h1>
+				<p>Da das System aus unterschiedlicher Hardware besteht, die nur teilweise miteinander kompatibel ist, müssen Kommunikationskanäle und Schnittstellen zwischen den Microcontrollern, den Bluetoothmodulen, der Modellbahn und dem Versuchsrechner geschaffen werden. Die Kanäle beschreiben insbesondere die Verbindungen zwischen einem Microcontroller und einem Bluetoothmodul, einem Microcontroller und der Teststreckenzentrale (Booster) sowie einem Controller und dem Versuchsrechner, auf dem später die Reglung laufen soll.</p>
+				<p>Erst wenn die Kommunikation zwischen der einzelnen Hardware sichergestellt ist, kann mit dem Aufbau einer Regelungsstrecke begonnen werden. Hierbei stellt das Olimex Board die zentrale Vermittlungsstelle dar. Die Streckeninformationen, seitens der Modellbahn werden über Bluetooth an dieses geschickt und über eine serielle Schnittstelle an den Versuchsrechner weitervermittelt. Das Olimex Board übernimmt außerdem die Steuerung der Lokomotiven. Hierzu muss eine Verbindung zur Modellbahnzentrale aufgebaut werden, die openDCC unterstützt.</p>
+				<p>Zur Verarbeitung der ermittelten Streckeninformationen kommen die Embedded Artists' Boards zum Einsatz. Sie nehmen Informationen auf und leiten diese über UART an ein Bluetoothmodul weiter, das vermittelt.</p>
+				<p>Die Regelung selbst findet auf einem gewöhnlichen PC statt, der Streckeninformationen vom Olimex Board bekommt, auswertet und einen Steuerungsbefehl, zurück zum Olimex Board absetzt. Die Verbindung zum Microcontroller soll über eine serielle Schnittstelle erfolgen.</p>
+				<h2>Kommunikationsmodell</h2>
+
+				<img src="images/adc/doku_commodel_s.png">
+				<div>Kommunikationsmodell</div>
+
+				<h2>Vorgehen</h2>
+
+				<p>Das primäre Projektziel ist die Umsetzung des oben gezeigten Kommunikationsmodells bzw. der genannten Hardwareverbindungen. Dafür bedarf es der folgenden Teilschritte.</p>
+
+				<ul>
+					<li>[1.] Aufbau der seriellen Kommunikation zwischen PC und MC.</li>
+					<li>[2.] Aufbau der UART Kommunikation zwischen MC und Bluetoothmodul.</li>
+					<li>[3.] Bluetoothmodulkommunikation zwischen den Modulen.</li>
+					<li>[4.] Aufbau der openDCC Protokoll Kommunikation zwischen MC und Modelbahn.</li>
+				</ul>
+
+				<p>Sobald die einzelnen Kanäle funktionsfähig sind, soll mit dem Aufbau der elektronik begonnen werden. Diese umfassen insbesondere die Stromversorgung der Quickstart Boards sowie der Aufnahme der spezifischen Streckeninformationen.</p>
+				<p>Im nächsten Schritt soll eine Benutzeroberfläche entwickelt werden, die den notwendigen Spielraum für die Visualisierung der angestrebten Regelung und der aufgenommenen Informationen bietet.</p>
+				<p>Im letzten Schritt wird die Relgelung des Systems umgesetzt.</p>
+
+
+				<h2>Dateistrukturen</h2>
+
+				<!-- FILE TREE -->
+
+				\bottomcaption{Projektordner}
+				\begin{supertabular*}{0.7\textwidth}[]{p{0.05\textwidth}p{0.15\textwidth}p{0.45\textwidth}}
+					project\_adc  & & \\\midrule[1.5pt]
+					 & adc\_gui 	& Windowsbenutzeroberfläche \\
+					 & adc\_mc 		& Microcontrollercode \\
+					 & adc\_tools 	& nützliche Softwaretools \\\midrule[1.5pt] 
+					project\_doku & & Projektdokumentation \\
+					project\_lib  & & Handbuecher, Infomaterial \\\bottomrule[1.5pt]
+				\end{center}
+
+
+				<h3>Microcontrollercode</h3>
+				<p>Für die Entwicklung des Microcontrollercodes wurde IAR Embedded Workbench benutzt. Der Code basiert auf einem Beispiel der Firma Olimex, entsprechend wurde die Umgebungsstruktur übernommen bzw. teilweise angepasst. Zusätzlich entsandener Code ist im Ordner source abgelegt. Näheres siehe Tabelle XX.</p>
+
+				<!-- FILE TREE -->
+
+				\bottomcaption{IAR Projekt (MC Code)}
+				\begin{supertabular*}{0.7\textwidth}[]{p{0.05\textwidth}p{0.15\textwidth}p{0.45\textwidth}}
+					adc\_mc & & \\\midrule[1.5pt]
+					 & app 			& Boardabhängigkeiten und CDC \\
+					 & board 		& Boardabhängigkeiten \\
+					 & Flash Debug	& binary dump file\\
+					 & modules		& \\
+					 & source		& Projektcode \\\bottomrule[1.5pt]
+				\end{center}
+
+				<h3>Windowscode</h3>
+				<p>Die Testoberfläche ist mit Microsoft Visual 2010 realisiert worden. Zur Inbetriebnahe Bedarf es des Mircrocontrollertreibers. Dieser ist im Porjekt hinterlegt.</p>
+
+				<!-- FILE TREE -->
+
+				\bottomcaption{Visual Studio Projekte (GUI Code)}
+				\begin{supertabular*}{0.8\textwidth}[]{p{0.05\textwidth}p{0.25\textwidth}p{0.55\textwidth}}
+					adc\_gui & & \\\midrule[1.5pt]
+					 & adc\_gui\_cdc\_dll & Benutzeroberfläche als Visual Studio Projekt \\
+					 & adc\_gui\_cdc\_hid & Benutzeroberfläche als Visual Studio Projekt (nicht lauffähig) \\\bottomrule[1.5pt]
+				\end{center}
+
+
+				<!-- KAPITEL ACHT -->
+				<!-- KAPITEL ACHT -->
+				<!-- KAPITEL ACHT -->
+
+
+				<h1>Informatikteil</h1>
+				<p>In diesem Abschnitt werden die programmtechnischen Hintergründe zum Kommunikationsmodell, siehe Abschnitt 4 Projektstruktur beschrieben. Die in C verfassten Module sind mit allen verfügbaren Microcontrollern kompatibel und einstzbar. Die bisher genutzte Benutzeroberfläche ist in vb geschrieben und somit nur für Windows Systeme verfügbar.</p>
+				<h2>C-Code</h2>
+				<p>Die Microcontrollerkommunikation umfasst eine Reihe von Schnittstellen. Dazu gehören die serielle Kommunikation mit dem Versuchsrechner, die UART Kommunikation mit den Bluetoothmodulen und die Verbindung zur Verstuchsstrecke über das openDCC Protokoll. Um eine verlässliche Kommunikation zwischen den unterschiedlichen Systemkomponenten zu realisieren bedarf es zunächst einer zentralen Funktion, die Systembefehle, wie in Abschnitt 3 beschrieben interpretiert und entsprechend weiterleitet.</p>
+				<h3>Kommandoschnittstelle</h3>
+
+				\begin{supertabular*}{\textwidth}[]{p{0.06\textwidth}p{0.4\textwidth}|p{0.45\textwidth}}
+
+				    \multicolumn{3}{l}{\docCode Int8U model\_decoder\_reset[42] = } \\
+				     & \multicolumn{2}{l}{\docCode {\grqq 111111111111110000000000000000000000000001 \grqq};} \\
+				      \multicolumn{3}{l}{\docCode Int8U model\_decoder\_idle[42] = } \\
+				     & \multicolumn{2}{l}{\docCode {\grqq 111111111111110111111110000000000011111111 \grqq};} \\
+				    \multicolumn{3}{l}{\docCode Int8U model\_broadcast\_stop[42] = } \\
+				     & \multicolumn{2}{l}{\docCode {\grqq 111111111111110000000000011000000011100001 \grqq};} \\   
+				    \multicolumn{3}{l}{\docCode Int8U model\_adr[8] = {\grqq 00000011 \grqq};} \\
+				    \multicolumn{3}{l}{\docCode Int8U model\_cmd[8] = {\grqq 00000000 \grqq};} \\
+				    \multicolumn{3}{l}{\docCode Int8U model\_err[8] = {\grqq 00000000 \grqq};} \\ \midrule[1.5pt]
+				    \multicolumn{3}{l}{globale Modulfunktionen} \\  \midrule[1.5pt]
+
+
+				     & Name & Beschreibung \\    \midrule
+				    \docCode void & \docCode com\_usb\_output(Int8U cmd[], Int32U cmd\_size) & USB schreiben \\    \midrule
+				    \docCode bool & \docCode com\_interpreter(Int8U cmd[], Int32U cmd\_size) & interpretiert eingehende Kommandos und vermittelt zur entsprechenden Hardware \\    \midrule [1.5pt]
+				    \multicolumn{3}{l}{lokale Modulfunktionen} \\  \midrule[1.5pt]
+				     & Name & Beschreibung \\    \midrule
+				    \docCode void & \docCode com\_pio\_inverter() & invertiert openDCC Nachrichten \\    \midrule
+				    \docCode void & \docCode com\_pio\_error\_calc() & berechnet openDCC Error Byte \\    \midrule
+				    \docCode void & \docCode com\_pio\_output(Int8U cmd[], Int32U cmd\_size) & ändert Decodernachricht \\    \midrule
+				    \docCode void & \docCode com\_uart\_output(Int8U cmd[], Int32U cmd\_size) & UART schreiben \\    \bottomrule[1.5pt]
+
+				<div>MC Kommandoschnittstelle: cmd.c</div>
+				<h3>Details der Schnittstelle</h3>
+
+
+				<div>cmd.c: Uart Kommando</div>
+				<pre><code>docC
+				bool com_interpreter(Int8U cmd[], Int32U cmd_size){
+
+				    // clean command
+				    if(cmd[cmd_size - 2] != '<' || cmd[cmd_size - 1] != '>'){return false;}
+				    else{
+				        cmd[cmd_size-2] = cmd[cmd_size];
+				        cmd_size = cmd_size - 2;
+				    }
+
+				    // switch command to output channel
+				    // transmit BLUETOOTH AT cmd
+				    if(cmd[0] == 'A' && cmd[1] == 'T'){
+				        com_usb_output(cmd,cmd_size);
+				        com_uart_output(cmd, cmd_size);
+				        return true;
+				    }
+				    // transmit MODELBAHN output
+				    else if(cmd[0] == 'Z' && cmd[1] == 'U' && cmd[2] == 'G'){
+				        com_usb_output(cmd,cmd_size);
+				        com_pio_output(cmd,cmd_size);
+				        return true;
+				    }
+				    // transmit BLUETOOTH output
+				    else if(cmd[0] == 'U' && cmd[1] == 'A' && cmd[2] == 'R' && cmd[3] == 'T'){
+				        com_usb_output(cmd,cmd_size);
+				        com_uart_output(cmd, cmd_size);
+				        return true;
+				    }
+				    return false;
+				}
+				</code></pre>
+
+
+				<h2>USB Schnittstelle</h2>
+				<p>Der Code für die serielle Kommunikation mit CDC ist überwiegend dem Olimex Beispiel entnommen. Zunächst muss die Funktion, wie unten stehend, initialisiert werden.</p>
+				<div>snippet: CDC init</div>
+				<pre><code>[caption=snippet: CDC init, style=docC]
+
+				#if CDC_DEVICE_SUPPORT_LINE_CODING > 0
+				//CDC_LineCoding_t CDC_LineCoding;
+				//UartLineCoding_t UartLineCoding;
+				#endif      // CDC_DEVICE_SUPPORT_LINE_CODING > 0
+
+				#if CDC_DEVICE_SUPPORT_LINE_STATE > 0
+				UartLineEvents_t      UartLineEvents;
+				SerialState_t         SerialState;
+				#endif      // CDC_DEVICE_SUPPORT_LINE_STATE > 0
+
+				UsbCdcInit();
+
+				USB_ConnectRes(TRUE);
+				volatile Boolean CdcConfigureStateHold;
+				CdcConfigureStateHold = !IsUsbCdcConfigure();
+				</code></pre>
+				Mit den folgenden Codebeispielen wird gezeigt, wie die USB Funktionalität zum lesen und schreiben genutzt werden kann. 
+				<div>snippet: CDC read</div>
+				<pre><code>[caption=snippet: CDC read, style=docC]
+				/*  init variable  */
+				Int8U usb_com[100] = "";
+				Int32U usb_size = 0;
+				Int8U com_bffr[100] = "";
+				Int32U com_cnt = 0;
+
+				/*  start reading  */
+				while(1){
+				  if (IsUsbCdcConfigure()){
+				    usb_size = UsbCdcRead(com_bffr,sizeof(com_bffr)-1);
+				    if(usb_size){
+				      // buffering transmission
+				      usb_com[com_cnt] = com_bffr[0];
+				      com_cnt++;
+				      // break loop if something has been recieved
+				      if(usb_com[com_cnt - 2] == '<' && usb_com[com_cnt - 1] == '>'){
+				        if(com_interpreter(usb_com,com_cnt)){}
+				        else{com_usb_output(">> invalid command usb",22);}
+				        com_cnt = 0;
+				      }
+				    }
+				  }
+				}
+				</code></pre>
+				<div>snippet: CDC write</div>
+				<pre><code>[caption=sinppet: CDC write, style=docC]
+				while(!UsbCdcWrite(cmd, cmd_size));
+				while(!UsbCdcWrite("\n",2)); 
+				</code></pre>
+				<h2>UART Schnittstelle</h2>
+
+
+
+				<!-- \begin{supertabular*}{\textwidth}[]{p{0.1\textwidth}|p{0.4\textwidth}|p{0.5\textwidth}} -->
+				<table>
+				    \multicolumn{3}{l}{globale Modulvariable} \\\midrule[1.5pt]
+				     & Name & Beschreibung und Aufruf \\\midrule
+				    \docCode enum & \docCode \_UartNum\_t             & UartNum\_t \\    \midrule
+				    \docCode enum & \docCode \_UartMode\_t            & UartMode\_t \\    \midrule
+				    \docCode enum & \docCode \_UartParity\_t          & UartParity\_t \\    \midrule
+				    \docCode enum & \docCode \_UartStopBits\_t        & UartStopBits\_t \\    \midrule
+				    \docCode enum & \docCode \_UartWordWidth\_t       & UartWordWidth\_t \\    \midrule
+				    \docCode struct & \docCode \_UartFifo\_t          & UartFifo\_t,\\ 
+				     & &                                                *pUartFifo\_t \\    \midrule
+				    \docCode union & \docCode \_UartModemLineState\_t & UartModemLineState\_t,\\ 
+				     & &                                                *pUartFifo\_t \\    \midrule
+				    \docCode struct & \docCode \_UartLineCoding\_t    & UartLineCoding\_t, \\ 
+				     & &                                                *pUartLineCoding\_t \\    \midrule
+				    \docCode union & \docCode \_UartLineEvents\_t     & UartLineEvents\_t, \\  
+				     & &                                                *pUartLineEvents\_t \\    \midrule
+				    \docCode union & \docCode \_UartModemEvents\_t    & UartModemEvents\_t, \\    
+				     & &                                                *pUartModemEvents\_t \\    \midrule[1.5pt]
+				    \multicolumn{3}{l}{globale Modulfunktionen} \\\midrule[1.5pt]
+				     & Name & Beschreibung \\\midrule
+				    \docCode bool & \docCode UartInit(void)                                    & Schnittstelle initiieren \\ \midrule
+				    \docCode void & \docCode UartSetLineCoding(UartLine Coding\_t UartCoding)  & Schnittstellenparameter setzen \\ \midrule
+				    \docCode Int32U & \docCode UartRead(pInt8U pBuffer, Int32U BufferSize)     & UART schreiben \\ \midrule
+				    \docCode Int32U & \docCode UartWrite(pInt8U pBuffer, Int32U BufferSize)    & UART lesen \\ \midrule
+				    \docCode UartLin eEvents \_t  & \docCode UartGetUartLineEvents(void)       & Schnittstellenparameter abrufen \\ \midrule[1.5pt]
+				    \multicolumn{3}{l}{lokale Abhängigkeiten (mit\docCode extern \normalfont aufrufen!)} \\ \midrule[1.5pt]
+				    \docCode  void   & \multicolumn{2}{l}{\docCode NVIC\_IntEnable(Int32U IntNumber);} \\ \midrule
+				    \docCode  void   & \multicolumn{2}{l}{\docCode NVIC\_IntDisable(Int32U IntNumber);} \\ \midrule
+				    \docCode  void   & \multicolumn{2}{l}{\docCode NVIC\_IntPri(Int32U IntNumber, Int8U Priority);} \\ \midrule
+				    \docCode  Int32U & \multicolumn{2}{l}{\docCode SYS\_GetMainClk(void);} \\ \midrule
+				    \docCode  void   & \multicolumn{2}{l}{\docCode NVIC\_ClrPend(Int32U IntNumber);} \\ \midrule
+				    \multicolumn{3}{l}{lokale Modulvariable} \\ \midrule[1.5pt]
+				    \multicolumn{3}{l}{\docCode pUartFifo\_t pUart0RxFifo;} \\
+				    \multicolumn{3}{l}{\docCode pUartFifo\_t pUart0TxFifo;} \\\midrule[1.5pt]
+				    \multicolumn{3}{l}{lokale Modulfunktionen} \\ \midrule[1.5pt]
+				     & Name & Beschreibung \\\midrule
+				    \docCode static Boolean & \docCode FifoPush(pUartFifo\_t Fifo, Int8U Data)  & \\\midrule
+				    \docCode static Boolean & \docCode FifoPop(pUartFifo\_t Fifo, pInt8U pData)  & \\\midrule
+				    \docCode void & \docCode UART0\_IRQHandler(void)     & \\\midrule
+				    \docCode void & \docCode UartCalcDivider(Int32U Freq, Int32U Baud, pInt32U pDiv, pInt32U pAddDiv, pInt32U pMul) & \\\bottomrule[1.5pt]
+				</table>
+				<div>UART Interface: uart.c</div>
+				Die UART Kommunikation wird je nach angeschlossenem Bluetoothmodul verschieden konfiguriert. Die Parameter des fogenden Codeausschnitts gelten für ein Typ A Modul.
+				<div>snippet: UART init</div>
+				<pre><code>[caption=snippet: UART init, style=docC]
+				UartInit();
+				//  A modul settings
+				UartLineCoding_t UartCoding;
+				UartCoding.dwDTERate = 38400;   // for B Modul 9600
+				                                // A Modul requires 38400
+				UartCoding.bStopBitsFormat = UART_ONE_STOP_BIT;
+				UartCoding.bParityType = UART_NO_PARITY;
+				UartCoding.bDataBits = UART_WORD_WIDTH_8;
+				UartSetLineCoding(UartCoding);
+				</code></pre>
+				Nach erfolgreicher initialisierung kann wie im folgenden beschrieben über die UART Schnittstelle kommuniziert werden.
+				<div>snippet: UART read</div>
+				<pre><code>[caption=snippet: UART read, style=docC]
+				/*  init variable  */
+				Int8U uart_com[100] = "";
+				Int32U uart_size = 0;
+				Int8U com_bffr[100] = "";
+				Int32U com_cnt = 0;
+				/*  start reading  */
+				while(1){
+				  /*  Read Data from UART  */
+				  uart_size = UartRead(uart_com, sizeof(com_bffr)-1);
+				  if(uart_size){
+				    // buffering transmission
+				    uart_com[com_cnt] = com_bffr[0];
+				    com_cnt++;
+				    // break loop if something has been recieved
+				    if(uart_com[com_cnt - 2] == '<' && uart_com[com_cnt - 1] == '>'){
+				      if(com_interpreter(usb_com,com_cnt)){}
+				      else{com_usb_output(">> invalid command uart",23);}
+				      com_cnt = 0;
+				    }              
+				  }
+				}
+				</code></pre>
+				<div>snippet: UART write</div>
+				<pre><code>[caption=snippet: UART write, style=docC]
+				    int i;
+				    int j;
+				    Int8U uart_cmd[40];
+				    for(i = 0; i < Size; i++){
+				        if(Command_Buffer[i] == 'D' && Command_Buffer[i+1] == ':'){
+				            for(j = 0; j < 40; j++){uart_cmd[j] = Command_Buffer[i+2+j];};
+				            Size = 0;
+				        }    
+				    }
+				    Size = j;
+				    Int32U tmp_Size = 0;
+				    //com_usb_output("write to uart", 13);
+				    tmp_Size = UartWrite(uart_cmd, Size);
+				    if(tmp_Size == 0){com_usb_output("cannot_writeUart", 16);}
+				    //Int8U Command_Response[40];
+				    //tmp_Size = UartRead(Command_Response, 40);
+				    //if(tmp_Size != 0){com_usb_output(Command_Response, tmp_Size);}
+				    //else{com_usb_output("cannot_readUart", 15);}
+				</code></pre>
+
+
+				<h2>openDCC Schnittstelle</h2>
+				<!-- \begin{supertabular*}{\textwidth}[]{p{0.06\textwidth}p{0.4\textwidth}|p{0.54\textwidth}} -->
+				<table>
+				    \multicolumn{3}{l}{lokale Modulvariable} \\    \midrule
+				    \multicolumn{3}{l}{\docCode int timer\_killer = 0;} \\
+				    \multicolumn{3}{l}{\docCode unsigned int model\_period\_flank = 1;} \\
+				    \multicolumn{3}{l}{\docCode unsigned int model\_period\_timer = 0;} \\
+				    \multicolumn{3}{l}{\docCode unsigned int model\_period\_count = 0;} \\
+				    \multicolumn{3}{l}{\docCode unsigned int model\_command\_counter = 0;} \\
+				    \multicolumn{3}{l}{\docCode unsigned int model\_command\_changer = 0;} \\
+				    \multicolumn{3}{l}{\docCode Int8U model\_command[42] = } \\
+				     & \multicolumn{2}{l}{\docCode {\grqq 0111111111111110000000110011000110011000001\grqq};} \\
+				      \multicolumn{3}{l}{\docCode Int8U model\_command\_a[42] = } \\
+				     & \multicolumn{2}{l}{\docCode {\grqq 000000000000001111111001100111001100111110\grqq};} \\
+				    \multicolumn{3}{l}{\docCode Int8U model\_command\_b[42] = } \\
+				     & \multicolumn{2}{l}{\docCode {\grqq 000000000000001111111001100111001100111110\grqq};} \\   \midrule[1.5pt]
+				    \multicolumn{3}{l}{globale Modulvariable} \\    \midrule[1.5pt]
+				     & Name & Beschreibung \\    \midrule
+				    \docCode void & \docCode delay\_10(volatile unsigned long cycles) &  \\\midrule
+				    \docCode void & \docCode CT16B0\_chngPKT(Int8U model\_adr[], Int8U model\_cmd[], Int8U model\_err[]) & DCC Nachricht ändern \\\midrule
+				    \docCode void & \docCode CT32B0\_IRQHandler(void) & Interrupt Handler \\\midrule
+				    \docCode void & \docCode CT32B1\_IRQHandler(void) & Interrupt Handler \\\midrule
+				    \docCode void & \docCode CT16B0\_IRQHandler(void) & Interrupt Handler \\\midrule
+				    \docCode void & \docCode CT16B1\_IRQHandler(void) & Interrupt Handler \\\midrule[1.5pt]
+				    \multicolumn{3}{l}{\docCode use 132MHz ahbdiv 2 clock:}  \\
+				    \multicolumn{3}{l}{\docCode 56s: 0.00056 [s] = 66000000 * 0.000056 = 3696} \\
+				    \multicolumn{3}{l}{\docCode -> match\_level\_divider = 66000000/3696 = 1785} \\
+				    \multicolumn{3}{l}{\docCode 112s: 0.00112 [s] = 66000000 * 0.000112 = 7392} \\
+				    \multicolumn{3}{l}{\docCode -> match\_level\_divider = 66000000/7392 = 8928} \\
+				    \multicolumn{3}{l}{\docCode 1s: 0.00001 [s] = 66000000 * 0.000001 = 48} \\
+				    \multicolumn{3}{l}{\docCode -> match\_level\_divider = 66000000/48 = 1000000} \\\midrule[1.5pt]
+				    \docCode void & \docCode CT32B0\_Init(unsigned long Match\_Level\_Divider, int priority) & Timer initiieren \\\midrule
+				    \docCode void & \docCode CT32B0\_Init(unsigned long Match\_Level\_Divider, int priority) & Timer initiieren \\\midrule
+				    \docCode void & \docCode CT32B0\_Init(unsigned long Match\_Level\_Divider, int priority) & Timer initiieren \\\midrule
+				    \docCode void & \docCode CT32B0\_Init(unsigned long Match\_Level\_Divider, int priority) & Timer initiieren \\\midrule
+				    \docCode void & \docCode CT32B0\_Stop(void) & Timer stoppen \\\midrule
+				    \docCode void & \docCode CT32B0\_Stop(void) & Timer stoppen \\\midrule
+				    \docCode void & \docCode CT32B0\_Stop(void) & Timer stoppen \\\midrule
+				    \docCode void & \docCode CT32B0\_Stop(void) & Timer stoppen \\\bottomrule[1.5pt]
+				</table>
+				<div>openDcc Interface: tmr.c</div>
+				<p>Für die Kommunikation mit dem openDCC Decoder wird mit einem Timer gearbeitet. Das garantiert ein möglichst häufiges wiederholen der Nachrichten. Wichtig bei der Konfiguration des Timers ist die Systemkonfiguration mit 132 Mhz Taktung, da das USB Beispiel seitens Olimex auf dieser Einstellung basiert.</p>
+				<p>Ein Timer wird wie im unten stehenden gezeigt initialisiert.</p>
+				<div>snippet: TIMER init</div>
+				<pre><code>[caption=snippet: TIMER init, style=docC]
+				IOCON_PIO2_10 = 0x0400;        // %00|000 no pull|func PIO3_0
+				GPIO2DIR_bit.P2_10 = 1 ;       // set to output
+				GPIO2DATA_bit.P2_10 = 0;       // %0 low
+
+				SYSAHBCLKCTRL_bit.CT32B0 = 1; // Enable CT32B0 input clock
+
+				TMR32B0TCR_bit.CE = 0;     // counting disable
+				TMR32B0TCR_bit.CR = 1;     // counting reset
+				TMR32B0TCR_bit.CR = 0;     // release counting reset
+				TMR32B0CTCR_bit.CTM = 0;   // Timer mode: every rising PCLK edge
+				TMR32B0MCR_bit.MR0I = 1;   // enable interrupt on MR0
+				TMR32B0MCR_bit.MR0R = 1;   // enable reset on MR0
+				TMR32B0MCR_bit.MR0S = 0;   // disable stop on MR0
+				TMR32B0PR = 0;             // Prescale Register
+				TMR32B0PC = 0;             // Prescale Counter
+
+				TMR32B0MR0 = (SYS_GetMainClk()/(SYSAHBCLKDIV))/Match_Level_Divider;
+
+				TMR32B0IR_bit.MR0INT = 1;     // clear pending interrupt, 
+				                              // i.e. MR0 interrupt flag
+				TMR32B0TCR_bit.CE = 1;        // counting enable
+				NVIC_IntEnable(NVIC_CT32B0);  // enable NVIC Timer0 Interrupt
+
+				NVIC_IntPri(NVIC_CT32B0, priority);  // interrupt priority
+				</code></pre>
+				Die Steuerung des Flankensignals am IO Ausgang wird über einen Interrupt gesteuert. Der folgende Codeauszug ist für das Senden nur einer Nachricht gedacht. Diese wird fortlaufend wiederholt. Soll Die Nachricht geändert werden, wird der Timer gestoppt. Dafür steht eine andere Funktion zur Verfügung.
+				<div>snippet: TIMER interrupt</div>
+				<pre><code>[caption=snippet: TIMER interrupt, style=docC]
+				void CT16B0_IRQHandler(void){
+				  GPIO3DATA_bit.P3_0 ^= 1;
+				  GPIO0DATA_bit.P0_2 ^= 1;
+				  
+				  model_period_timer++;
+
+				  // toggle IO nach halber periode (flank=1: send 1; flank=2: send 0)
+				  if(model_period_timer % 4 == model_period_flank){
+				    GPIO2DATA_bit.P2_10 ^= 1;
+				    model_period_count++;
+				    model_period_timer = 0;
+				  }
+
+				  // toggle flank nach ganzer periode
+				  if(model_period_count == 2){
+				    model_period_count = 0;
+				    model_command_counter++;
+				    // reset command counter if end of array
+				    if(model_command_counter % 42 == 0){model_command_counter = 0;}    // cmd
+				    // send model commandos
+				    if(model_command[model_command_counter] == '0'){model_period_flank = 2;}
+				    else{model_period_flank = 1;}
+				    // send next command
+				    model_command_changer = (model_command_changer + 1) % 10;
+				  }
+				  TMR16B0IR_bit.MR0INT = 1;
+				  NVIC_ClrPend(NVIC_CT16B0);
+				}
+				</code></pre>
+
+				Das unten folgenden Listing zeigt wie eine DCC Nachricht geändert wird.
+
+				<div>snippet: openDCC config</div>
+				<pre><code>[caption=snippet: openDCC config, style=docC]
+				void CT16B0_chngPKT(Int8U model_adr[], Int8U model_cmd[], Int8U model_err[]){
+				  CT16B0_Stop();
+				  com_usb_output(">> stop timer to update model_cmd",33);
+				  com_usb_output(">> update signal string",23);
+				  model_period_timer = 0;
+				  model_period_count = 0;
+				  model_command_counter = 0;     
+				  int i = 0;
+				  for(i=15; i <= 22; i++){model_command[i] = model_adr[i-15];}
+				  for(i=24; i <= 31; i++){model_command[i] = model_cmd[i-24];}
+				  for(i=33; i <= 40; i++){model_command[i] = model_err[i-33];}
+				  CT16B0_Init(17241, 0);
+				  com_usb_output(model_command,42); 
+				  com_usb_output(">> reinit model_cmd send timer",30);   
+				}
+				</code></pre>
+
+				<h2>vb-Code (PC - MC)</h2>
+				<h3>Serielle Schnittstelle</h3>
+
+				<p>Für die Steuerung der Analge ist eine Oberfläche in Visual Basic realisiert worden. Von hier aus können über die serielle Schnittstelle Befehle ins System eingespeist werden. Zentrales Element der Anlage ist allerdings das Olimex Board, da von hier aus die openDCC Pakete wiederholt an die Modelbahn geschickt werden. Um die Oberfläche nutzen zu können muss lediglich die im Projektordner hinterlegte \grqq RSCOM.dll\grqq ins bin file der Visual Studio Umgebung kopiert werden.</p>
+
+				<img src="images/adc/gui_a.png">
+				<div>vb Benutzeroberfläche</div>
+
+				<p>Zunächst müssen COM und BAUD (9600) gewählt werden. Mit dem "Connect"-Button wird die Verbindung zum System aufgebaut.</p>
+				<p>Mit der Oberfläche lässt sich einmal die Modellbahn steuern sowie Befehle über UART an die HC Module absetzen bzw. empfangen. Dies geschieht über die Kommandozeile im Ausgabefenster rechts, vgl. hierzu Kapitel \ref{subsec:mcprotokoll}. Für die Steuerung der Modelbahn ist zusätzlich ein Kommandopanel implementiert, mit dem allerdings nur Geschwindigkeit und Fahrtrichtung verändert werden kann.</p>
+
+				<img src="images/adc/gui_b.png">
+				<div>vb Streckenmodell</div>
+
+				<p>Zusätzlich sind Erweiterungen für die Streckenvisualisierung vorgesehen. Hier sind allerdings nur die Voraussetzungen zu Konstruktion einer Strecke, sowie zur animierten Darstellung der aktuellen Position des Zuges lauffähig. Es gibt noch Keine synchronisation zur Versuchsstrecke. Das Fenster dazu ist über den Button Streckenmodell erreichbar.</p>
+				<p>Alternativ kann LabView oder ein anderes Programm genutzt werden, das direkte serielle Verbindungen unterstützt.</p>
+
+				
+				<!-- p{0.07\textwidth}p{0.4\textwidth}|p{0.53\textwidth}} -->
+				<table>
+				    \multicolumn{3}{l}{dll Abhängigkeiten für die serielle Verbindung} \\\midrule[1.5pt]
+				    \multicolumn{3}{l}{\docCode Declare Function OPENCOM Lib \grqq RSCOM\grqq (ByVal OpenString\$) As Integer} \\
+				    \multicolumn{3}{l}{\docCode Declare Sub BUFFERSIZE Lib \grqq RSCOM\grqq (ByVal b\%)} \\
+				    \multicolumn{3}{l}{\docCode Declare Sub CLOSECOM Lib \grqq RSCOM\grqq ()} \\
+				    \multicolumn{3}{l}{\docCode Declare Sub SENDBYTE Lib \grqq RSCOM\grqq (ByVal Dat\%)} \\
+				    \multicolumn{3}{l}{\docCode Declare Sub TXD Lib \grqq RSCOM\grqq (ByVal b\%)} \\
+				    \multicolumn{3}{l}{\docCode Declare Function INBUFFER Lib \grqq RSCOM\grqq () As Integer} \\
+				    \multicolumn{3}{l}{\docCode Declare Function READBYTE Lib \grqq RSCOM\grqq () As Integer} \\\midrule[1.5pt]
+				    \multicolumn{3}{l}{\docCode Public cmd\_direction As String = \grqq 011 \grqq} \\
+				    \multicolumn{3}{l}{\docCode Public cmd\_speed\_cnt As Integer = 0} \\
+				    \multicolumn{3}{l}{\docCode Private comPorts As Array} \\
+				    \multicolumn{3}{l}{\docCode Private comBauds(7) As Double} \\\midrule[1.5pt]
+
+
+				     & Name & Beschreibung \\    \midrule
+				    \docCode void  & \docCode com\_init() & Klasse initiieren \\    \midrule
+				    \docCode void  & \docCode com\_connect(ByVal comPort As String, ByVal comBaud As String) & serielle Verbindung herstellen \\    \midrule
+				    \docCode void  & \docCode com\_disconnect() & Verbindung trennen \\    \midrule
+				<tr></tr>
+				    \docCode Array & \docCode com\_getPorts() & Verfügbare Ports abrufen \\    \midrule
+				    \docCode Array & \docCode com\_getBauds() & Baud Raten abrufen \\    \midrule
+				<tr></tr>
+				    \docCode String & \docCode com\_setSpeed(ByVal setSpeed As Integer) &  \\    \midrule
+				    \docCode void   & \docCode com\_setDirection(ByVal setDirection As Integer) & \\    \midrule
+				<tr></tr>
+				    \docCode void    & \docCode com\_send(ByVal myCode As String) & seriell schreiben \\    \midrule
+				    \docCode String  & \docCode com\_receive() & seriell empfangen \\   \bottomrule[1.5pt]
+
+				</table>
+				<div>Serielles Interface für Windows: gui\_comKit.vb</div>
+
+				<div>snippet: VB com Klasse initiieren</div>
+				<pre><code>[caption=snippet: VB com Klasse initiieren, style=docVB]
+				    ' start/stop control
+				    Private Sub gui_initialize(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles MyBase.Load
+				        com.com_init()
+				        'get com ports
+				        Dim ports As Array = com.com_getPorts()
+				        gui_port.Items.Add("Select COM")
+				        For i = 0 To UBound(ports)
+				            gui_port.Items.Add(ports(i).ToString())
+				        Next
+				        gui_port.Text = gui_port.Items.Item(0)
+				        'get com Baud Rate
+				        Dim bauds As Array = com.com_getBauds()
+				        gui_baud.Items.Add("Select Baud")
+				        For i = 0 To UBound(bauds)
+				            gui_baud.Items.Add(bauds(i).ToString())
+				        Next
+				        gui_baud.Text = gui_baud.Items.Item(0)
+				    End Sub
+				</code></pre>
+				<div>snippet: VB serielle Verbindung herstellen</div>
+				<pre><code>[caption=snippet: VB serielle Verbindung herstellen, style=docVB]
+				    Private Sub gui_connect(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles btn_connect.Click
+				        com.com_connect(gui_port.Text, gui_baud.Text)
+				        gui_optic_connect()
+				    End Sub
+				</code></pre>
+				<div>snippet: VB schreiben/lesen mit den DLL-Funktionen</div>
+				<pre><code>[caption=snippet: VB schreiben/lesen, style=docVB]
+				    ' function to send data to mc
+				    Public Sub com_send(ByVal myCode As String)
+				        Dim myByte As Byte
+				        For i = 0 To (Len(myCode) - 1)
+				            myByte = Asc(myCode.Chars(i))
+				            If myByte < 0 Then
+				                myByte = 1
+				            ElseIf myByte > 255 Then
+				                myByte = 255
+				            ElseIf myByte < 96 And myByte > 123 Then
+				                UCase(myByte) 'capitalize letters
+				            End If
+				            SENDBYTE(myByte)
+				        Next i
+				        SENDBYTE(60)
+				        SENDBYTE(62)
+				    End Sub
+				    ' function to receive data from mc
+				    Public Function com_receive() As String
+				        TXD(1)
+				        If INBUFFER > 0 Then
+				            Return Chr(READBYTE)
+				        End If
+				        Return ""
+				    End Function
+				</code></pre>
+			</div>
+			<!-- content goes here -->
 			<footer>
 				<form class="c-1 r-1-4"></form>
 				<form class="c-1 r-2-4">
-					<img src="images/favicon.coyote.poly_white.b.png">
+					<img src="images/logos/fox.gray.png">
 				</form>
 				<form class="r-1-4">
 					<a href="#" call="call-mvp-test"></a>

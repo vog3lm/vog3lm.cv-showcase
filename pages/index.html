@@ -56,7 +56,6 @@
 					}
 					popup.css(style);
 					popup.html(data.content);
-					popup.css({'left':(pageWidth-popup.outerWidth())/2,'top':(pageHeight-popup.outerHeight())/2});
 					popup.removeClass('hide');
 					// bind hide listener, do only mouse down
 					// open click will close immedialtly else
@@ -94,7 +93,6 @@
 						// unbind hide listener
 						// unbind hide timer
 					} else {
-						popup.css({'left':(window.innerWidth-popup.outerWidth())/2,'top':(window.innerHeight-popup.outerHeight())/2});
 						popup.html('<div style="background-color:rgba(34,34,34,1);padding:0.75em">'+data.content+'</div>');
 						popup.removeClass('hide');
 						// bind hide listener, do only mouse down
@@ -349,11 +347,9 @@
 			this.page = {
 				'show':(data) => {
 					document.title = data.title;
-					var footer = $('footer section#content'); // add footer data
+					var footer = $('footer section#content');
 					footer.html(data.footer);
 					holder = $('footer');
-					footer.css({'top':(holder.outerHeight()-footer.outerHeight())/2
-							   ,'left':(holder.outerWidth()-footer.outerWidth())/2*0}) // center vertical, horizontal
 				}
 				,'clear':() => {
 					document.title = 'smart.cv.og3lm';
@@ -376,12 +372,13 @@
 						})
 					});
 
-					/* move to ... */
+					/* move to get from mvp oder so */
 					var url = null;
 					if(data.id.indexOf('hello') != -1){
 						url = 'images/portraits/me.pass_gate.jpg';
 					}
-					if(null != url){
+
+					if(null != url){ // main label
 						$('<img class="portrait" src="'+url+'">').load(function(){
 							var element = $(this);
 							element.appendTo('header section#content');
@@ -827,12 +824,25 @@
 			right:0em;
 		}
 
+
+		@media screen and (orientation:landscape){
+			header img#hello{
+				top:60%;
+				left:12.5%;
+				height:50%;
+				transform:translate(0,-50%);
+			}
+		}
+		@media screen and (orientation:portrait){
+			header img#hello{
+				top:62.5%;
+				left:55%;
+				width:70%;
+				transform:translate(-50%,-50%);
+			}
+		}
 		header img#hello{
 			position: absolute;
-			height:50%;
-		    top:60%;
-    		left:12.5%;
-    		transform:translate(0,-50%);
     		z-index:1;
     		cursor:pointer;
 		}
@@ -897,6 +907,10 @@
 			background-color:rgb(34,34,34);
 			color:rgb(255,255,255);
 		}
+		popup.flash{
+			background-color:rgb(255,0,170);
+			color:rgb(34,34,34);
+		}
 
 
 		@media screen and (min-width:1024px){
@@ -911,7 +925,6 @@
 				font-size:2em;
 			}
 		}
-
 
 		footer section p{
 			margin-top:1em;
@@ -968,33 +981,6 @@
 			width:calc(100% - 32px);
 		}
 
-
-
-
-
-		/* unused right now */
-		tip{
-			/* move to design element file */
-			position:fixed;
-			visibility:hidden; /* tootip effect */
-			opacity:0;
-			transition:opacity 0.5s;
-			min-height:calc(2.5em - 10px);
-			/* move to design theme file */
-			font-size:1rem;
-			background-color:rgba(34,34,34,1);
-			color:rgba(187,187,187,1);
-			padding:13px;
-			border-radius:7px;
-		}
-		/* dynamically created animation.js */
-		scroll{
-			position:absolute;
-			top:0px;
-			width:100%;
-			height:100%;
-			overflow:hidden;
-		}
 	</style>
 </head>
 <body>
@@ -1077,6 +1063,5 @@
 			<a href="#" class="fa fa-github" call="animation-colors"></a>
 		</edge>
 	</footer>
-	<tip></tip>
 </body>
 </html>

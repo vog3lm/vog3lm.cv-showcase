@@ -28,8 +28,105 @@
 	<script type="text/javascript" src="js/animate.cv.js"></script>
 	<script type="text/javascript" src="js/animate.dots.js"></script>
 	<script type="text/javascript">
+
+		function PageSwipePresenter(){
+			var events = {
+			    'start-x-swipe':(data) => {this.start();}
+			    ,'prev-x-swipe':(data) => {this.prev();}
+			    ,'next-x-swipe':(data) => {this.next();}
+			    ,'show-x-swipe':(data) => {this.create(data.index);}
+			};
+			var args = {'parent':null,'id':null,'tag':'playground','start':0,'mode':'children','distance':1,'before':()=>{return true},'after':()=>{}}
+			var swipeParent = null;
+			var swipeMax = 0;
+			var swipePages = 0;
+			this.decorate = function(opts){
+				decorate(args,opts);
+				return this;
+			}
+			this.create = function(dispatcher){
+				errors = [];
+				if(null == args.parent){
+					errors.push('swipe presenter parent not set')
+				}
+				if(null == args.id){
+					errors.push('swipe presenter parent not set')
+				}
+				if(0 < errors.length){
+					console.error(errors);
+					return this
+				}
+				var tmp = {};
+				for(key in events){
+					tmp[key.replace('x',args.id)] = events[key];
+				}
+				events = tmp;
+				if(dispatcher){dispatcher.onAppend({'events':Object.keys(events),'issues':Object.values(events)});}
+				return this;
+			}
+			this.start = function(){
+				swipeParent = $(args.parent);
+				swipeParent.attr('index',args.start);
+				swipePages = swipeParent.find(args.tag).length;
+				swipeMax = swipePages;
+				if('relative' === args.mode){swipeMax=swipePages-args.distance;} // swipe 3 childs 3 swipes 
+				else{swipePages=swipePages-1;} // swipe child width (3 childs 2 swipes)
+				this.show(args.start);
+				return this
+			}
+			this.index = function(){return parseInt(swipeParent.attr('index'));}
+			this.next = function(){
+				if(!args.before()){return index;}
+				var index = parseInt(swipeParent.attr('index'));
+				if(index == swipePages){return index;}
+				index = index+1;
+				if(index == swipePages){$('a.fa-chevron-right').addClass('hide');} 
+				else if(index == 1){$('a.fa-chevron-left').removeClass('hide');}
+				swipeParent.attr('index',index);
+				swipeParent.scrollLeft(distance(index));
+				args.after();
+				console.log('newxt swieedfsf',swipeMax,args);
+				return index;
+			}
+			this.prev = function(){
+				if(!args.before()){return index;}
+				var index = parseInt(swipeParent.attr('index'));
+				if(index == 0){return index;} 
+				index = index-1;
+				if(index == 0){$('a.fa-chevron-left').addClass('hide');} 
+				else if(index == swipePages-1){$('a.fa-chevron-right').removeClass('hide');}					
+				swipeParent.attr('index',index);
+				swipeParent.scrollLeft(distance(index));
+				args.after();
+				return index;
+			}
+			this.show = function(index){
+				if(!args.before()){return index;}
+				if(0 > index){index = 0;}
+				else if(swipeMax < index){index = swipeMax;} 
+				if(index == 0){$('a.fa-chevron-left').addClass('hide');} 
+				else{$('a.fa-chevron-left').removeClass('hide');}
+				if(index == swipeMax){$('a.fa-chevron-right').addClass('hide');}
+				else{$('a.fa-chevron-right').removeClass('hide');}
+				swipeParent.attr('index',index);
+				swipeParent.scrollLeft(distance(index));
+				args.after();
+				return index;
+			}
+			function distance(index){
+				if('relative' == args.mode){return index*swipeParent.width()*swipeMax/swipePages;}
+				else{
+					var scrollValue = 0;
+					for(var i=0;i<index;i++){
+						scrollValue=scrollValue+swipeParent.find(args.tag+':nth-child('+(i+1)+')').width();
+					};
+					return scrollValue;
+				}
+			}
+		}
+
 		function PageContentPresenter(){
-			this.interval = null; /* cold start relevant */
+			var interval = null; /* cold start relevant */
 			this.popup = {
 				'show':(data) => {
 					var popup = $('popup');
@@ -57,51 +154,33 @@
 					popup.css(style);
 					popup.html(data.content);
 					popup.removeClass('hide');
-					// bind hide listener, do only mouse down
-					// open click will close immedialtly else
-					var ops = $(':not(popup)')
-					ops.on("mousedown",function(e){
+					/* 	bind hide listener on everything but popup and 
+						children do only mouseup will close after clicked 
+					*//* TODO:not working properly. */
+					var ops = $('header').not('popup, popup *');
+					ops.on("mouseup",function(e){
 						popup.addClass('hide');
-						ops.off("mousedown")
+						ops.off("mouseup");
 					});
-					// bind hide timer
+					/* bind hide timer */
 					var timeout = data.timeout;
 					if(Number.isInteger(timeout)){
 						setTimeout(function(){
 							popup.addClass('hide');
-							ops.off("mousedown")
+							ops.off("mouseup")
 						},5000);
 					}else if(null === timeout || false === timeout){
+						/* close by click only */
 					}else{
 						setTimeout(function(){
 							popup.addClass('hide');
-							ops.off("mousedown")
+							ops.off("mouseup")
 						},5000);
 					}
-
 				}
 				,'hide':() => {
 					$('popup').addClass('hide');
 					$(':not(popup)').off("mousedown")
-				}
-				,'toggle':(data) => {
-					var popup = $('popup');
-					var ops = $(':not(popup)')
-					if(!popup.hasClass('hide')){ // hide
-						popup.html('');
-						popup.addClass('hide');
-						// unbind hide listener
-						// unbind hide timer
-					} else {
-						popup.html('<div style="background-color:rgba(34,34,34,1);padding:0.75em">'+data.content+'</div>');
-						popup.removeClass('hide');
-						// bind hide listener, do only mouse down
-						// open click will close immedialtly else
-						ops.on("mousedown",function(e){
-							popup.addClass('hide');
-							ops.off("mousedown")
-						});
-					}
 				}
 			}
 			this.cfg = {
@@ -200,9 +279,8 @@
 					overlay.removeClass('hide');
 				}
 				,'hide':() => {
-					$('body overlay').each(function(){
-						$(this).remove();
-					})
+					$('body overlay').each(function(){$(this).remove();});
+					if(null != interval){window.clearInterval(interval)}
 				}
 				,'page':() => {
 					var overlay = $('<overlay></overlay>');
@@ -240,108 +318,12 @@
 						var c=parseInt(e.text());
 						if(0!=c){e.text((c-1));}
 						else{
-							clearInterval(i);
-							$('body overlay').each(function(){
-								$(this).remove();
-							})
-							var overlay = $('<overlay></overlay>');
-							overlay.html('<div style="height:100%;width:100%;color:black;">'
-										+'<img style="position:absolute;height:25%;left:50%;top:50%;transform:translate(-50%,-50%);" src="images/logos/fox.gray.png">'
-										+'<p style="position:absolute;left:50%;top:65%;transform:translate(-50%,0%);text-align:center;">'+data.id+' lädt...</p>'
-									+'</div>');
-							overlay.appendTo('footer');
+							window.clearInterval(interval);
+							this.hide();
+							this.footer({'load':data.id+' lädt...'});
 							$("body").trigger("call-mvp",{"call":"call-mvp","id":data.id,"q":data.q});
 						}
 					},1000);
-				}
-			}
-			/* swipe args */
-			var swipeMax = 0;
-			var swipePages = 0;
-			var swipeStart = 0;
-			/* swipe args */
-			this.swipe = {
-				'initialize':() => {
-					var header = $('header section#content');
-					header.attr('index',swipeStart);
-					swipePages = header.find('playground').length;
-					swipeMax = swipePages-1;
-					this.swipe.show({'index':swipeStart});
-				}
-				,'index':() => {return parseInt($('header section#content').attr('index'));}
-				,'next':() => {
-					if($("body").hasClass('scroll-flag')){
-						return index;
-					}
-					var header = $('header section#content');
-					var index = parseInt(header.attr('index'));
-					if(index == swipePages){
-						return index;
-					}
-					// SWIPE HTML NEXT UI UPDATE //
-					index = index+1;
-					if(index == swipePages){
-						$('a.fa-chevron-right').addClass('hide');
-					} else if(index == 1){
-						$('a.fa-chevron-left').removeClass('hide');
-					}
-					header.attr('index',index);
-					var footer = $('footer section#content');
-					footer.attr('index',index);
-					// SWIPE HTML NEXT UI UPDATE //
-					// scroll page
-					header.scrollLeft(index*header.width()*swipeMax/swipePages);
-
-					// scroll canvas
-					return index;
-				}
-				,'prev':() => {
-					if($("body").hasClass('scroll-flag')){
-						return index;
-					}
-					var header = $('header section#content');
-					var index = parseInt(header.attr('index'));
-					if(index == 0){
-						return index;
-					} 
-					// SWIPE HTML PREVIOUS UI UPDATE //
-					index = index-1;
-					if(index == 0){
-						$('a.fa-chevron-left').addClass('hide');
-					} else if(index == swipePages-1){
-						$('a.fa-chevron-right').removeClass('hide');
-					}					
-					header.attr('index',index);
-					var footer = $('footer section#content');
-					footer.attr('index',index);
-					// SWIPE HTML PREVIOUS UI UPDATE //
-					header.scrollLeft(index*header.width()*swipeMax/swipePages);
-					// scroll canvas
-					return index;
-				}
-				,'show':(data) => {
-					if($("body").hasClass('scroll-flag')){
-						this.footer.hide();
-					}
-					var header = $('header section#content');
-					var index = data.index;
-					if(0 > index || swipeMax < index){
-						return index;
-					} 
-					if(index == 0){
-						$('a.fa-chevron-left').addClass('hide');
-					} else {
-						$('a.fa-chevron-left').removeClass('hide');
-					}
-					if(index == swipeMax){
-						$('a.fa-chevron-right').addClass('hide');
-					} else {
-						$('a.fa-chevron-right').removeClass('hide');
-					}
-					header.attr('index',index);
-					var footer = $('footer section#content');
-					footer.attr('index',index);
-					return index;
 				}
 			}
 			this.page = {
@@ -371,24 +353,6 @@
 							,'top':(window.innerHeight*0.3/2-element.height()/2)+'px'
 						})
 					});
-
-					/* move to get from mvp oder so */
-					var url = null;
-					if(data.id.indexOf('hello') != -1){
-						url = 'images/portraits/me.pass_gate.jpg';
-					}
-
-					if(null != url){ // main label
-						$('<img class="portrait" src="'+url+'">').load(function(){
-							var element = $(this);
-							element.appendTo('header section#content');
-							element.css({
-								'left':(window.innerWidth*0.00)+'px'
-								,'top':(window.innerHeight*0.3/2-element.height()/2)+'px'
-							});
-							
-						});
-					}
 				}
 				,'arrange':(data) => {
 					if(null == data.id){
@@ -399,7 +363,6 @@
 					$('a.fa-chevron-right').css({'visibility':'visible'}); // show ui chevrons
 					$('a.fa-chevron-left').css({'visibility':'visible'});
 					document.title = 'smart.cv.og3lm';
-					$('header section#content img.portrait').remove();
 					$('footer section#content').attr('view','empty');
 					$('footer edge.hr a.fa-download').attr('q','unset');
 				}
@@ -477,11 +440,11 @@
 			var fox = new FoxNetHolder().operator.decorate(animations.fox).interlink(dots).create().start();
 			var cv = new CvAnimationHolder().operator.decorate(animations.cv).create().start(); // moving labels
 
-			var presenter = new PageContentPresenter();
 			var adapter = new PagePresentationAdapter();
+			var presenter = new PageContentPresenter();
+			var swipeHead = new PageSwipePresenter();
 
 			var args = {'token':'unset','authenicate':'unset'};
-
 			var events = {
 				'rating-toggle':(data) => {
 					presenter.footer.toggle();
@@ -504,9 +467,11 @@
 						$('img.label').css({'visibility':'visible'}); // show all labels
 						$('a.fa-chevron-right').css({'visibility':'visible'}); // show ui chevrons
 						$('a.fa-chevron-left').css({'visibility':'visible'});
+						$('header section#content passport').remove();
+						$('header section#content passcroll').remove();
 						presenter.load.hide();
 					} else {
-						presenter.page.clear()
+						presenter.page.clear();
 						data.load = data.id+' lädt...'
 						presenter.load.footer(data);
 						$('body').trigger('call-mvp',{'call':'call-mvp','id':data.id,'q':data.q});
@@ -514,6 +479,24 @@
 						$('a.fa-chevron-right').css({'visibility':'hidden'}); // hide ui chevrons
 						$('a.fa-chevron-left').css({'visibility':'hidden'});
 						$('#'+data.id).css({'visibility':'visible'});
+						/* move to get from mvp oder so *//*
+							show images
+						*/
+						var passport = '<passport index="0">'
+								+ '<img index="0" src="images/portraits/me.pass_gate.jpg">'
+								+ '<img index="1" src="images/portraits/me.pass_front.jpg">'
+								+ '<img index="2" src="images/portraits/me.pass_reich.framed.jpg">'
+							+ '</passport>'
+						$('header section#content').append(passport);
+						var passport = '<passcroll index="1">'
+								+ '<a href="#" id="img-prev" class="fa fa-chevron-left"></a>'
+								+ '<a href="#" id="img-next" class="fa fa-chevron-right"></a>'
+							+ '</passcroll>'
+						$('header section#content').append(passport);
+						passport = $('passport');
+						swipePassport = new PageSwipePresenter().decorate({'parent':'passport','id':'passport','tag':'img','start':1}).create().start();
+						$('passcroll a.fa-chevron-left').on('click',function(){swipePassport.prev();});
+						$('passcroll a.fa-chevron-right').on('click',function(){swipePassport.next();});
 					}
 				}
 				,'cfg-toggle':(data) => {presenter.cfg.toggle();}
@@ -526,11 +509,12 @@
 					presenter.popup.show({'content':text});
 				}
 				,'project-toggle':(data) => {
-					var text = '<a href="">smart application</a>'
-							 + '<a href="">kleiner MUK</a>'
-							 + '<a href="">torcs race client</a>'
-							 + '<a href="">stalker rc</a>'
-					presenter.popup.show({'content':text});
+					var text = '<a href="https://github.com/vog3lm/vog3lm.cv-showcase">smart cv code</a>'
+							 + '<a href="https://github.com/vog3lm/scr.torcs">Torcs Race Client</a>'
+							 + '<a href="https://github.com/vog3lm/pi.muk">kleiner MUK</a>'
+					//		 + '<a href="https://github.com/vog3lm/scr.torcs">Outlaw Crypto Recorder</a>'
+					//		 + '<a href="">stalker rc</a>'
+					presenter.popup.show({'content':text,'timeout':null,'design':'dark'});
 				}
 				,'user-toggle':(data) => {
 					$('body').trigger('log-state',{'call':'log-state','id':'user-toggle','promise':function(response){
@@ -617,7 +601,7 @@
 			    }
 			    /* page/content */
 			    ,'get-start':(data) => {
-					presenter.swipe.initialize();
+					swipeHead.start();
 					var leed = window.localStorage.getItem('l');
 					window.localStorage.setItem('l',null);
 					if(leed && 'null' !== leed){
@@ -627,22 +611,22 @@
 					}
 			    }
 				,'get-next':(data) => {
-					var index = presenter.swipe.next();
+					var index = swipeHead.next();
 					$('body').trigger('history-push',{'call':'get-history','id':'get-next','index':index});
 				}
 				,'get-prev':(data) => {
-					var index = presenter.swipe.prev();
+					var index = swipeHead.prev();
 					$('body').trigger('history-push',{'call':'get-history','id':'get-prev','index':index});
 				}
 				,'get-history':(data) => {
 					presenter.footer.hide();
 					presenter.page.arrange(data);
 					cv.resume(); // wird immer schneller ?
-					if(data.direction == -1){presenter.swipe.prev();}
-					else if(data.direction == 1){presenter.swipe.next();}
+					if(data.direction == -1){swipeHead.prev();}
+					else if(data.direction == 1){swipeHead.next();}
 					else{
-						if(data.id.indexOf('get-next') != -1){presenter.swipe.prev();}
-						else if(data.id.indexOf('get-prev') != -1){presenter.swipe.next();}
+						if(data.id.indexOf('get-next') != -1){swipeHead.prev();}
+						else if(data.id.indexOf('get-prev') != -1){swipeHead.next();}
 						else{console.log('get history went wrong.',data.id,data.direction);}
 					}
 				}
@@ -660,12 +644,9 @@
 					//				 books read | gfs shit & prasentationen
 					// previous, next links
 					data = adapter.get(data);
-					data.index = presenter.swipe.index();
+					data.index = swipeHead.index();
 					presenter.page.show(data);
 					presenter.load.hide();
-					if(null != presenter.interval){
-						clearInterval(presenter.interval)
-					}
 				}
 				,'fail-mvp':(data) => {
 					presenter.load.hide();
@@ -751,6 +732,9 @@
 					$('footer img#after-effect').attr('src','images/after/after.foot.land.dark.png');
 				}
 				if(d){
+					swipeHead.decorate({'parent':'header section#content','id':'header','mode':'relative','before':()=>{
+						return !$("body").hasClass('scroll-flag');
+					}}).create(d);
 					d.onAppend({'events':Object.keys(events),'issues':Object.values(events)});
 				} else {
 					console.log('page listener','internal dispatcher used');
@@ -783,9 +767,11 @@
 			firebase.initializeApp(config);
 			new Mvp4p1Operator()/*.decorate({'url':'http://'+window.location.hostname+'/vog3lm-0x1/us-central1'})*/.create(dispatcher);
 			new PageEventListener().create(dispatcher);
+		//	new PageSwipePresenter().decorate({'parent':'header section#content','id':'header','before':()=>{
+		//		return !$("body").hasClass('scroll-flag');
+		//	}}).create(d); // done in event listener do here later
 			new D3s1gn4p1Operator().create(dispatcher);
 			new F1rebas3Auth4p1Operator(firebase).create(dispatcher);
-			//	new F1rebas3Storage4p1Operator(firebase).create(dispatcher);
 			new BrowserHistorD1spatcher().create(dispatcher);
 			new Keyboard4p1Operator().map(keymap).create();
 			new Swipe4p1Operator().map(gestures).create();
@@ -798,7 +784,6 @@
 		});
 	</script>
 	<style type="text/css">
-
 
 		header canvas#one{
 			transform:rotateY(30deg) scaleX(1.15);
@@ -880,30 +865,46 @@
 			max-height:168px;
 			min-height:56px;
 		}
-		header section#content img.portrait{
+		header section#content passport,
+		header section#content passcroll{
 			position:fixed;
-			/*height:216px;*/
+			left:32px;
+			top:15%;
+			transform:translate(0, -50%);
+			height:calc(30% - 64px);
 			max-height:27.5%;
+		    width:15%;
+		    overflow:hidden;
+		    display:flex;
 			z-index:1;
+		}
+		header section#content passport img{
+			height:100%;
+			padding-right:7px;
 		}
 
 
 
-		popup p{
+		popup p,
+		popup a{
 			margin-top:1em;
 			margin-bottom:1em;
 		}
-		popup p:first-child{
+		popup p:first-child,
+		popup a:first-child{
 			margin-top:0em;
 		}
-		popup p:last-child{
+		popup p:last-child,
+		popup a:last-child{
 			margin-bottom:0em;
 		}
-		popup.dark{
+		popup.dark,
+		popup.dark a{
 			background-color:rgb(255,255,255);
 			color:rgb(34,34,34);
 		}
-		popup.light{
+		popup.light,
+		popup.light a{
 			background-color:rgb(34,34,34);
 			color:rgb(255,255,255);
 		}

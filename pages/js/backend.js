@@ -1,5 +1,5 @@
 
-function HtmlCancasTool(animation){
+function HtmlCancasTool(animation){ /* used in animation.X.js move ? */
 	var holder = animation;
     this.canvasParse = (id) => {
         return document.getElementById(id);
@@ -31,34 +31,17 @@ function HtmlCancasTool(animation){
     }
 }
 
-
-/*
-function F1rebas3Storage4p1Operator(firebase){
-	var dispatcher = null;
-	var base = firebase.storage();
-	var events = {
-	    'storage-create':(data) => {this.create();}
-	    ,'storage-load':(data) => {
-			var reference = base.ref(data.url);
-			reference.getDownloadURL().then(function(url) {
-				console.log(url)
-			}).catch(function(error) {	// https://firebase.google.com/docs/storage/web/handle-errors 
-				console.error(error)
-			});
-		}
-	};
-	this.create = function(d){
-		if(d){
-			dispatcher = d;
-			dispatcher.onAppend({'events':Object.keys(events),'issues':Object.values(events)});
-		} else {
-			console.warn('firebase storage operator','internal dispatcher used');
-			dispatcher = new V13wEv3ntD1spatch3r().onDecorate({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
-		}
-		return this;
+function decorate(args,opts){
+	for(var key in opts) {
+	    if(args.hasOwnProperty(key)) {
+	    	if('events' !== key){
+	    		args[key] = opts[key];
+	    	}
+	    }
 	}
 }
-*/
+
+
 function F1rebas3Auth4p1Operator(firebase){
 	var base = firebase.auth();
 	var dispatcher = null;

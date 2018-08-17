@@ -62,16 +62,17 @@ header section#content{ /* main content container */
 
 
 header user{ /* user auth form */
+	display:inline-block;
 	height:32px;
 	width:100%;
 	overflow:hidden;
 }
 header user form,
 header user card{
-	display:inline-block;
 	width:calc(100% - 32px);
 	height:100%;
 	padding:0px;
+	float:right;
 }
 header user form input{
 	height:32px;
@@ -104,13 +105,24 @@ header a.fa-chevron-down{
 
 
 
-
+@media screen and (orientation:landscape){
+	body popup{
+		min-width:32px;
+	    max-width:calc(70% - 1.5em);
+	    min-height:32px;
+	    max-height:calc(60% - 1.5em);
+	}
+}
+@media screen and (orientation:portrait){
+	body popup{
+		min-width:32px;
+	    max-width:calc(90% - 1.5em);
+	    min-height:32px;
+	    max-height:calc(70% - 1.5em);
+	}
+}
 body popup {	/* movie split to font... */
 	position:fixed;
-	min-width:32px;
-    max-width:calc(100% - 1.5em);
-    min-height:32px;
-    max-height:calc(100% - 1.5em);
     top:50%;
     left:50%;
 	transform:translate(-50%, -50%);

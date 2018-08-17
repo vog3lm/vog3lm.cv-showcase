@@ -273,7 +273,7 @@
 				'show':(data) => {
 					var overlay = $('overlay');
 					overlay.html('<div style="height:100%;width:100%;color:black;">'
-								+'<img style="position:absolute;height:25%;left:50%;top:50%;transform:translate(-50%,-50%);" src="images/logos/fox.gray.png">'
+								+'<img style="position:absolute;height:25%;left:50%;top:50%;transform:translate(-50%,-50%);" src="images/logos/fox.gray.png"></img>'
 								+'<p style="position:absolute;left:50%;top:65%;transform:translate(-50%,0%);">Seite lädt...</p>'
 							+'</div>');
 					overlay.removeClass('hide');
@@ -285,7 +285,7 @@
 				,'page':() => {
 					var overlay = $('<overlay></overlay>');
 					overlay.html('<div style="height:100%;width:100%;color:black;">'
-								+'<img style="position:absolute;height:25%;left:50%;top:50%;transform:translate(-50%,-50%);" src="images/logos/fox.gray.png">'
+								+'<img style="position:absolute;height:25%;left:50%;top:50%;transform:translate(-50%,-50%);" src="images/logos/fox.gray.png"></img>'
 								+'<p style="position:absolute;left:50%;top:65%;transform:translate(-50%,0%);">Seite lädt...</p>'
 							+'</div>');
 					overlay.appendTo('body');
@@ -293,7 +293,7 @@
 				,'header':() => {
 					var overlay = $('<overlay></overlay>');
 					overlay.html('<div style="height:100%;width:100%;color:black;">'
-								+'<img style="position:absolute;height:25%;left:50%;top:50%;transform:translate(-50%,-50%);" src="images/logos/fox.gray.png">'
+								+'<img style="position:absolute;height:25%;left:50%;top:50%;transform:translate(-50%,-50%);" src="images/logos/fox.gray.png"></img>'
 								+'<p style="position:absolute;left:50%;top:65%;transform:translate(-50%,0%);">Seite lädt...</p>'
 							+'</div>');
 					overlay.appendTo('header');
@@ -301,7 +301,7 @@
 				,'footer':(data) => {
 					var overlay = $('<overlay></overlay>');
 					overlay.html('<div style="height:100%;width:100%;color:black;">'
-								+'<img style="position:absolute;height:25%;left:50%;top:50%;transform:translate(-50%,-50%);" src="images/logos/fox.gray.png">'
+								+'<img style="position:absolute;height:25%;left:50%;top:50%;transform:translate(-50%,-50%);" src="images/logos/fox.gray.png"></img>'
 								+'<p style="position:absolute;left:50%;top:65%;transform:translate(-50%,0%);text-align:center;">'+data.load+'</p>'
 							+'</div>');
 					overlay.appendTo('footer');
@@ -309,7 +309,7 @@
 				,'cold':(data)=>{
 					var overlay = $('<overlay></overlay>');
 					overlay.html('<div style="height:100%;width:100%;color:black;">'
-								+'<img style="position:absolute;height:25%;left:50%;top:50%;transform:translate(-50%,-50%);" src="images/logos/fox.gray.png">'
+								+'<img style="position:absolute;height:25%;left:50%;top:50%;transform:translate(-50%,-50%);" src="images/logos/fox.gray.png"></img>'
 								+'<p style="position:absolute;left:50%;top:65%;transform:translate(-50%,0%);text-align:center;">Firebase Cold Start Timeout<br>Auto retry in <cnt>'+data.load+'</cnt></p>'
 							+'</div>');
 					overlay.appendTo('footer');
@@ -365,6 +365,8 @@
 					document.title = 'smart.cv.og3lm';
 					$('footer section#content').attr('view','empty');
 					$('footer edge.hr a.fa-download').attr('q','unset');
+					$('header section#content passport').remove();
+					$('header section#content passcroll').remove();
 				}
 			}
 		}
@@ -483,9 +485,9 @@
 							show images
 						*/
 						var passport = '<passport index="0">'
-								+ '<img index="0" src="images/portraits/me.pass_gate.jpg">'
-								+ '<img index="1" src="images/portraits/me.pass_front.jpg">'
-								+ '<img index="2" src="images/portraits/me.pass_reich.framed.jpg">'
+								+ '<img index="0" src="images/portraits/me.pass_gate.jpg"></img>'
+								+ '<img index="1" src="images/portraits/me.pass_front.jpg"></img>'
+								+ '<img index="2" src="images/portraits/me.pass_reich.framed.jpg"></img>'
 							+ '</passport>'
 						$('header section#content').append(passport);
 						var passport = '<passcroll index="1">'
@@ -509,26 +511,30 @@
 					presenter.popup.show({'content':text});
 				}
 				,'project-toggle':(data) => {
-					var text = '<a href="https://github.com/vog3lm/vog3lm.cv-showcase">smart cv code</a>'
-							 + '<a href="https://github.com/vog3lm/scr.torcs">Torcs Race Client</a>'
-							 + '<a href="https://github.com/vog3lm/pi.muk">kleiner MUK</a>'
+					var text = '<h2>Code Samples</h2>'
+							 + '<a href="https://github.com/vog3lm/vog3lm.cv-showcase" class="wrap"><p class="fa fa-github"></p><p>smart cv code</p></a>'
+							 + '<a href="https://github.com/vog3lm/scr.torcs" class="wrap"><p class="fa fa-github"></p><p>Torcs Race Client</p></a>'
+							 + '<a href="https://github.com/vog3lm/pi.muk" class="wrap"><p class="fa fa-github"></p><p>kleiner MUK</p></a>'
 					//		 + '<a href="https://github.com/vog3lm/scr.torcs">Outlaw Crypto Recorder</a>'
 					//		 + '<a href="">stalker rc</a>'
 					presenter.popup.show({'content':text,'timeout':null,'design':'dark'});
 				}
 				,'user-toggle':(data) => {
 					$('body').trigger('log-state',{'call':'log-state','id':'user-toggle','promise':function(response){
-						var content = '<p>Name: '+response.name+'</p><p>Email: '
-										   +response.email+'</p><p>Phone: '
-										   +response.phone+'</p><p>User Id: '
-										   +response.uid+'</p><p>User Token: '
-										   +response.token+'</p>';
+						var content = '<h2>User Details</h2>'
+									+ '<p>Name: '+response.name+'</p><p>Email: '
+									+ response.email+'</p><p>Device: '
+									+ response.phone+'</p><p>User Id: '
+									+ response.uid+'</p><p>User Token: '
+									+ response.token+'</p>';
 						presenter.popup.show({'content':content,'timeout':null,'size':'match','design':'dark'});
 					}});
 
 				}
 				,'dox-toggle':(data) => {
-					var text = '<p>full stack application mvp architecture</p>'
+					var text = '<h2>Informationsblatt</h2>' 
+
+							 +'<p>full stack application mvp architecture</p>'
 
 							 + '<p>event driven user interface</p>'
 							 + '<p>dynamic backend analytics</p>'
@@ -724,13 +730,6 @@
 				}
 			}
 			this.create = function(d){
-				if(window.innerWidth < window.innerHeight){ // portrait
-					$('header img#after-effect').attr('src','images/after/after.head.port.dark.png');
-					$('footer img#after-effect').attr('src','images/after/after.foot.port.dark.png');
-				} else {
-					$('header img#after-effect').attr('src','images/after/after.head.land.dark.png');
-					$('footer img#after-effect').attr('src','images/after/after.foot.land.dark.png');
-				}
 				if(d){
 					swipeHead.decorate({'parent':'header section#content','id':'header','mode':'relative','before':()=>{
 						return !$("body").hasClass('scroll-flag');
@@ -812,24 +811,23 @@
 
 		@media screen and (orientation:landscape){
 			header img#hello{
-				top:60%;
-				left:12.5%;
-				height:50%;
-				transform:translate(0,-50%);
+				bottom:13%;
+				right:60%;
+				width:22%;
 			}
 		}
 		@media screen and (orientation:portrait){
 			header img#hello{
-				top:62.5%;
-				left:55%;
-				width:70%;
-				transform:translate(-50%,-50%);
+				bottom:12%;
+				right:21%;
+				width:50%;
 			}
 		}
 		header img#hello{
 			position: absolute;
     		z-index:1;
     		cursor:pointer;
+    		max-height:50%
 		}
 
 		header section#content playground{ /* moving labels */
@@ -865,6 +863,20 @@
 			max-height:168px;
 			min-height:56px;
 		}
+
+
+		@media screen and (orientation:landscape){
+			header section#content passport,
+			header section#content passcroll{
+				width:30%;
+			}
+		}
+		@media screen and (orientation:portrait){
+			header section#content passport,
+			header section#content passcroll{
+				width:50%;
+			}
+		}
 		header section#content passport,
 		header section#content passcroll{
 			position:fixed;
@@ -872,8 +884,6 @@
 			top:15%;
 			transform:translate(0, -50%);
 			height:calc(30% - 64px);
-			max-height:27.5%;
-		    width:15%;
 		    overflow:hidden;
 		    display:flex;
 			z-index:1;
@@ -886,25 +896,38 @@
 
 
 		popup p,
-		popup a{
-			margin-top:1em;
+		popup a,
+		popup h2{
 			margin-bottom:1em;
 		}
-		popup p:first-child,
-		popup a:first-child{
-			margin-top:0em;
+		popup h2{
+			margin-right:2em;
+		}
+		popup a,
+		popup h2{
+			white-space:nowrap;
+			display:inline-flex;
+		}
+		popup a.wrap p{
+		    margin:0 1em 0 0;
+		    float:left;
+		    line-height:32px;
+		    vertical-align:middle;
 		}
 		popup p:last-child,
-		popup a:last-child{
+		popup a:last-child,
+		popup h2:last-child{
 			margin-bottom:0em;
 		}
 		popup.dark,
-		popup.dark a{
+		popup.dark a,
+		popup.dark h2{
 			background-color:rgb(255,255,255);
 			color:rgb(34,34,34);
 		}
 		popup.light,
-		popup.light a{
+		popup.light a,
+		popup.light h2{
 			background-color:rgb(34,34,34);
 			color:rgb(255,255,255);
 		}
@@ -968,6 +991,10 @@
 		footer section table td:nth-child(even){
 			text-align:center;
 		}
+		footer a.fa-chevron-down{
+			position:absolute;
+			z-index:1;
+		}
 
 
 
@@ -986,8 +1013,8 @@
 </head>
 <body>
 	<header id="zone">
-		<img id="after-effect" class="after-effect" src="" alt="after.head.x.png">
-		<img class="label" call="hello-toggle" q="6PW2gsYzD" id="hello" src="images/labels/hello.world.png"></img>
+		<img id="after-effect" class="after-effect" src="" alt="after.head.x.png"></img>
+		<img class="label" call="hello-toggle" q="6PW2gsYzD" id="hello" src=""></img>
 		<section id="content" index="0">
 			<playground index="2">
 				<img class="label m" call="rating-toggle" q="uiLT6kFBG" id="tutor" src="images/labels/hs.tutor.png"></img>
@@ -1054,7 +1081,8 @@
 		<popup class="hide"></popup>
 	</header>
 	<footer>
-		<img id="after-effect" class="after-effect" src="" alt="after.foot.x.png">
+		<img id="after-effect" class="after-effect" src="" alt="after.foot.x.png"></img>
+		<a href="#" id="close-footer" class="fa fa-chevron-down" call="rating-toggle"></a>
 		<edge class="hr">
 			<a href="#" class="fa fa-download" q="unset" call="origin-download"></a>
 			<a href="#" class="fa fa-print" q="unset" call="origin-print"></a>

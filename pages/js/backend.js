@@ -322,6 +322,14 @@ function D3s1gn4p1Operator(){
 		}catch(error){
 			console.error(error);
 		}
+		if(0 == window.orientation){ // portrait
+			$('header img#after-effect').attr('src','images/after/port.head.'+args.design+'.png');
+			$('footer img#after-effect').attr('src','images/after/port.foot.'+args.design+'.png');
+		} else {
+			$('header img#after-effect').attr('src','images/after/land.head.'+args.design+'.png');
+			$('footer img#after-effect').attr('src','images/after/land.foot.'+args.design+'.png');
+		}
+		$('header img#hello').attr('src','images/labels/hello.world.'+args.design+'.png');
 		return this;
 	}
 	this.design = function(){return args.design;}
@@ -337,12 +345,21 @@ function D3s1gn4p1Operator(){
 			src = src.replace(args.design,'dark');
 			args.design = 'dark';
 			document.querySelector('meta[name="theme-color"]').setAttribute("content",'#222222');
+			var element = $('header img#after-effect');
+			element.attr('src',element.attr('src').replace('white','dark'));
+			element = $('footer img#after-effect');
+			element.attr('src',element.attr('src').replace('white','dark'));
 		}
 		else{
 			src = src.replace(args.design,'white');
 			args.design = 'white';
 			document.querySelector('meta[name="theme-color"]').setAttribute("content",'#ffffff');
+			var element = $('header img#after-effect');
+			element.attr('src',element.attr('src').replace('dark','white'));
+			element = $('footer img#after-effect');
+			element.attr('src',element.attr('src').replace('dark','white'));
 		}
+		$('header img#hello').attr('src','images/labels/hello.world.'+args.design+'.png');
 		cssAdd(src);
 	}
 
@@ -526,8 +543,10 @@ function Swipe4p1Operator(){
 			});
 		}
 		if(mapping.hasOwnProperty('orientationchange')){
-			$(document).on("orientationchange",function(event){
-				console.log('orientationchange',event.orientation,event)
+			$(window).on("orientationchange",function(event){
+				var tmp = mapping["swiperight"];
+				$('body').trigger(tmp.call,{'call':tmp.call,'id':'swiperight'});
+				$('body').trigger('design-create',{'call':'design-create','id':'orientationchange'});
 			});
 		}
 	    return this;
@@ -636,8 +655,15 @@ function V13wEv3ntD1spatch3r(){
     		throw 'view event dispachter not decorated. call onDecorate/onAppend first!'
     		return this;
     	}
-		for (var i=0; i<events.length; i++) {
-            $('body').on(events[i],selfDispatch);
+        var registered = [];
+		for (var i=0; i<events.length; i++){
+            /* register events only one time! */
+            if(!registered.includes(events[i])){
+                var evt = events[i];
+                $('body').on(evt,selfDispatch);
+                registered.push(evt);
+            }
+            
         };
         return this;
     }
@@ -676,11 +702,14 @@ function V13wEv3ntD1spatch3r(){
 	    	if(events == null || issues == null){
 	    		throw 'view event dispachter not decorated. call onDecorate first!'
 	    	}
-            index = events.indexOf(evt.type)
-            if(index < 0){
+            if(events.indexOf(evt.type) < 0){
                 throw 'view event Intel not Found!'
             }
-            issues[index](data)
+            for(var i=0;i<events.length;i++){
+                if(events[i] === evt.type){
+                    issues[i](data);
+                }
+            }
         } catch(error) {
         	$('body').trigger('loading-stop');
             console.error(error)

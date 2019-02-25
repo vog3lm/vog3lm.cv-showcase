@@ -322,11 +322,16 @@ function FoxNetSetting(){
 function FoxNetAnimation(animation){
     var holder = animation;
     holder.operator = this;
+    /* non event access methods */
     this.decorate = function(opts){
         holder.setting.decorate(opts);
         return this;
     }
-    this.create = () => {
+    this.create = function(dispatcher){
+        if(dispatcher){
+            dispatcher.onAppend({'events':Object.keys(holder.listener.events),'issues':Object.values(holder.listener.events)});
+        }
+
         var canvas = holder.util.canvasCreate();
         var args = holder.setting.args;
         canvas.id = args.paneId
@@ -388,32 +393,25 @@ function FoxNetAnimation(animation){
         
         return this;
     }
-    this.validate = () => {
+    this.validate = function(){
         return this;
     }
-    this.interlink = (connectors) => {
+    /* hybrid access methods */
+    this.interlink = function(connectors){
         holder.objects.link = connectors;
         return this;
     }
-    this.start = (mode='any') => {
+    this.start = function(mode='any'){
         holder.engine.start();
-        return this;
+        return holder;
     }
 }
 function FoxNetListener(animation){
     var holder = animation;
-    var events = {
-        'dot-net-decorate':(data) => {holder.operator.decorate(opts);}
-       ,'dot-net-create':(data) => {holder.operator.create();}
-       ,'dot-net-refresh':(data) => {holder.operator.refresh();}
-       ,'dot-net-start':(data) => {holder.operator.start();}
-       ,'dot-net-lock':(data) => {holder.operator.lock();}
-       ,'dot-net-stop':(data) => {holder.operator.stop();}
-    }
-    for (var i=0; i<events.length; i++) {
-        $('body').on(events[i],function(evt,data){
-            events[i](data);
-        });
+    this.events = {
+//       'fox-net-refresh':(data) => {holder.operator.refresh();}
+       'fox-net-start':(data) => {holder.operator.start();}
+//       ,'fox-net-stop':(data) => {holder.operator.stop();}
     }
 }
 function FoxNetObjects(){
@@ -426,7 +424,7 @@ function FoxNetObjects(){
     this.scouts = [];
 }
 function FoxNetHolder(){
-    var listener = new FoxNetListener(this);
+    this.listener = new FoxNetListener(this);
     this.operator = new FoxNetAnimation(this);
     this.objects = new FoxNetObjects();
     this.engine = new FoxNetEngine(this);

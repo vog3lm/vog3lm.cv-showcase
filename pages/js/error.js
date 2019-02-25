@@ -197,7 +197,7 @@ function Med1aPlay3r4p1Operator(){
 	this.tag = function(){return args.tag;}
 	this.id = function(){return args.id;}
 }
-function Fl4chM3ss4g34piOperator(){
+function Fl4shM3ss4g34piOperator(){
 	var events = {
 		'error-flash':(data) => {this.error(data);}
 		,'info-flash':(data) => {}

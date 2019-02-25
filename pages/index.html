@@ -6,9 +6,9 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 	<title>smart.cv.og3lm</title>
 	<link rel="manifest" href="/manifest.json"/>
-	<link rel="stylesheet" href="css/font.awesome.min.css"/>
-    <link rel="stylesheet" href="css/font.geometry.css"/>
-    <link rel="stylesheet" href="css/design.geometry.css"/>
+	<link rel="stylesheet" type="text/css" href="css/font.awesome.min.css" media="screen,print"/>
+    <link rel="stylesheet" type="text/css" href="css/font.geometry.css" media="screen"/>
+    <link rel="stylesheet" type="text/css" href="css/design.geometry.css" media="screen"/>
     <!-- PRELOAD FONTS -->
     <link rel="preload" href="fonts/UbuntuMono-R.ttf" as="font" crossorigin="anonymous" />
     <link rel="preload" href="fonts/MyriadPro-Light.woff" as="font" crossorigin="anonymous" />
@@ -29,372 +29,52 @@
 	<script type="text/javascript" src="js/animate.dots.js"></script>
 	<script type="text/javascript">
 
-		function PageSwipePresenter(){
-			var events = {
-			    'start-x-swipe':(data) => {this.start();}
-			    ,'prev-x-swipe':(data) => {this.prev();}
-			    ,'next-x-swipe':(data) => {this.next();}
-			    ,'show-x-swipe':(data) => {this.create(data.index);}
-			};
-			var args = {'parent':null,'id':null,'tag':'playground','start':0,'mode':'children','distance':1,'before':()=>{return true},'after':()=>{}}
-			var swipeParent = null;
-			var swipeMax = 0;
-			var swipePages = 0;
-			this.decorate = function(opts){
-				decorate(args,opts);
-				return this;
-			}
-			this.create = function(dispatcher){
-				errors = [];
-				if(null == args.parent){
-					errors.push('swipe presenter parent not set')
+		/* @job :: dto to content adapter */
+		function PageContentAdapter(){
+			/* adapter meta.tag interface */
+			this.get = function(data){
+				var meta = data.meta;
+				if('success' === meta.state){
+					if('samples' === meta.tag){return this.samples(data.recs);}
+					else if('leed' === meta.tag){return text(data.recs);}
+					else{return this.mixed(data.recs,data.id);} 
 				}
-				if(null == args.id){
-					errors.push('swipe presenter parent not set')
-				}
-				if(0 < errors.length){
-					console.error(errors);
-					return this
-				}
-				var tmp = {};
-				for(key in events){
-					tmp[key.replace('x',args.id)] = events[key];
-				}
-				events = tmp;
-				if(dispatcher){dispatcher.onAppend({'events':Object.keys(events),'issues':Object.values(events)});}
-				return this;
-			}
-			this.start = function(){
-				swipeParent = $(args.parent);
-				swipeParent.attr('index',args.start);
-				swipePages = swipeParent.find(args.tag).length;
-				swipeMax = swipePages;
-				if('relative' === args.mode){swipeMax=swipePages-args.distance;} // swipe 3 childs 3 swipes 
-				else{swipePages=swipePages-1;} // swipe child width (3 childs 2 swipes)
-				this.show(args.start);
-				return this
-			}
-			this.index = function(){return parseInt(swipeParent.attr('index'));}
-			this.next = function(){
-				if(!args.before()){return index;}
-				var index = parseInt(swipeParent.attr('index'));
-				if(index == swipePages){return index;}
-				index = index+1;
-				if(index == swipePages){$('a.fa-chevron-right').addClass('hide');} 
-				else if(index == 1){$('a.fa-chevron-left').removeClass('hide');}
-				swipeParent.attr('index',index);
-				swipeParent.scrollLeft(distance(index));
-				args.after();
-				console.log('newxt swieedfsf',swipeMax,args);
-				return index;
-			}
-			this.prev = function(){
-				if(!args.before()){return index;}
-				var index = parseInt(swipeParent.attr('index'));
-				if(index == 0){return index;} 
-				index = index-1;
-				if(index == 0){$('a.fa-chevron-left').addClass('hide');} 
-				else if(index == swipePages-1){$('a.fa-chevron-right').removeClass('hide');}					
-				swipeParent.attr('index',index);
-				swipeParent.scrollLeft(distance(index));
-				args.after();
-				return index;
-			}
-			this.show = function(index){
-				if(!args.before()){return index;}
-				if(0 > index){index = 0;}
-				else if(swipeMax < index){index = swipeMax;} 
-				if(index == 0){$('a.fa-chevron-left').addClass('hide');} 
-				else{$('a.fa-chevron-left').removeClass('hide');}
-				if(index == swipeMax){$('a.fa-chevron-right').addClass('hide');}
-				else{$('a.fa-chevron-right').removeClass('hide');}
-				swipeParent.attr('index',index);
-				swipeParent.scrollLeft(distance(index));
-				args.after();
-				return index;
-			}
-			function distance(index){
-				if('relative' == args.mode){return index*swipeParent.width()*swipeMax/swipePages;}
-				else{
-					var scrollValue = 0;
-					for(var i=0;i<index;i++){
-						scrollValue=scrollValue+swipeParent.find(args.tag+':nth-child('+(i+1)+')').width();
-					};
-					return scrollValue;
-				}
-			}
-		}
-
-		function PageContentPresenter(){
-			var interval = null; /* cold start relevant */
-			this.popup = {
-				'show':(data) => {
-					var popup = $('popup');
-					var pageWidth = $(window);
-					var pageHeight = pageWidth.height();
-					pageWidth = pageWidth.width();
-					var style = {};
-					if(data.hasOwnProperty('design')){popup.addClass(data.design);}
-					else{popup.addClass('dark');}
-					if(data.hasOwnProperty('opacity')){style['opacity'] = data.opacity;}
-					if(data.hasOwnProperty('padding')){style['padding'] = data.padding;}
-					if(data.hasOwnProperty('size')){
-						var size = data.size;
-						if('full' === size){
-							style['width'] = '100%';
-							style['height'] = '100%';
-						}else if('half' === size){
-							style['width'] = '50%';
-							style['height'] = '50%';
-						}else if('match' === size){
-							if(pageWidth > pageHeight){style['width'] = '50%';}
-							else{style['width'] = '80%';}
-						}
-					}
-					popup.css(style);
-					popup.html(data.content);
-					popup.removeClass('hide');
-					/* 	bind hide listener on everything but popup and 
-						children do only mouseup will close after clicked 
-					*//* TODO:not working properly. */
-					var ops = $('header').not('popup, popup *');
-					ops.on("mouseup",function(e){
-						popup.addClass('hide');
-						ops.off("mouseup");
-					});
-					/* bind hide timer */
-					var timeout = data.timeout;
-					if(Number.isInteger(timeout)){
-						setTimeout(function(){
-							popup.addClass('hide');
-							ops.off("mouseup")
-						},5000);
-					}else if(null === timeout || false === timeout){
-						/* close by click only */
-					}else{
-						setTimeout(function(){
-							popup.addClass('hide');
-							ops.off("mouseup")
-						},5000);
-					}
-				}
-				,'hide':() => {
-					$('popup').addClass('hide');
-					$(':not(popup)').off("mousedown")
-				}
-			}
-			this.cfg = {
-				'toggle':(views) => {
-					$('nav#cfg-navigation').toggleClass('hide');
-				}
-			}
-			this.footer = {
-				'show':() => {
-					var element = $("body")
-					element.scrollTop($('footer').height());
-					element.addClass('scroll-flag');
-				}
-				,'hide':() => {
-					var element = $("body");
-					element.scrollTop(0);
-					element.removeClass('scroll-flag');
-				}
-				,'toggle':() => {
-					var flag = null;
-					var element = $("body")
-					if(!element.hasClass('scroll-flag')){
-						element.scrollTop($('footer').height());
-						flag = false;
-					}else{
-						element.scrollTop(0);
-						flag = true;
-					}
-					element.toggleClass('scroll-flag');
-					return flag;
-				}
-				,'open':() => {
-					var element = $("body")
-					if(element.hasClass('scroll-flag')){
-						return true;
-					}else{
-						return false;
-					}
-				}
-			}
-			this.login = {
-				'show':(views) => {
-					var tag = $('user');
-					tag.find('form').removeClass('hide');
-					var tmp = tag.find('a.fa-hashtag');
-				//	tmp.removeClass('fa-hashtag'); // feels bad!
-				//	tmp.addClass('fa-lock');
-					tmp.attr('call','login-hide');
-					tmp.attr('title','Hide Login');
-					tag.find('input#mail').focus();
-				}
-				,'hide':() => {
-					var tag = $('user');
-					tag.find('form').addClass('hide');
-					var tmp = tag.find('a.fa-hashtag');
-					tmp.attr('call','login-show');
-					tmp.attr('title','Show Login');
-				}
-				,'toggle':(views) => {
-					var tag = $('user')
-					if(tag.find('form').hasClass('hide')){
-						tag.find('form').removeClass('hide');
-						var element = tag.find('a.fa-hashtag');
-						element.attr('call','login-hide');
-						element.attr('title','Hide Login');
-					} else { // show
-						tag.find('form').addClass('hide');
-						var element = tag.find('a.fa-hashtag');
-						element.attr('call','login-show');
-						element.attr('title','Show Login');
-					}
-				}
-				,'clear':() => {
-					var tag = $('user');
-					tag.find('card').addClass('hide');
-					tag.find('input#mail').val('');
-					tag.find('input#pass').val('');
-					tag.find('id').html('');
-				}
-				,'user':(data) => {
-					var tag = $('user');
-					tag.find('card').removeClass('hide');
-					var element = tag.find('a.fa-hashtag');
-					element.attr('call','log-out');
-					element.attr('title','Logout');
-					tag.find('id').html(data.mail);
-				}
-			}
-			this.load = {
-				'show':(data) => {
-					var overlay = $('overlay');
-					overlay.html('<div style="height:100%;width:100%;color:black;">'
-								+'<img style="position:absolute;height:25%;left:50%;top:50%;transform:translate(-50%,-50%);" src="images/logos/fox.gray.png"></img>'
-								+'<p style="position:absolute;left:50%;top:65%;transform:translate(-50%,0%);">Seite lädt...</p>'
-							+'</div>');
-					overlay.removeClass('hide');
-				}
-				,'hide':() => {
-					$('body overlay').each(function(){$(this).remove();});
-					if(null != interval){window.clearInterval(interval)}
-				}
-				,'page':() => {
-					var overlay = $('<overlay></overlay>');
-					overlay.html('<div style="height:100%;width:100%;color:black;">'
-								+'<img style="position:absolute;height:25%;left:50%;top:50%;transform:translate(-50%,-50%);" src="images/logos/fox.gray.png"></img>'
-								+'<p style="position:absolute;left:50%;top:65%;transform:translate(-50%,0%);">Seite lädt...</p>'
-							+'</div>');
-					overlay.appendTo('body');
-				}
-				,'header':() => {
-					var overlay = $('<overlay></overlay>');
-					overlay.html('<div style="height:100%;width:100%;color:black;">'
-								+'<img style="position:absolute;height:25%;left:50%;top:50%;transform:translate(-50%,-50%);" src="images/logos/fox.gray.png"></img>'
-								+'<p style="position:absolute;left:50%;top:65%;transform:translate(-50%,0%);">Seite lädt...</p>'
-							+'</div>');
-					overlay.appendTo('header');
-				}
-				,'footer':(data) => {
-					var overlay = $('<overlay></overlay>');
-					overlay.html('<div style="height:100%;width:100%;color:black;">'
-								+'<img style="position:absolute;height:25%;left:50%;top:50%;transform:translate(-50%,-50%);" src="images/logos/fox.gray.png"></img>'
-								+'<p style="position:absolute;left:50%;top:65%;transform:translate(-50%,0%);text-align:center;">'+data.load+'</p>'
-							+'</div>');
-					overlay.appendTo('footer');
-				}
-				,'cold':(data)=>{
-					var overlay = $('<overlay></overlay>');
-					overlay.html('<div style="height:100%;width:100%;color:black;">'
-								+'<img style="position:absolute;height:25%;left:50%;top:50%;transform:translate(-50%,-50%);" src="images/logos/fox.gray.png"></img>'
-								+'<p style="position:absolute;left:50%;top:65%;transform:translate(-50%,0%);text-align:center;">Firebase Cold Start Timeout<br>Auto retry in <cnt>'+data.load+'</cnt></p>'
-							+'</div>');
-					overlay.appendTo('footer');
-					var e=$("overlay cnt");
-					interval=setInterval(function(){
-						var c=parseInt(e.text());
-						if(0!=c){e.text((c-1));}
-						else{
-							window.clearInterval(interval);
-							this.hide();
-							this.footer({'load':data.id+' lädt...'});
-							$("body").trigger("call-mvp",{"call":"call-mvp","id":data.id,"q":data.q});
-						}
-					},1000);
-				}
-			}
-			this.page = {
-				'show':(data) => {
-					document.title = data.title;
-					var footer = $('footer section#content');
-					footer.html(data.footer);
-					holder = $('footer');
-				}
-				,'clear':() => {
-					document.title = 'smart.cv.og3lm';
-					var footer = $('footer section#content');
-					footer.html('')
-				}
-				,'rearrange':(data) => {
-					$('img.label').css({'visibility':'hidden'}); // hide other labels
-					$('a.fa-chevron-right').css({'visibility':'hidden'}); // hide ui chevrons
-					$('a.fa-chevron-left').css({'visibility':'hidden'});
-					$('footer edge.hr a.fa-download').attr('q',data.q)
-					$('footer section#content').attr('view',data.id);
-					window.requestAnimationFrame(function(){
-						var element = $('#'+data.id);
-						element.css({
-							'visibility':'visible'
-							,'position':'fixed'
-							,'left':(window.innerWidth*0.95-element.width())+'px'
-							,'top':(window.innerHeight*0.3/2-element.height()/2)+'px'
-						})
-					});
-				}
-				,'arrange':(data) => {
-					if(null == data.id){
-						data.id = $('footer section#content').attr('view');
-					}
-					$('#'+data.id).css({'position':'absolute'});
-					$('img.label').css({'visibility':'visible'}); // show all labels
-					$('a.fa-chevron-right').css({'visibility':'visible'}); // show ui chevrons
-					$('a.fa-chevron-left').css({'visibility':'visible'});
-					document.title = 'smart.cv.og3lm';
-					$('footer section#content').attr('view','empty');
-					$('footer edge.hr a.fa-download').attr('q','unset');
-					$('header section#content passport').remove();
-					$('header section#content passcroll').remove();
-				}
-			}
-		}
-		function PagePresentationAdapter(){
-			this.get = (data) => {
-				var adaption = '';
-				if(data.hasOwnProperty('recs')){
-					for(var i=0; i < data.recs.length; i++) {
-						var vto = data.recs[i];
-						if(vto.meta){
-								 if('text' === vto.meta.type){adaption = adaption+text(vto.view);}
-							else if('table' === vto.meta.type){adaption = adaption+table(vto.view,vto.meta);}
-							else if('html' === vto.meta.type){adaption = adaption+html(vto.view);}
-						}
-					};
-				} else if(data.hasOwnProperty('errors')){
+				else if('errors' === meta.state){
 					console.log(data.errors)
 					// if('Firebase Cold Start Error' in data.errors):
-					// ...
 					// data['id'] = 'smart.cv.og3lm';
-				} else {
-					data['id'] = 'smart.cv.og3lm';
+					return {'title':'smart.cv.og3lm','html':null};
 				}
-				if('' === adaption){
-					return null
-				}
-				return {'title':data.id,'footer':adaption}; 
+				else{return {'title':'smart.cv.og3lm','html':null};}
 			}
+			/* adapt content methods */
+			this.mixed = function(records,title){
+				var adaption = '';
+				var print = {'title':'No Title','facility':'No Facility','period':'No Period','code':'No QR Code','label':'No Label','user':'No User','link':'No Link'};
+				for(var i=0; i < records.length; i++){
+					var vto = records[i];
+					if('success' == vto.meta.state){
+							 if('text' === vto.meta.type){adaption = adaption+text(vto.view);}
+						else if('table' === vto.meta.type){adaption = adaption+table(vto.view,vto.meta);}
+						else if('html' === vto.meta.type){adaption = adaption+html(vto.view,vto.meta);}
+						else if('rate' === vto.meta.type){adaption = adaption+rate(vto.view,vto.meta);}
+						else if('image' === vto.meta.type){adaption = adaption+image(vto.view,vto.meta);}
+						else if('print' === vto.meta.type){print = vto.view;}
+					}
+				};
+				return {'title':title,'html':adaption,'print':print}; 
+			}
+			this.samples = function(records){
+				var html = '<h2>Code Samples</h2>';
+				for(var i=0; i<records.length; i++){
+					var record = records[i];
+					html = html + '<a href="'+record.url+'" class="wrap">'
+								+ '<p class="fa fa-'+record.src+'"></p>'
+								+ '<p>'+record.text+'</p></a>';
+				}
+				return {'title':'Samples','html':html}; 
+			}
+			/* private helpers */
 			function text(lines){
 				var adaption = '';
 				for(var i=0; i<lines.length; i++){
@@ -409,7 +89,6 @@
 			}
 			function table(records,meta){
 				var adaption = '';
-				var index = 0;
 				if(meta.hasOwnProperty('title')){
 					adaption = adaption+'<p><b>'+records[meta.title]+'</b></p>';
 					records.shift();
@@ -427,112 +106,77 @@
 				};
 				return adaption+'</table><p> </p>';
 			}
-			function html(records){
+			function html(records,meta){
 				var adaption = '';
+				if(meta.hasOwnProperty('title')){
+					adaption = adaption+'<p><b>'+records[meta.title]+'</b></p>';
+					records.shift();
+				}
+				for(var i=0; i<records.length; i++){
+					adaption = adaption+records[i];
+				}
 				return adaption;
 			}
+			function image(records,meta){
+				var adaption = '';
+				if('logo' === meta.url){
+					for(var i=0; i<records.length; i++){
+						var element = records[i];
+						adaption = adaption+'<a href="'+element.link+'" id="'+meta.class+'-'+i+'" class="'+meta.class+'"><img src="images/logos/'+element.url+'"></<>';
+					}
+				}else{
+					for(var i=0; i<records.length; i++){
+						adaption = adaption+'<img id="'+meta.class+'-'+i+'" alt="portrait" class="'+meta.class+'" src="'+meta.url+records[i].url+'">';
+					};
+				}
+				return adaption;
+			}
+			function rate(records,meta){
+				var adaption = '';
+				if(meta.hasOwnProperty('title')){
+					adaption = adaption+'<p><b>'+records[meta.title]+'</b></p>';
+					records.shift();
+				}
+				var cols = meta.cols;
+				adaption = adaption+'<table>';
+				for(var m=0; m<records.length; m=m+cols*2){
+					adaption = adaption+'<tr>';
+					for(var i=m; i<m+cols*2; i=i+2){
+						if(records[i]){
+							adaption = adaption+'<td>'+records[i]+'</td><td>'
+							for(var j=0; j<records[i+1];j++){
+								adaption = adaption+'<i class="rating fa fa-star"></i>';
+							}
+							for(var j=0; j<5-records[i+1];j++){
+								adaption = adaption+'<i class="rating fa fa-star-o"></i>';
+							}
+							adaption = adaption+'</td>';
+						}
+					}
+					adaption = adaption+'</tr>';
+				};
+				return adaption+'</table><p> </p>';
+			}
 		}
-		function PageEventListener(){
-
-			var one = new DotNetHolder() // moving background dots
-			one.operator.decorate(animations.one).create().start();
-			var dots = one.objects.dots;
-			//	var two = new DotNetHolder()
-			//	two.operator.decorate(animations.two).create().start();
-			var fox = new FoxNetHolder().operator.decorate(animations.fox).interlink(dots).create().start();
-			var cv = new CvAnimationHolder().operator.decorate(animations.cv).create().start(); // moving labels
-
-			var adapter = new PagePresentationAdapter();
-			var presenter = new PageContentPresenter();
-			var swipeHead = new PageSwipePresenter();
-
-			var args = {'token':'unset','authenicate':'unset'};
-			var events = {
-				'rating-toggle':(data) => {
-					presenter.footer.toggle();
-					data['q'] = $('img#'+data.id).attr('q');
-					if(cv.toggle()){
-						presenter.page.arrange(data);
-						presenter.load.hide();
-					} else {
-						presenter.page.clear()
-						data.load = data.id+' lädt...';
-						presenter.load.footer(data);
-						$('body').trigger('call-mvp',{'call':'call-mvp','id':data.id,'q':data.q});
-						presenter.page.rearrange(data);
-					}
+		/* @job :: content presenter */
+		function PageContentPresenter(){
+			/* content operator objects */
+			var adapter = new PageContentAdapter();
+			var popup = new P0pup4p1Operator().create(dispatcher);
+			/* global args */
+			var pageHeight = $(window).height();
+			var pageWidth = $(window).width();
+			var body = $('body');
+			/* popup view args */
+			this.popups = { // move to popup adapter ...
+				'help':() => { // make as overlay
+					popup.load({'content':'<p>swipe left/right</p>'
+											 + '<p>foldable footer</p>'
+											 + '<p>realtime animation control</p>'
+											 + '<p>user login</p>'}).show();
 				}
-				,'hello-toggle':(data) => { /* bilder, views zusammenbauen */
-					presenter.footer.toggle();
-					data['q'] = $('img#'+data.id).attr('q');
-					if(cv.toggle()){
-						$('img.label').css({'visibility':'visible'}); // show all labels
-						$('a.fa-chevron-right').css({'visibility':'visible'}); // show ui chevrons
-						$('a.fa-chevron-left').css({'visibility':'visible'});
-						$('header section#content passport').remove();
-						$('header section#content passcroll').remove();
-						presenter.load.hide();
-					} else {
-						presenter.page.clear();
-						data.load = data.id+' lädt...'
-						presenter.load.footer(data);
-						$('body').trigger('call-mvp',{'call':'call-mvp','id':data.id,'q':data.q});
-						$('img.label').css({'visibility':'hidden'}); // hide other labels
-						$('a.fa-chevron-right').css({'visibility':'hidden'}); // hide ui chevrons
-						$('a.fa-chevron-left').css({'visibility':'hidden'});
-						$('#'+data.id).css({'visibility':'visible'});
-						/* move to get from mvp oder so *//*
-							show images
-						*/
-						var passport = '<passport index="0">'
-								+ '<img index="0" src="images/portraits/me.pass_gate.jpg"></img>'
-								+ '<img index="1" src="images/portraits/me.pass_front.jpg"></img>'
-								+ '<img index="2" src="images/portraits/me.pass_reich.framed.jpg"></img>'
-							+ '</passport>'
-						$('header section#content').append(passport);
-						var passport = '<passcroll index="1">'
-								+ '<a href="#" id="img-prev" class="fa fa-chevron-left"></a>'
-								+ '<a href="#" id="img-next" class="fa fa-chevron-right"></a>'
-							+ '</passcroll>'
-						$('header section#content').append(passport);
-						passport = $('passport');
-						swipePassport = new PageSwipePresenter().decorate({'parent':'passport','id':'passport','tag':'img','start':1}).create().start();
-						$('passcroll a.fa-chevron-left').on('click',function(){swipePassport.prev();});
-						$('passcroll a.fa-chevron-right').on('click',function(){swipePassport.next();});
-					}
-				}
-				,'cfg-toggle':(data) => {presenter.cfg.toggle();}
-				/* popups */
-				,'help-toggle':(data) => {
-					var text = '<p>swipe left/right</p>'
-							 + '<p>foldable footer</p>'
-							 + '<p>realtime animation control</p>'
-							 + '<p>user login</p>'
-					presenter.popup.show({'content':text});
-				}
-				,'project-toggle':(data) => {
-					var text = '<h2>Code Samples</h2>'
-							 + '<a href="https://github.com/vog3lm/vog3lm.cv-showcase" class="wrap"><p class="fa fa-github"></p><p>smart cv code</p></a>'
-							 + '<a href="https://github.com/vog3lm/scr.torcs" class="wrap"><p class="fa fa-github"></p><p>Torcs Race Client</p></a>'
-							 + '<a href="https://github.com/vog3lm/pi.muk" class="wrap"><p class="fa fa-github"></p><p>kleiner MUK</p></a>'
-					//		 + '<a href="https://github.com/vog3lm/scr.torcs">Outlaw Crypto Recorder</a>'
-					//		 + '<a href="">stalker rc</a>'
-					presenter.popup.show({'content':text,'timeout':null,'design':'dark'});
-				}
-				,'user-toggle':(data) => {
-					$('body').trigger('log-state',{'call':'log-state','id':'user-toggle','promise':function(response){
-						var content = '<h2>User Details</h2>'
-									+ '<p>Name: '+response.name+'</p><p>Email: '
-									+ response.email+'</p><p>Device: '
-									+ response.phone+'</p><p>User Id: '
-									+ response.uid+'</p><p>User Token: '
-									+ response.token+'</p>';
-						presenter.popup.show({'content':content,'timeout':null,'size':'match','design':'dark'});
-					}});
-
-				}
-				,'dox-toggle':(data) => {
-					var text = '<h2>Informationsblatt</h2>' 
+				,'dox':() => { // move to popup adapter ... // make separate page...
+					popup.load({'content':'<h2>Informationsblatt</h2>' 
 
 							 +'<p>full stack application mvp architecture</p>'
 
@@ -565,10 +209,8 @@
 							 + '<img src="images/logos/jqm.png" height="64px"></img>'
 							 + '<p>html5, css3, javascript, jQuery, jQuery Mobile</p>'
 
-
 							 + '<img src="images/logos/node.js.png" height="64px"></img>'
 							 + '<img src="images/logos/express.js.png" height="64px"></img>'
-
 
 							 + '<p>font-awesome, myriad pro, ubuntu mono</p>'
 
@@ -580,182 +222,501 @@
 							 + '<p>javascript animation</p>'
 
 							 + '<p>smart printmedia support</p>'
-							 + '<p>no password transmission printmedia auto login</p>'
-					presenter.popup.show({'content':text});
+							 + '<p>no password transmission printmedia auto login</p>'}).show();
 				}
-				/* user */
-				,'login-show':(data) => {presenter.login.show(data)}
-				,'login-hide':(data) => {presenter.login.hide()}
-				,'login-toggle':(data) => {presenter.login.toggle()}
-				,'login-validate':(data) => {
-					presenter.load.show(data);
-					$('body').trigger('log-in',[{'mail':$('input#mail').val(),'pass':$('input#pass').val(),'call':'log-in','id':'login-validate'}]);
+				,'samples':(data) => { // move to got-mvp
+					var records = [{'url':'https://github.com/vog3lm/vog3lm.cv-showcase','src':'github','text':'smart cv code'}
+								  ,{'url':'https://github.com/vog3lm/pi.muk','src':'github','text':'kleiner MUK'}
+								  ,{'url':'https://github.com/vog3lm/scr.torcs','src':'github','text':'Torcs Race Client'}]; // Outlaw Crypto Recorder
+					data = {'cols':[],'recs':records,'meta':{'state':'success','type':'dto','tag':'samples'}};
+					popup.load({'content':adapter.get(data).html,'timeout':null}).show();
 				}
-				,'logged-in':(data) => {
-					presenter.login.clear();
-					presenter.login.user(data);
-					presenter.load.hide();
-				}
-				,'logged-err':(data) => {
-					presenter.load.hide();
-					presenter.popup.show({'content':'Login Fail. '+data.message});
-					presenter.load.hide();
-				}
-				,'logged-out':(data) => {
-					presenter.login.clear()
-			    	presenter.load.hide();
-			    }
-			    /* page/content */
-			    ,'get-start':(data) => {
-					swipeHead.start();
-					var leed = window.localStorage.getItem('l');
-					window.localStorage.setItem('l',null);
-					if(leed && 'null' !== leed){
-						leed = JSON.parse(leed);
-						leed = adapter.get(leed);
-						presenter.popup.show({'content':leed.footer,'timeout':null,'size':'match','design':'dark'});
-					}
-			    }
-				,'get-next':(data) => {
-					var index = swipeHead.next();
-					$('body').trigger('history-push',{'call':'get-history','id':'get-next','index':index});
-				}
-				,'get-prev':(data) => {
-					var index = swipeHead.prev();
-					$('body').trigger('history-push',{'call':'get-history','id':'get-prev','index':index});
-				}
-				,'get-history':(data) => {
-					presenter.footer.hide();
-					presenter.page.arrange(data);
-					cv.resume(); // wird immer schneller ?
-					if(data.direction == -1){swipeHead.prev();}
-					else if(data.direction == 1){swipeHead.next();}
-					else{
-						if(data.id.indexOf('get-next') != -1){swipeHead.prev();}
-						else if(data.id.indexOf('get-prev') != -1){swipeHead.next();}
-						else{console.log('get history went wrong.',data.id,data.direction);}
+			};
+			/* leed popup args */
+			var leedOperator = $('header user a#leed-operator');
+			var leedEvent = {'call':'view-toggle','url':'leed','id':'leed'};
+			var leedText = null;
+			this.leed = {
+				'load':() => {
+					var l = window.localStorage.getItem('l');
+					window.localStorage.setItem('l','null');
+					if(l && 'null' !== l){
+						json = JSON.parse(l);
+						json.meta.state = 'success';
+						json.meta.tag = 'leed';
+						leedText = adapter.get(json);
+						if(leedText){leedOperator.removeClass('hide');}
 					}
 				}
-				,'got-token':(data) => {
-					args.token = data.token;
-					$('body').trigger('call-mvp',{'id':'hello','q':'6PW2gsYzD'});
+				,'show':() => {
+					if(leedText){
+						leedOperator.removeClass('fa-envelope');
+						leedOperator.addClass('fa-envelope-open');
+						popup.load({'content':leedText,'timeout':null,'size':'match','event':leedEvent}).show();
+					}
 				}
-				,'got-mvp':(data) => {
-					/* append test icons */
-					// image 
-					// timeperiod
-					// icons	e.g. study, graduate, award, 
-					//								  | -->  cum laude (gut), magna cum laude (sehr gut), summa cum laude (sehr gut mit Auszeichnung)
-					// links	e.g. informatikprojekt, bachelor arbeit | projekte & samples muk,stalker,chr app, outlaw, ...? | Studieninhalte
-					//				 books read | gfs shit & prasentationen
-					// previous, next links
-					data = adapter.get(data);
-					data.index = swipeHead.index();
-					presenter.page.show(data);
-					presenter.load.hide();
+				,'hide':() => {
+					leedOperator.removeClass('fa-envelope-open');
+					leedOperator.addClass('fa-envelope');
 				}
-				,'fail-mvp':(data) => {
-					presenter.load.hide();
+				,'toggle':() => {
+					if(leedOperator.hasClass('fa-envelope')){this.leed.show();}
+					else{this.leed.hide();}
+				}
+			}
+			/* animation view args */
+			var uiHolder = $('header nav#cfg-navigation');
+			this.animation = {
+				'toggle':() => {uiHolder.toggleClass('hide');}
+				,'movement':() => {
+					if(!body.hasClass('scroll-flag')){
+						if(body.hasClass('animation-flag')){
+							$('nav a.fa-pause').each(function(){
+								var element = $(this)
+								element.attr('title','Start Animation');
+								element.removeClass('fa-pause');
+								element.addClass('fa-play');
+								//	cv.pause(); 			// make event listener style ...
+								//	one.operator.pause();
+							});
+							body.removeClass('animation-flag');
+							body.trigger('dot-net-pause');
+							body.trigger('label-net-pause');
+						}else{
+							$('nav a.fa-play').each(function(){
+								var element = $(this)
+								element.attr('title','Stop Animation');
+								element.removeClass('fa-play');
+								element.addClass('fa-pause');
+								// cv.resume();
+								// one.operator.resume();
+							});
+							body.addClass('animation-flag');
+							body.trigger('dot-net-resume');
+							body.trigger('label-net-resume');
+						}
+
+					}
+				}
+				,'color':() => {
+					var colors = ['#ff00aa','#aaff00','#3ed7f7','#ffff00','#a200ff'];
+					var index = Math.floor(Math.random()*(colors.length-1));
+					$('header a, header h1, header input, header id').css({'color':colors[index]}) 
+					body.trigger('dot-net-color',[{'call':'dot-net-color','id':'animation','color':colors[index]}]);
+				}
+			};
+			/* page style view args */
+			this.style = {
+				'toggle':() => {$('header nav#cfg-style').toggleClass('hide');}
+			}
+			/* login view args */
+			var loginHolder = $('user');
+			var loginCard = $('user card');
+			var loginForm = $('user form');
+			var loginOperator = $('user a#login-operator');
+			var loginUser = null;
+			this.login = {
+				'load':(data) => {
+					/* clear errors */
+					loginOperator.removeClass('error');
+					loginForm.removeClass('error');
+					/* clear inputs */
+					loginHolder.find('input#mail').val('');
+					loginHolder.find('input#pass').val('');
+					/* load view */
+					if('auth-state-login' === data.id){
+						loginUser = data.user;
+						loginHolder.find('id').html(loginUser.email);
+						loginForm.addClass('hide');
+						loginCard.removeClass('hide');
+						loginOperator.removeClass('fa-circle-o-notch');
+						loginOperator.removeClass('fa-spin');
+						loginOperator.removeClass('fa-hashtag');
+						loginOperator.removeClass('fa-user');
+						loginOperator.addClass('fa-lock');
+						loginOperator.attr('call','view-toggle');
+						loginOperator.attr('url','user');
+						loginOperator.attr('title','Show User');
+						this.leed.show();
+					}else{
+						loginCard.addClass('hide');
+						loginForm.addClass('hide');
+						loginOperator.attr('url','login');
+						loginOperator.removeClass('fa-lock');
+						loginOperator.addClass('fa-hashtag');
+					}
+				}
+				,'show':() => {
+					loginForm.removeClass('hide');
+					loginOperator.attr('title','Hide Login');
+					loginOperator.removeClass('fa-hashtag');
+					loginOperator.addClass('fa-user');
+					loginHolder.find('input#mail').focus();
+				}
+				,'hide':() => {
+					/* clear errors */
+					loginOperator.removeClass('error');
+					loginForm.removeClass('error');
+					/*  */
+					loginForm.addClass('hide');
+					loginOperator.attr('title','Show Login');
+					loginOperator.removeClass('fa-user');
+					loginOperator.addClass('fa-hashtag');
+				}
+				,'toggle':() => {
+					if(loginForm.hasClass('hide')){this.login.show();} 
+					else{this.login.hide();}
+				}
+				,'validate':() => {
+					var user = loginForm.find('input#mail').val();
+					var pass = loginForm.find('input#pass').val();
+					var errors = [];
+					if('' === user){errors.push('no user name found');}
+					if('' === pass){errors.push('no password found');}
+					if(0 < errors.length){
+						this.login.error({'errors':errors});
+					}else{
+						loginOperator.removeClass('fa-user');
+						loginOperator.addClass('fa-circle-o-notch');
+						loginOperator.addClass('fa-spin');
+						$('body').trigger('log-in',[{'call':'log-in','id':'login-validate','url':'login','mail':user,'pass':pass}]);
+					}
+				}
+				,'error':(data) => {
+					loginOperator.removeClass('fa-circle-o-notch');
+					loginOperator.removeClass('fa-spin');
+					loginOperator.addClass('fa-user');
+					loginOperator.addClass('error');
+					loginForm.addClass('error');
+					loginForm.find('input#mail').addClass('error');
+					loginForm.find('input#pass').addClass('error');
+					// show popup ...
+				}
+				,'popup':() => {
+					var content = ''
+					if(null === loginUser){
+						content = '<p>No User Found.</p>'
+								+ '<p>Sign In First.</p>'
+					}else{
+						content = '<h2>User Details</h2>'
+							/*	+ '<img src="images/logo.png">'
+								+ '<img src="images/code.png">'
+								    width:164px;
+								    position:absolute;
+								    right:1em;
+								    top:calc(32px + 1em); */
+								+ '<p>Name: '+loginUser.name+'</p>'
+								+ '<p>Email: '+loginUser.email+'</p>'
+								+ '<p>Phone: '+ loginUser.phone+'</p>'
+								+ '<p>Platform: '+ navigator.platform+'</p>'
+								+ '<p>User Id: '+ loginUser.uid+'</p>'
+								+ '<p>User Token: '+ loginUser.token+'</p>'
+					}
+					popup.load({'content':content,'timeout':null,'size':'match'}).show();
+				}
+			};
+			/* footer view args */
+			var footerHolder = $('footer');
+			var footerView = $('footer section#content');
+			var footerOverlay = $('footer overlay#footer-overlay');
+			this.footer = {
+				'load':(data) => {
+					var vto = adapter.get(data);
+					document.title = vto.title;
+					/* update screen layout blocks */
+					footerView.attr('view',data.id);
+					footerView.html(vto.html);
+					footerHolder.find('a.fa-download').attr('q',data.meta.id);
+					footerOverlay.addClass('hide');
+					/* update print layout blocks */
+					$('footer section.print h1#print-title').html(vto.print.title);
+					$('footer section.print p#print-facility').html(vto.print.facility);
+					$('footer section.print p#print-period').html(vto.print.period);
+					$('footer section.print-label img#print-label').attr('src',headerContent.find('img#'+data.id).attr('src'));
+					$('footer section.print-label img#print-code').attr('src','images/code.png');
+					var today = new Date();
+					$('footer section.print p#print-disclaimer').html('Dieser Ausdruck stellt keinen offiziell gültigen Nachweis für erbrachte Leistungen dar. Es handelt sich um ein selbst erstelltes Duplikat, erstellt am '+today.getDate()+'.'+today.getMonth()+'.'+today.getFullYear()+' für '+loginUser.name+'.');
+					var link = $('footer section.print a#print-link')
+					link.html('http://....de');
+					link.attr('href','#');
+				}
+				,'show':(data) => {
+					footerView.html('');
+					footerOverlay.removeClass('hide');
+					footerOverlay.find('p').html('loading '+data.id+' data');
+					body.scrollTop(footerHolder.height());
+					body.addClass('scroll-flag');
+					if(null === loginUser){this.footer.error({'code':'0','errors':['no user logged in','log in or request permission']});}
+					else{body.trigger('call-mvp',[{'id':data.id,'url':'footer','q':$('img#'+data.id).attr('q')}]);}
+				}
+				,'hide':() => {
+					document.title = 'smart.cv.og3lm';
+					/* update screen layout blocks */
+					footerOverlay.addClass('hide');
+					body.scrollTop(0);
+					body.removeClass('scroll-flag');
+					footerView.html('');
+					footerHolder.find('a.fa-download').attr('q','unset');
+					/* update print layout blocks */
+					// remove Titel
+					// remove Einrichtung/Unternehmen
+					// remove Zeitraum
+					// remove image/qr.code
+					// remove Datum/Benutzer
+					// remove Nachweislink
+				}
+				,'toggle':(data) => {
+					if(!body.hasClass('scroll-flag')){this.footer.show(data);}
+					else{this.footer.hide();}
+				}
+				,'error':(data) => {
 					if(-1 !== data.errors.indexOf('Firebase Cold Start Timeout')){
+						/* retry on firebase cold start timeout */
 						data.load = 30;
 						data.q = data.q;
-						presenter.load.cold({'load':30,'q':data.q,'id':data.id});
 					} else {
-						presenter.load.footer({'load':'Eingeschränkter Zugang!<br>Login Beantragen.'});
+						/* default error */
+						footerOverlay.find('p').html('error '+data.code+': '+data.errors.join('<br>'));
 					}
 				}
-				,'got-pdf':(data) => {
-					// window.open("data:application/pdf;base64, "+data.pdf,'_blank');
+			};
+			/* header view args */
+			var headerContent = $('header section#content');
+			var gestures = {'swiperight':{'call':'header-left','url':''}
+						   ,'swipeleft':{'call':'header-right','url':''}
+						   ,'orientationchange':{'call':'get-reloaded'}};
+			var headerSwipe = new Swipe4p1Operator().decorate({'mapping':gestures,'parent':headerContent,'id':'header','mode':'relative'
+																,'before':()=>{return !body.hasClass('scroll-flag');}}).create(dispatcher);
+			this.header = {
+				'show':() => {
+					document.title = 'smart.cv.og3lm';
+					/* show page decoration */
+					$('img.label').css({'visibility':'visible'});
+					$('a.fa-chevron-right').css({'visibility':'visible'});
+					$('a.fa-chevron-left').css({'visibility':'visible'});
+					
+					//	$('footer section#content').attr('view','empty');
+					//	$('footer edge.hr a.fa-download').attr('q','unset');
+				}
+				,'hide':(data) => {
+					document.title = data.id;
+					/* hide page decoration */
+					$('img.label').css({'visibility':'hidden'});
+					$('a.fa-chevron-right').css({'visibility':'hidden'});
+					$('a.fa-chevron-left').css({'visibility':'hidden'});
+				}
+				,'toggle':(data) => {
+					if(!body.hasClass('scroll-flag')){this.header.show(data);}
+					else{this.header.hide();}
+				}
+			};
+			/* 	header view args */
+			this.download = {
+				'request':(data) => {
+					var element = $('a#'+data.id);
+					if(!element.hasClass('fa-spin')){
+						element.removeClass('fa-download');
+						element.addClass('fa-circle-o-notch');
+						element.addClass('fa-spin');
+						body.trigger('call-src',[{'call':'call-src','id':data.id,'q':element.attr('q'),'url':'download'}]);
+					}
+				}
+				,'load':(data) => {
 					var a = document.createElement('a'); /* download */
 					var pdfAsDataUri = "data:application/pdf;base64, "+data.pdf;
 					a.download = data.name;
 					a.type = 'application/pdf';
 					a.href = pdfAsDataUri;
 					a.click();
+
+					var element = $('a#'+data.id);
+					element.removeClass('fa-spin');
+					element.removeClass('fa-circle-o-notch');
+					element.addClass('fa-download');
 				}
-				,'fail-pdf':(data) => {
-					console.log(data);
-					console.log('do a flash')
+				,'error':(data) => {
+					element.removeClass('fa-spin');
+					element.removeClass('fa-circle-o-notch');
+					element.addClass('fa-download');
+
+					console.error('download error not implemented',data)
 				}
-				/* origins/sources */
-				,'origin-download':(data) => {
-					var q = $('footer edge.hr a.fa-download').attr('q');
-					if('unset' !== q){$('body').trigger('call-pdf',{'id':'origin-download','call':'call-pdf','q':q});}
-					else{console.log('q=pdf not found',q);}
+			};
+			/*  */
+			var searchHolder = $('header search');
+			var searchOperator = $('header search a#search-toggle');
+			this.search = {
+				'load':(data) => {}
+				,'show':() => {
+					searchHolder.css({'top':'0px'});
+					searchHolder.addClass('search-flag');
+					searchOperator.removeClass('fa-chevron-down');
+					searchOperator.addClass('fa-chevron-up');
 				}
-				,'origin-print':(data) => {
-					// <link rel="stylesheet" href="../../stylesheets/coloringpageprint.css" type="text/css" media="print" />
-					// window.print()
-					console.log('print document');
+				,'hide':() => {
+					searchHolder.css({'top':-(searchHolder.height()-90)+'px'});
+					searchHolder.removeClass('search-flag');
+					searchOperator.removeClass('fa-chevron-up');
+					searchOperator.addClass('fa-chevron-down');
 				}
-				,'origin-togo':(data) => {
-					// download info graphics
-					console.log('togo document');
+				,'toggle':() => {
+					if(searchHolder.hasClass('search-flag')){this.search.hide();}
+					else{this.search.show();}
 				}
-				/* animation contorl */
-				,'animation-colors':(data) => {
-					var colors = ['#fb1','#67f','#b0f','#2F2','#6be','#e5f','#ff1','#444']
-				  	one.operator.decorate({'lineColor':colors[Math.floor(Math.random()*(colors.length-1))]}).refresh();
-					// two.operator.decorate({'lineColor':colors[Math.floor(Math.random()*(colors.length-1))]}).refresh();
-				}
-				,'animation-pause':(data) => {
-					if(presenter.footer.open()){
-						return;
+				,'validate':() => {}
+			}
+			/* main view interface *//*
+			   wraps header/footer ui */
+			this.page = {
+				'load':(data) => { /* history operator call */
+					console.log('page.load',data.id)
+					this.footer.hide();
+					this.header.show();
+					if(data.direction === -1){headerSwipe.prev();}
+					else if(data.direction === 1){headerSwipe.next();}
+					else{
+						if(data.id.indexOf('get-next') != -1){headerSwipe.prev();}
+						else if(data.id.indexOf('get-prev') != -1){headerSwipe.next();}
+						else{console.log('get history went wrong.',data.id,data.direction);}
 					}
-					$('nav a.fa-pause').each(function(){
-						var element = $(this)
-						element.attr('title','Start Animation');
-						element.attr('call','animation-play')
-						element.removeClass('fa-pause')
-						element.addClass('fa-play')
-					})
-					cv.pause();
-					one.operator.pause();
-					// two.operator.pause();
 				}
-				,'animation-play':(data) => {
-					if(presenter.footer.open()){
-						return;
+				,'toggle':(data) => {
+					if(!body.hasClass('scroll-flag')){
+						this.header.hide(data);
+						this.footer.show(data);
+					}else{
+						this.header.show();
+						this.footer.hide();
 					}
-					$('nav a.fa-play').each(function(){
-						var element = $(this);
-						element.attr('title','Stop Animation');
-						element.attr('call','animation-pause');
-						element.removeClass('fa-play');
-						element.addClass('fa-pause');
-					})
-					cv.resume();
-					one.operator.resume();
-					// two.operator.resume();
 				}
+				,'print':(data) => {
+					if('afterprint' === data.id){
+						body.scrollTop(footerHolder.height());
+					}
+					else{window.print();}
+				}
+			};
+			this.message = {
+				'toggle':() => {
+					var content = '<form>'
+						+'<input type="text" id="name" name="name" placeholder="Enter Your Name">'
+						+'<error id="name" class="hide">Enter your Name</error>'
+						+'<input type="email" id="from" name="from" placeholder="Enter Your Email">'
+						+'<error id="from" class="hide">Enter a valid Email Address</error>'
+						+'<textarea id="message" rows="7" cols="50" placeholder="Enter Your Message"></textarea>'
+						+'<error id="message" class="hide">Leave a message</error>'
+						+'<a href="#" class="fa fa-send" title="Send Message"></a>'
+					+'</form>';
+					popup.load({'content':content,'timeout':null,'size':'match'}).show();
+					$('popup form a.fa-send').on('click',function(){
+						body.trigger('form-validate',[{'call':'form-validate','url':'message'}]);
+					})
+				}
+				,'validate':() => {
+					var errorMessage = $('popup form error#message');
+					var errorSender = $('popup form error#name');
+					var errorFrom = $('popup form error#from');
+					errorSender.addClass('hide');
+					errorFrom.addClass('hide');
+					errorMessage.addClass('hide');
+					var from = $('popup form input#name').val();
+					var mail = $('popup form input#from').val();
+					var text = $('popup form textarea#message').val();
+					var errors = [];
+					if('' === from){
+						errors.push('no sender name found');
+						errorSender.removeClass('hide');
+					}
+					if('' === mail){
+						errors.push('no sender mail found');
+						errorFrom.removeClass('hide');
+					}
+					if('' === text){
+						errors.push('no message found');
+						errorMessage.removeClass('hide');
+					}
+				}
+				,'error':(data) => {
+
+				}
+			}
+		}
+		/* @job :: input operator */
+		function PagePresenterInterface(){
+			var presenter = new PageContentPresenter();
+			/* auto routing interaface methods */
+			this.load = (key,data)=>{
+				if('login' === key){presenter.login.load(data);}
+				else if('footer' === key){presenter.footer.load(data);}
+				else if('page' === key){presenter.page.load(data);}
+				else if('download' === key){presenter.download.load(data);}
+				else if('leed' === key){presenter.leed.load();}
+				else{console.error('load error. content key',key,'is unknown.',data);}
+			};
+			this.error = (key,data)=>{
+				if('login' === key){presenter.login.error(data);}
+				else if('footer' === key){presenter.footer.error(data);}
+				else if('download' === key){presenter.download.error(data);}
+				else{console.error('error error. content key',key,'is unknown.',data);}
+			}
+			this.show = (key,data)=>{
+				if('login' === key){presenter.login.show();}
+				else{console.error('show error. content key',key,'is unknown.',data);}
+			};
+			this.hide = (key,data)=>{
+				if('login' === key){presenter.login.hide();}
+				else{console.error('hide error. content key',key,'is unknown.',data);}
+			};
+			this.toggle = (key,data)=>{
+				if('login' === key){presenter.login.toggle();}
+				else if('search' === key){presenter.search.toggle(data);}
+				else if('page' === key){presenter.page.toggle(data);}
+				else if('print' === key){presenter.page.print(data);}
+				else if('download' === key){presenter.download.request(data);}
+				else if('user' === key){presenter.login.popup();}
+				else if('animation' === key){presenter.animation.toggle();}
+				else if('animation-move' === key){presenter.animation.movement();}
+				else if('animation-color' === key){presenter.animation.color();}
+				else if('style' === key){presenter.style.toggle();}
+				else if('help' === key){presenter.popups.help();}
+				else if('dox' === key){presenter.popups.dox();}
+				else if('samples' === key){presenter.popups.samples(data);}
+				else if('leed' === key){presenter.leed.toggle();}
+				else if('message' === key){presenter.message.toggle();}
+				else{console.error('toggle error. content key',key,'is unknown.',data);}
+			};
+			this.swipe = (key,data)=>{
+				if('header-left' == key){presenter.header.prev();}
+				else if('header-right' == key){presenter.header.next();}
+				else{console.error('validate error. content key',key,'is unknown.',data);}
+			};
+			this.validate = (key,data)=>{
+				if('login' == key){presenter.login.validate();}
+				else if('message' == key){presenter.message.validate();}
+				else{console.error('validate error. content key',key,'is unknown.',data);}
+			};
+		}
+		/* @job :: input listener */
+		function PageEventListener(){
+			var operator = new PagePresenterInterface();
+			var events = {
+				'got-mvp':(data) => {operator.load(data.url,data);}
+				,'got-pdf':(data) => {operator.load(data.url,data);}
+				,'got-error':(data) => {operator.error(data.url,data);}
+				,'view-toggle':(data) => {operator.toggle(data.url,data);}
+				,'view-swipe':(data) => {operator.swipe(data.url,data);}
+				,'form-validate':(data) => {operator.validate(data.url,data);}
 			}
 			this.create = function(d){
 				if(d){
-					swipeHead.decorate({'parent':'header section#content','id':'header','mode':'relative','before':()=>{
-						return !$("body").hasClass('scroll-flag');
-					}}).create(d);
 					d.onAppend({'events':Object.keys(events),'issues':Object.values(events)});
 				} else {
-					console.log('page listener','internal dispatcher used');
+					console.warning('page listener','internal dispatcher used');
 					new V13wEv3ntD1spatch3r().onDecorate({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
 				}
 			}
 		}
-
-		var animations = {'fox':{'lineColor':'#373737','lineWidth':'1px','paneParent':'zone','paneId':'fox','scaleFactor':11,'dotLeft':25,'dotBottom':5}
-						,'cv':{'lineColor':'#373737','lineWidth':7,'paneParent':'zone','paneId':'cv'}
-						,'one':{'lineColor':'#373737','lineWidth':'1px','paneParent':'zone','paneId':'one'}
-						,'two':{'lineColor':'#373737','lineWidth':'1px','paneParent':'zone','paneId':'two'}
-						,'tre':{'lineColor':'#373737','lineWidth':'1px','paneParent':'zone','paneId':'tre'}
-					};
-
-		var keymap = {'37':{'call':'get-prev'},'39':{'call':'get-next'}};
-
-		var gestures = {'swiperight':{'call':'get-prev'}
-					   ,'swipeleft':{'call':'get-next'}
-					   ,'orientationchange':{'call':'get-reloaded'}
-					};
-
+		/* @job :: initialize contents */
 		var dispatcher = new V13wEv3ntD1spatch3r();
 		$(document).ready(function(){
 			var config = {
@@ -764,85 +725,82 @@
 			    projectId:"vog3lm-0x1",
 			};
 			firebase.initializeApp(config);
-			new Mvp4p1Operator()/*.decorate({'url':'http://'+window.location.hostname+'/vog3lm-0x1/us-central1'})*/.create(dispatcher);
+			new Mvp4p1Operator().create(dispatcher);
 			new PageEventListener().create(dispatcher);
-		//	new PageSwipePresenter().decorate({'parent':'header section#content','id':'header','before':()=>{
-		//		return !$("body").hasClass('scroll-flag');
-		//	}}).create(d); // done in event listener do here later
 			new D3s1gn4p1Operator().create(dispatcher);
 			new F1rebas3Auth4p1Operator(firebase).create(dispatcher);
 			new BrowserHistorD1spatcher().create(dispatcher);
+			/**/
+			var animations = {'fox':{'lineColor':'#373737','lineWidth':'1px','paneParent':'zone','paneId':'fox','scaleFactor':11,'dotLeft':25,'dotBottom':5}
+							,'cv':{'lineColor':'#373737','lineWidth':7,'paneParent':'zone','paneId':'cv'}
+							,'one':{'lineColor':'#373737','lineWidth':'1px','paneParent':'zone','paneId':'one'}
+							,'two':{'lineColor':'#373737','lineWidth':'1px','paneParent':'zone','paneId':'two'}
+							,'tre':{'lineColor':'#373737','lineWidth':'1px','paneParent':'zone','paneId':'tre'}}
+			var one = new DotNetHolder().operator.decorate(animations.one).create(dispatcher).start();
+			new FoxNetHolder().operator.decorate(animations.fox).interlink(one.objects.dots).create(dispatcher).start();
+			new CvAnimationHolder().operator.decorate(animations.cv).create(dispatcher).start();
+			/* integrate in swipe api operator */
+			var keymap = {'37':{'call':'header-left','url':'header-left'}
+						 ,'39':{'call':'header-right','url':'header-right'}
+						 ,'27':{'call':'view-toggle','url':'keyboard'}};
 			new Keyboard4p1Operator().map(keymap).create();
-			new Swipe4p1Operator().map(gestures).create();
 		});
 		$(window).load(function() {
 			dispatcher.onRegister().onUnleash();
-			$('body').trigger('log-refresh',{'call':'login-refresh','id':'doc-load-next'});
-			$('body').trigger('history-replace',{'call':'get-history','id':'get-next','index':0});
-			$('body').trigger('get-start',{'call':'get-start','id':'doc-load'});
+			$('body').trigger('history-replace',{'call':'got-mvp','url':'page','id':'get-next','index':0});
+			$('body').trigger('got-mvp',{'call':'got-mvp','id':'doc-load','url':'leed'});
 		});
 	</script>
 	<style type="text/css">
-
-		header canvas#one{
-			transform:rotateY(30deg) scaleX(1.15);
-		}
-		header canvas#two{
-			transform:rotateY(-20deg) scaleX(1.15);
-		}
-
-
-		header nav#cfg-navigation{
-			position:absolute;
-			right:0px;
-			bottom:32px;
-			width:32px;
-		}
+		/* custom page styles *//* 
+		 * header animation geometry */
+		header canvas{ position:absolute; }
+		header canvas#one{ transform:rotateY(30deg) scaleX(1.15); }
+		header canvas#two{ transform:rotateY(-20deg) scaleX(1.15); }
+		/* page header section */	
 		header a.fa-chevron-right, /* ui swipe */
 		header a.fa-chevron-left{
 			z-index:2;
 			position:absolute;
 			top:50%;
 		}
-		header a.fa-chevron-right{
-			right:0em;
-		}
-
-
+		header a.fa-chevron-right{ right:0em; }
+		/* reorder hello world label */
 		@media screen and (orientation:landscape){
-			header img#hello{
+			header img#personal{
 				bottom:13%;
 				right:60%;
 				width:22%;
 			}
 		}
 		@media screen and (orientation:portrait){
-			header img#hello{
+			header img#personal{
 				bottom:12%;
 				right:21%;
 				width:50%;
 			}
 		}
-		header img#hello{
+		header img#personal{
 			position: absolute;
     		z-index:1;
     		cursor:pointer;
     		max-height:50%
 		}
-
-		header section#content playground{ /* moving labels */
+		header img#message{
+			position:absolute;
+			z-index:1;
+			cursor:pointer;
+		}
+		/* content access/moving labels */
+		header section#content playground{
 			position:absolute;
 			top:0px;
 			left:0px;
 			width:100%;
 			height:100%;
 		}
-		header section#content playground:nth-child(1){
-			left:100%;
-		}
-		header section#content playground:nth-child(2){
-			left:200%;
-		}
+		header section#content playground:nth-child(1){ left:100%; }
+		header section#content playground:nth-child(2){ left:200%; }
 		header section#content img.label{ 
 			z-index:1;
 			position:absolute;
@@ -863,102 +821,117 @@
 			max-height:168px;
 			min-height:56px;
 		}
+		/**/
+		popup form input,
+		popup form textarea{
+			width:100%;
 
+			font-size:1.5em;
+			color:black;
+		
+			background:transparent;
+		}
+		popup form a.fa{
+			color:black;
+			float:right;
+		}
+		popup form input:nth-of-type(2){
+			margin-top:7px;
+			outline:none;
+		}
+		popup form textarea{
+			margin-top:21px;
+			resize:none;
+			border:0px solid black;
+			outline:none;
+		}
+		popup form error {
+			color:red;
+			display: inline-block;
+		}
+		popup form error:last-of-type{
+			line-height: 32px;
+			height: 32px;
+			vertical-align: middle;
+		}
 
-		@media screen and (orientation:landscape){
-			header section#content passport,
-			header section#content passcroll{
-				width:30%;
-			}
-		}
-		@media screen and (orientation:portrait){
-			header section#content passport,
-			header section#content passcroll{
-				width:50%;
-			}
-		}
-		header section#content passport,
-		header section#content passcroll{
-			position:fixed;
-			left:32px;
-			top:15%;
-			transform:translate(0, -50%);
-			height:calc(30% - 64px);
-		    overflow:hidden;
-		    display:flex;
+		/* skill scout form */
+		header search{
+			position:absolute;
+			left:45%;
+			height:576px;
+			top:-486px;
+			width:40%;
 			z-index:1;
 		}
-		header section#content passport img{
+		header search img {
+			width:100%;
 			height:100%;
-			padding-right:7px;
 		}
+		header search wrap {
+			position:absolute;
+			top:0px;
+			left:100px;
+			width:calc(100% - 100px - 60px);
+			height:calc(100% - 100px);
+			overflow:hidden;
+		}
+		header search wrap form {
+			width:100%;
+			height:100%;
+			margin-left:14px;
+			font-size:2em;
+			overflow-y:auto;
+		}
+		header search wrap form h3 {
+			margin-top:24px;
+			margin-bottom:14px;
+		}
+		header search wrap form input[type="checkbox"]{
+		    display: inline-block;
+			height:16px;
+			width:16px;
+			margin-left:8px;
+			margin-right:8px;
+			cursor:pointer;
 
+            -webkit-appearance:none;
 
-
-		popup p,
-		popup a,
-		popup h2{
-			margin-bottom:1em;
+            background-color:transparent;
+            border:1px solid rgba(187,187,187,1);
+            box-shadow:0px 0px 0px rgba(0,0,0,0.05), inset 0px -15px 10px -12px rgba(0,0,0,0.05);
+            border-radius:0px;			
 		}
-		popup h2{
-			margin-right:2em;
+		header search wrap form input[type="checkbox"]:checked{ background:rgba(187,187,187,1); }
+		header search wrap form l{
+			display: inline-block;
+			height:32px;
+			line-height:32px;
+			vertical-align:middle;
 		}
-		popup a,
-		popup h2{
-			white-space:nowrap;
-			display:inline-flex;
+		header search wrap form l.topic{ min-width:calc(100% / 2 - 32px); }
+		header search wrap form l.code{ min-width:calc(100% / 5 - 32px); }
+		header search a#search-toggle{
+			position:absolute;
+			top:calc(100% - 76px);
+			left:50%;
+			width:96px;
+			color:#363636;
+			font-size:32px;
 		}
-		popup a.wrap p{
-		    margin:0 1em 0 0;
-		    float:left;
-		    line-height:32px;
-		    vertical-align:middle;
-		}
-		popup p:last-child,
-		popup a:last-child,
-		popup h2:last-child{
-			margin-bottom:0em;
-		}
-		popup.dark,
-		popup.dark a,
-		popup.dark h2{
-			background-color:rgb(255,255,255);
-			color:rgb(34,34,34);
-		}
-		popup.light,
-		popup.light a,
-		popup.light h2{
-			background-color:rgb(34,34,34);
-			color:rgb(255,255,255);
-		}
-		popup.flash{
-			background-color:rgb(255,0,170);
-			color:rgb(34,34,34);
-		}
-
-
+		/* footer geometry */
 		@media screen and (min-width:1024px){
 			/* and (orientation:landscape) */
-			footer section p{
-				font-size:2em;
-			}
-			footer section table{
-				font-size:2em;
-			}
-			footer overlay p{
-				font-size:2em;
-			}
+			footer section#content{ width:60%; }
+			footer section p{ font-size:2em; }
+			footer section table{ font-size:2em; }
+			footer overlay p{ font-size:2em; }
 		}
-
-		footer section p{
+		footer section#content p{
 			margin-top:1em;
 			margin-bottom:1em;
 		}
-		footer overlay p{
-			color:gray;
-			font-family:monospace;
-		}
-		footer section textarea{
+		footer section#content textarea{
 			font-size:2em;
 			margin-bottom:0.5em;
 			resize:none;
@@ -969,128 +942,268 @@
 			height:50%;
 			color:rgba(34,34,34,1);
 		}
-		footer section p:first-child,
-		footer section textarea:first-child{
+		footer section#content p:first-child,
+		footer section#content textarea:first-child{
+			margin-top:5em;
+		    max-width: 75%;
+		}
+		footer section#content p:last-child,
+		footer section#content textarea:last-child{ margin-bottom:5em; }
+		footer section#content table{ width:100% }
+		footer section#content table td{ vertical-align:top; }
+		footer section#content table td:nth-child(even){ text-align:center; }
+		footer section#content i.rating{ color:gray; }
+		footer section#content img.photo{
+			position:absolute;
+		    top:0px;
+		    margin-top:10em;
+			right:32px;
+			height:calc(256px * 0.8);
+			width:512px;
+		}
+		footer section#content a.logo{
+			position:absolute;
+			height:86px;
+			/*min-width:86px;*/
+			top:0px;
+			right:0px;
 			margin-top:5em;
 		}
-		footer section p:last-child,
-		footer section textarea:last-child{
-			margin-bottom:5em;
-		}
-		footer section img.lico {
-		    position:absolute;
-			width:2.5em;
-			height:2.5em;
-		}
-		footer section table{
-			width:100%
-		}
-		footer section table td{
-			vertical-align:top; /* top|middle|bottom|baseline */
-		}
-		footer section table td:nth-child(even){
-			text-align:center;
-		}
-		footer a.fa-chevron-down{
-			position:absolute;
-			z-index:1;
-		}
+		footer section#content a.logo img{ height:100%; }
+		footer section#content a#logo-1{ right:0px; }
+		footer section#content a#logo-0{ right:96px; }
 
-
-
-		t.l{
+		footer section#content t.l{
 			display:inline-block;
 			vertical-align:top;
 			width:32px;
 		}
-		t.r{
+		footer section#content t.r{
 			display:inline-block;
 			vertical-align:top;
 			width:calc(100% - 32px);
 		}
+		footer section#content v{
+			width:100%;
+			display:block;
+		}
+		/* loading/error overlay content */
+		footer overlay img{
+			position:absolute;
+			height:25%;
+			left:50%;
+			top:50%;
+			transform:translate(-50%,-50%);
+		}
+		footer overlay p{
+			position:absolute;
+			left:50%;
+			top:65%;
+			transform:translate(-50%,0%);
+			text-align:center;
+		}
+		footer a#close-footer{
+			position:absolute;
+			width:50%;
+			left:25%;
+			z-index:4;
+		}
 
+		/* content print layout *//*
+		 * screen section */
+		footer section.print {
+			display:none;
+			position:relative;
+		}
+		footer section.print-label{
+			display:none;
+			position:absolute;
+			height:calc(25px + 38px + 3em);
+			right:0px;
+			top:0px;
+			margin-top:1em;
+		}
+		footer section.print-label img{ height:100%; }
+		/* print layout *//*
+		 * print section *//*
+		 *  https://www.quackit.com/css/at-rules/css_page_at-rule.cfm 
+		 * https://trac.webkit.org/browser/trunk/Source/WebCore/css/html.css
+		 * https://www.smashingmagazine.com/2015/01/designing-for-print-with-css/ *//*
+		 * level 3 margin-boxes not supported */
+		@media print{
+			@page {margin:1.5cm;}
+			/**/
+			head {display:none;}
+			body{
+				margin:0px;
+				padding:0px;
+				font-size:12pt;
+				font-family:monospace;
+			}
+			/* hide header elements */
+			header {display:none;}
+			/* hide footer elements */
+			footer edge {display:none;}
+			footer a#close-footer {display:none;}
+			footer img.after-effect {display:none;}
+			footer overlay {display:none;}
+			/* size content elements */
+			footer section.print {
+				display:block !important;
+			}
+			footer section.print-label {
+				display:block !important;
+			}
+			footer section#content {
+				position:relative;
+				/*overflow:visible;*/
+				page-break-after:auto;
+				page-break-before:auto;
+				page-break-inside:auto;
+			}
+		}
 	</style>
 </head>
-<body>
+<body class="animation-flag">
 	<header id="zone">
-		<img id="after-effect" class="after-effect" src="" alt="after.head.x.png"></img>
-		<img class="label" call="hello-toggle" q="6PW2gsYzD" id="hello" src=""></img>
+		<img class="after-effect" src="" alt="head"></img>
+		<img id="personal" class="label after-effect" alt="hello" call="view-toggle" url="page" q="6PW2gsYzD" src=""></img>
+		<img id="message" class="hide" alt="message" call="view-toggle" url="message" src="ddd"></img>
+		<search class="hide">
+			<img id="after-search" class="after-effect" alt="scout" src="">
+			<wrap>
+				<form>
+					<!-- !!! anders machen !!! -->
+					<h3>Themengebiete</h3>
+					<l class="topic"><input type="checkbox" name="search-cb-1" value="cb-1">Betriebswirtschaft</l>
+					<l class="topic"><input type="checkbox" name="search-cb-3" value="cb-3">Mathematik</l>
+					<l class="topic"><input type="checkbox" name="search-cb-3" value="cb-3">Netzwerktechnik</l>
+					<l class="topic"><input type="checkbox" name="search-cb-2" value="cb-2">Pädagogik</l>
+					<l class="topic"><input type="checkbox" name="search-cb-1" value="cb-1">Programmieren</l>
+					<l class="topic"><input type="checkbox" name="search-cb-1" value="cb-1">Volkswirtschaft</l>
+					<!-- kuenstliche Intelligenzen -->
+					<!-- Betriebssysteme :: Windows Linux Raspberry Pi Android -->
+					<h3>Programmiersprachen</h3>
+					<l class="code"><input type="checkbox" name="search-cb-1" value="cb-1">Assembler</l>
+					<l class="code"><input type="checkbox" name="search-cb-2" value="cb-2">C</l>
+					<l class="code"><input type="checkbox" name="search-cb-3" value="cb-3">C++</l>
+					<l class="code"><input type="checkbox" name="search-cb-3" value="cb-3">C#</l>
+					<l class="code"><input type="checkbox" name="search-cb-3" value="cb-3">Python</l>
+					<l class="code"><input type="checkbox" name="search-cb-3" value="cb-3">Java</l>
+					<h3>Programmiersprachen</h3>
+					<l class="code"><input type="checkbox" name="search-cb-1" value="cb-1">Assembler</l>
+					<l class="code"><input type="checkbox" name="search-cb-2" value="cb-2">C</l>
+					<l class="code"><input type="checkbox" name="search-cb-3" value="cb-3">C++</l>
+					<l class="code"><input type="checkbox" name="search-cb-3" value="cb-3">C#</l>
+					<l class="code"><input type="checkbox" name="search-cb-3" value="cb-3">Python</l>
+					<l class="code"><input type="checkbox" name="search-cb-3" value="cb-3">Java</l>
+
+				</form>
+			</wrap>
+			<a href="#" id="search-toggle" class="fa fa-chevron-down" call="view-toggle" url="search"></a>
+		</search>
 		<section id="content" index="0">
 			<playground index="2">
-				<img class="label m" call="rating-toggle" q="uiLT6kFBG" id="tutor" src="images/labels/hs.tutor.png"></img>
-				<img class="label m" call="rating-toggle" q="hN3EptFwt" id="konstanz" src="images/labels/uni.mathe.png"></img>
-				<img class="label s" call="rating-toggle" q="lvhPjXCTi" id="abitur" src="images/labels/wg.abi.png"></img>
-				<img class="label s" call="rating-toggle" q="mWwEH7SIG" id="service" src="images/labels/rhk.service.png"></img>
+				<img class="label m" call="view-toggle" url="page" q="uiLT6kFBG" id="tutor" src="images/labels/hs.tutor.png"></img>
+				<img class="label m" call="view-toggle" url="page" q="hN3EptFwt" id="konstanz" src="images/labels/uni.mathe.png"></img>
+				<img class="label s" call="view-toggle" url="page" q="lvhPjXCTi" id="abitur" src="images/labels/wg.abi.png"></img>
+				<img class="label s" call="view-toggle" url="page" q="mWwEH7SIG" id="service" src="images/labels/rhk.service.png"></img>
 			</playground>
 			<playground index="1">
-				<img class="label m" call="rating-toggle" q="QspGcws6S" id="berufsschule" src="images/labels/ihk.bank.png"></img>
-				<img class="label m" call="rating-toggle" q="P6deO31J9" id="bank" src="images/labels/ksk.bank.png"></img>
-				<img class="label s" call="rating-toggle" q="cZ311yCvd" id="zivildienst" src="images/labels/rhk.zivi.png"></img>
-				<img class="label s" call="rating-toggle" q="oa2G72Hbz" id="grundschule" src="images/labels/grund.schule.png"></img>
-				<img class="label s" call="rating-toggle" q="OMHCIBQLa" id="realschule" src="images/labels/mittlere.reife.png"></img>
+				<img class="label m" call="view-toggle" url="page" q="QspGcws6S" id="berufsschule" src="images/labels/ihk.bank.png"></img>
+				<img class="label m" call="view-toggle" url="page" q="P6deO31J9" id="bank" src="images/labels/ksk.bank.png"></img>
+				<img class="label s" call="view-toggle" url="page" q="cZ311yCvd" id="zivildienst" src="images/labels/rhk.zivi.png"></img>
+				<img class="label s" call="view-toggle" url="page" q="oa2G72Hbz" id="grundschule" src="images/labels/grund.schule.png"></img>
+				<img class="label s" call="view-toggle" url="page" q="OMHCIBQLa" id="realschule" src="images/labels/mittlere.reife.png"></img>
 			</playground>
 			<playground index="0">
-		<!--	<img class="label m" call="rating-toggle" q="6PW2gsYzD" id="hello" src="images/labels/hello.world.png"></img> -->
-				<img class="label m" call="rating-toggle" q="VA0850MmS" id="bachelor" src="images/labels/hs.bachelor.png"></img>
-				<img class="label m" call="rating-toggle" q="JxR6XBz6v" id="paedagogik" src="images/labels/ph.png"></img>
-				<img class="label m" call="rating-toggle" q="W9wNjMC7p" id="wirtschaftsinformatik" src="images/labels/hs.wi.png"></img>
-				<img class="label m" call="rating-toggle" q="R59lkouIm" id="schuelerhilfe" src="images/labels/sh.png"></img>
-				<img class="label m" call="rating-toggle" q="t6a5gVVXy" id="zf" src="images/labels/zf.intern.png"></img>
+				<img class="label m" call="view-toggle" url="page" q="VA0850MmS" id="bachelor" src="images/labels/hs.bachelor.png"></img>
+				<img class="label m" call="view-toggle" url="page" q="JxR6XBz6v" id="paedagogik" src="images/labels/ph.png"></img>
+				<img class="label m" call="view-toggle" url="page" q="W9wNjMC7p" id="wirtschaftsinformatik" src="images/labels/hs.wi.png"></img>
+				<img class="label m" call="view-toggle" url="page" q="R59lkouIm" id="schuelerhilfe" src="images/labels/sh.png"></img>
+				<img class="label m" call="view-toggle" url="page" q="t6a5gVVXy" id="zf" src="images/labels/zf.intern.png"></img>
 			</playground>
 		</section>
 		<edge class="hr">
-			<a href="#" class="fa-stack" call="help-toggle">
+			<a href="#" class="fa-stack" call="view-toggle" url="message">
+				<i class="fa fa-circle-thin fa-stack-2x"></i>
+				<i class="fa fa-sticky-note fa-stack-1x"></i>
+			</a>
+			<a href="#" class="fa-stack" call="view-toggle" url="help">
 				<i class="fa fa-circle-thin fa-stack-2x"></i>
 				<i class="fa fa-question fa-stack-1x"></i>
 			</a>
-			<a href="#" class="fa-stack" call="dox-toggle">
+			<a href="#" class="fa-stack" call="view-toggle" url="dox">
 				<i class="fa fa-circle-thin fa-stack-2x"></i>
 				<i class="fa fa-exclamation fa-stack-1x"></i>
 			</a>
-			<a href="#" class="fa-stack" call="project-toggle">
+			<a href="#" class="fa-stack" call="view-toggle" url="samples">
 				<i class="fa fa-circle-thin fa-stack-2x"></i>
 				<i class="fa fa-github fa-stack-1x"></i>
 			</a>
 		</edge>
 		<edge class="br">
-			<a href="#" class="fa fa-cog" call="cfg-toggle"></a>
+			<a href="#" class="fa fa-magnet hide" call="view-toggle" url="style" title="Page Styles"></a>
+			<a href="#" class="fa fa-cog" call="view-toggle" url="animation" title="Animation Controls"></a>
 		</edge>
 		<nav id="cfg-navigation" class="hide">
-			<a href="#" class="fa fa-pause" call="animation-pause" title="Stop Animation"></a>
+			<a href="#" class="fa fa-pause" call="view-toggle" url="animation-move" title="Stop Animation"></a>
 			<a href="#" class="fa"></a>
-			<a href="#" class="fa fa-eyedropper" call="animation-colors" title="Switch Animation Colors"></a>
-			<a href="#" class="fa fa-eye-slash" call="design-toggle" title="Switch Background Colors"></a>
-			<a href="#" class="fa fa-tachometer" call="animation-velocity" title="Animation Speed Configuration"></a>
-			<a href="#" class="fa fa-wrench" call="animation-refresh" title="Reload Page"></a>
+			<a href="#" class="fa fa-eyedropper" call="view-toggle" url="animation-color" title="Switch Interface Colors"></a>
+			<a href="#" class="fa fa-paint-brush" call="design-toggle" title="Switch Interface Design"></a>
+			<a href="#" class="fa fa-tachometer" call="view-toggle" url="animation-velocity"  title="Animation Speed Configuration"></a>
+		</nav>
+		<nav id="cfg-style" class="hide">
+			<a href="/listing" class="fa fa-th-list" title="List View"></a>
+			<a href="/cards" class="fa fa-th-large" title="Card View"></a>
 		</nav>
 		<edge class="bl">
 			<user>
-				<a href="#" class="fa fa-hashtag" call="login-show" title="Show Login"></a>
+				<a href="#" id="login-operator" class="fa fa-hashtag" call="view-toggle" url="login" title="Show Login"></a>
 				<card class='hide'>
-					<a href="#" class="fa fa-user" call="user-toggle" title="Show User Data"></a>
+					<a href="#" id="leed-operator" class="fa fa-envelope hide" call="view-toggle" url="leed" title="Show Leed Text"></a>
+					<a href="#" id="logout-operator" class="fa fa-user" call="log-out" url="login" title="Logout"></a>
 					<id></id>
 				</card>
-				<form class="hide" call="login-validate">
+				<form class="hide" call="form-validate" url="login">
 					<input type="text" id="mail" name="mail" placeholder="mail" value="" autocomplete="on">
 					<input type="password" id="pass" name="pass" placeholder="pass" value="" autocomplete="off">				
 				</form>
 			</user>
 		</edge>
-		<a href="#" id="get-next" class="fa fa-chevron-right" call="get-next"></a>
-		<a href="#" id="get-prev" class="fa fa-chevron-left hide" call="get-prev"></a>
-		<popup class="hide"></popup>
+		<a href="#" id="get-header-next" class="fa fa-chevron-right" call="header-right"></a>
+		<a href="#" id="get-header-prev" class="fa fa-chevron-left hide" call="header-left"></a>
+		<overlay id="header-overlay" class="hide semi"></overlay>
 	</header>
 	<footer>
-		<img id="after-effect" class="after-effect" src="" alt="after.foot.x.png"></img>
-		<a href="#" id="close-footer" class="fa fa-chevron-down" call="rating-toggle"></a>
+		<img class="after-effect" src="" alt="foot"></img>
+		<a href="#" id="close-footer" class="fa fa-chevron-down" call="view-toggle" url="page"></a>
 		<edge class="hr">
-			<a href="#" class="fa fa-download" q="unset" call="origin-download"></a>
-			<a href="#" class="fa fa-print" q="unset" call="origin-print"></a>
+			<a href="#" id="content-download" class="fa fa-download" title="Download PDF" call="view-toggle" q="unset" url="download"></a>
+			<a href="#" id="content-print" class="fa fa-print" title="Print Source" call="view-toggle" q="unset" url="print"></a>
 		</edge>
+		<!-- print layout element -->
+		<section class="print">
+			<h1 id="print-title">Angewandte Informatik</h1>
+			<p id="print-facility">Fachhochschule Ravensburg Weingarten</p>
+			<p id="print-period">2010-2014</p>
+		</section>
+		<section class="print-label">
+			<img id="print-label" src="images/labels/hs.bachelor.png">
+			<img id="print-code" src="images/code.png">
+		</section>
+		<!-- end of print layout block -->
 		<section id="content" index="0" view="emtpy"></section>
-		<edge class="br">
-			<a href="#" class="fa fa-github" call="animation-colors"></a>
-		</edge>
+		<!-- print layout element -->
+		<section class="print">
+			<p id="print-disclaimer">Dieser Ausdruck stellt keinen offiziell gültigen Nachweis für erbrachte Leistungen dar. Es handelt sich um ein selbst erstelltes Duplikat, erstellt am Datum für Benutzername.</p>
+			<p>Link zum offiziell gültigen Leistungsnachweis: <a id="print-link" href="#"></a></p>
+		</section>
+		<!-- end of print layout block -->
+		<overlay id="footer-overlay" class="hide semi">
+			<img src="images/logos/fox.gray.png"></img>
+			<p>lädt...</p>
+		</overlay>
 	</footer>
 </body>
 </html>

@@ -4,6 +4,7 @@ const qrLogin = require('./login');
 const logError = require('./error');
 const logInfo = require('./info');
 
+
 /* data transfer */
 let dto = {"cols":[],"recs":[],"meta":{"state":"error","type":"dto","id":null,"tag":""}};
 let vto = {"view":null,"meta":{"state":"error","type":null,"q":null,"tag":""}};
@@ -43,7 +44,7 @@ module.exports = {
 		dataRecord.meta.state = 'success';
 		dataRecord = JSON.stringify(dataRecord).replace(new RegExp('"','g'),'\\"');
 		logInfo.smartAuth('qr(req,res)','user: '+qrCreds.mail+' leed: '+qrLeed);
-		return res.status(200).send(qrLogin.page(qrLogin.script(qrCreds.mail,qrCreds.pass,dataRecord)));		
+		return res.status(200).send(qrLogin.page(qrLogin.script(qrCreds.mail,qrCreds.pass,dataRecord),qrCreds.mail));		
 	}
 	,'flyer': (rqId,flyId,credential,leeds,views,res) => {
 		/* load data */
@@ -95,23 +96,14 @@ module.exports = {
 		if(viewRecord){
 			console.log("for all view records build");
 			for(var i=0; i < viewRecord.length; i++){
-				
-				let data = JSON.parse(JSON.stringify(vto)); // clone view transfer object
-				let meta = data.meta;
-
-				meta.type = viewRecord[i].type; // text|table|html
+				/* clone view transfer object */
+				let data = JSON.parse(JSON.stringify(vto)); 
+				/* decorate view transfer object */
 				data.view = viewRecord[i].view;
-
-				if(viewRecord[i].hasOwnProperty('meta')){
-					for(var key in viewRecord[i].meta){
-						meta[key] = viewRecord[i].meta[key];
-					}
-				}
-
-				meta.q = qId;
-				meta.state = 'success';
-
-				data.meta = meta;
+				data.meta = viewRecord[i].meta;
+				data.meta.q = qId;
+				data.meta.state = 'success';
+				/* append to response object */
 				dataRecord['cols'].push(qId);
 				dataRecord['recs'].push(data);
 			}
@@ -144,5 +136,26 @@ module.exports = {
 				return res.status(e.code).send(e.message);
 			});
 	}
-
+	,'msg': (data,mail,name,msg) => {
+		var transporter = require('nodemailer')
+		transporter = transporter.createTransport({
+			service: 'gmail',
+			auth:{'user':data['user'],'pass':data['pass']}
+		});
+		/* send request mail */
+		transporter.sendMail({
+			'from':data['user'],
+			'to':'stift.mobile@gmail.com',
+			'subject':'smart.cv msg',
+			'text':'\n'+name+'\n'+msg+'\n\n'+mail
+		},(error,info) => {if(error){console.log(error,info);}});
+		/* confirm request mail 
+		transporter.sendMail({
+			'from':user,
+			'to':sender,
+			'subject':'smart.cv confirm request',
+			'text':''
+		},(error,info)=>{if(error){console.log(error,info);}});
+		*/
+	}
 }

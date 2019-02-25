@@ -20,10 +20,8 @@
 
 		function PageEventListener(){
 
-			var one = new DotNetHolder();
-			one.operator.decorate(animations.one).create().start();
-			var dots = one.objects.dots;
-			var fox = new FoxNetHolder().operator.decorate(animations.fox).interlink(dots).create().start();
+			var one = new DotNetHolder().operator.decorate(animations.one).create().start();
+			var fox = new FoxNetHolder().operator.decorate(animations.fox).interlink(one.objects.dots).create().start();
 
 			var events = {
 				'cfg-toggle':(data) => {

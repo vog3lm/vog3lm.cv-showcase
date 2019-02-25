@@ -24,7 +24,7 @@
 }
 /* Font and Color */
 body, a, h1, h2, h3, h4, h5, h6,
-input, span, p, pre { font-family:'mp-light',serif; white-space:normal; word-break:normal; word-wrap:break-word; white-space:normal; text-align:left; }
+input, span, p, pre, textarea { font-family:'mp-light',serif; white-space:normal; word-break:normal; word-wrap:break-word; white-space:normal; text-align:left; }
 
 a, h1, h2, h3, h4, h5, h6 { vertical-align:middle; text-align:left; }
 a.fa 					  { vertical-align:middle; text-align:center; font-size:1rem; }

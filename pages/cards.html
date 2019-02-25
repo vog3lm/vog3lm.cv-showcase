@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset='utf-8'/>
+	<meta name="theme-color" content="#222222"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<title>smart.cv.og3lm</title>
+	<link rel="manifest" href="/manifest.json"/>
+	<link rel="stylesheet" type="text/css" href="css/font.awesome.min.css" media="screen,print"/>
+    <link rel="stylesheet" type="text/css" href="css/font.geometry.css" media="screen"/>
+    <link rel="stylesheet" type="text/css" href="css/design.geometry.css" media="screen"/>
+    <!-- PRELOAD FONTS -->
+    <link rel="preload" href="fonts/UbuntuMono-R.ttf" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="fonts/MyriadPro-Light.woff" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="fonts/MyriadPro-Semibold.woff" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="fonts/MyriadPro-Bold.woff" as="font" crossorigin="anonymous" />
+    <!-- PRELOAD FONTS -->
+	<link rel="shortcut icon" href="images/logos/fox.white.png" type="image/x-icon"/>
+	<link rel="icon" 		  href="images/logos/fox.white.png" type="image/x-icon"/>
+
+	<script src="https://www.gstatic.com/firebasejs/4.9.1/firebase-app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/4.9.1/firebase-auth.js"></script>
+
+	<script type="text/javascript" src="js/jq.min.js"></script>
+	<script type="text/javascript" src="js/jm.min.js"></script>
+	<script type="text/javascript" src="js/backend.js"></script>
+	<script type="text/javascript">
+		/* @job :: content presenter */
+		function PageContentPresenter(){
+			/* global args */
+			var pageHeight = $(window).height();
+			var pageWidth = $(window).width();
+			var body = $('body');
+			/* animation view args */
+			var uiHolder = $('header nav#cfg-navigation');
+			this.animation = {
+				'toggle':() => {uiHolder.toggleClass('hide');}
+			};
+			/* page style view args */
+			this.style = {
+				'toggle':() => {$('header nav#cfg-style').toggleClass('hide');}
+			}
+			/* login view args */
+			var loginHolder = $('user');
+			var loginCard = $('user card');
+			var loginForm = $('user form');
+			var loginOperator = $('user a#login-operator');
+			var loginUser = null;
+			this.login = {
+				'load':(data) => {
+					/* clear errors */
+					loginOperator.removeClass('error');
+					loginForm.removeClass('error');
+					/* clear inputs */
+					loginHolder.find('input#mail').val('');
+					loginHolder.find('input#pass').val('');
+					/* load view */
+					if('auth-state-login' === data.id){
+						loginUser = data.user;
+						loginHolder.find('id').html(loginUser.email);
+						loginForm.addClass('hide');
+						loginCard.removeClass('hide');
+						loginOperator.removeClass('fa-circle-o-notch');
+						loginOperator.removeClass('fa-spin');
+						loginOperator.removeClass('fa-hashtag');
+						loginOperator.removeClass('fa-user');
+						loginOperator.addClass('fa-lock');
+						loginOperator.attr('call','view-toggle');
+						loginOperator.attr('url','user');
+						loginOperator.attr('title','Show User');
+					//	this.leed.show();
+					}else{
+						loginCard.addClass('hide');
+						loginForm.addClass('hide');
+						loginOperator.attr('url','login');
+						loginOperator.removeClass('fa-lock');
+						loginOperator.addClass('fa-hashtag');
+					}
+				}
+				,'show':() => {
+					loginForm.removeClass('hide');
+					loginOperator.attr('title','Hide Login');
+					loginOperator.removeClass('fa-hashtag');
+					loginOperator.addClass('fa-user');
+					loginHolder.find('input#mail').focus();
+				}
+				,'hide':() => {
+					/* clear errors */
+					loginOperator.removeClass('error');
+					loginForm.removeClass('error');
+					/*  */
+					loginForm.addClass('hide');
+					loginOperator.attr('title','Show Login');
+					loginOperator.removeClass('fa-user');
+					loginOperator.addClass('fa-hashtag');
+				}
+				,'toggle':() => {
+					if(loginForm.hasClass('hide')){this.login.show();} 
+					else{this.login.hide();}
+				}
+				,'validate':() => {
+					var user = loginForm.find('input#mail').val();
+					var pass = loginForm.find('input#pass').val();
+					/* developer access TODO delete */
+					var errors = [];
+					if('' === user){errors.push('no user name found');}
+					if('' === pass){errors.push('no password found');}
+					if(0 < errors.length){
+						this.login.error({'errors':errors});
+					}else{
+						loginOperator.removeClass('fa-user');
+						loginOperator.addClass('fa-circle-o-notch');
+						loginOperator.addClass('fa-spin');
+						$('body').trigger('log-in',[{'call':'log-in','id':'login-validate','url':'login','mail':user,'pass':pass}]);
+					}
+				}
+				,'error':(data) => {
+					loginOperator.removeClass('fa-circle-o-notch');
+					loginOperator.removeClass('fa-spin');
+					loginOperator.addClass('fa-user');
+					loginOperator.addClass('error');
+					loginForm.addClass('error');
+					loginForm.find('input#mail').addClass('error');
+					loginForm.find('input#pass').addClass('error');
+					// show popup ...
+				}
+				,'popup':() => {
+					var content = ''
+					if(null === loginUser){
+						content = '<p>No User Found.</p>'
+								+ '<p>Sign In First.</p>'
+					}else{
+						content = '<h2>User Details</h2>'
+							/*	+ '<img src="images/logo.png">'
+								+ '<img src="images/code.png">'
+								    width:164px;
+								    position:absolute;
+								    right:1em;
+								    top:calc(32px + 1em); */
+								+ '<p>Name: '+loginUser.name+'</p>'
+								+ '<p>Email: '+loginUser.email+'</p>'
+								+ '<p>Phone: '+ loginUser.phone+'</p>'
+								+ '<p>Platform: '+ navigator.platform+'</p>'
+								+ '<p>User Id: '+ loginUser.uid+'</p>'
+								+ '<p>User Token: '+ loginUser.token+'</p>'
+					}
+					this.popup.load({'content':content,'timeout':null,'size':'match'});
+					this.popup.show();
+				}
+			};
+			/* footer view args */
+			var footerHolder = $('footer');
+			var footerOperator = $('header a#footer-toggle');
+			this.footer = {
+				'show':(data) => {
+					body.scrollTop(footerHolder.height());
+					body.addClass('scroll-flag');
+					footerOperator.removeClass('fa-chevron-up');
+					footerOperator.addClass('fa-chevron-down');
+				}
+				,'hide':() => {
+					body.scrollTop(0);
+					body.removeClass('scroll-flag');
+					footerOperator.removeClass('fa-chevron-down');
+					footerOperator.addClass('fa-chevron-up');
+				}
+				,'toggle':(data) => {
+					if(!body.hasClass('scroll-flag')){this.footer.show(data);}
+					else{this.footer.hide();}
+				}
+			};
+			/* detail view args */
+			this.detail = {
+				'show':(data) => {
+					console.log('show detail overlay');
+				}
+				,'hide':(data) => {
+					console.log('hide detail overlay');
+				}
+				,'toggle':(data) => {
+					if($('header section#content div#'+data.id).hasClass('hide')){this.detail.show(data);}
+					else{this.detail.hide(data);}
+				}
+			}
+
+		}
+		/* @job :: input operator */
+		function PagePresenterInterface(){
+			var presenter = new PageContentPresenter();
+			/* auto routing interaface methods */
+			this.load = (key,data)=>{
+				if('login' === key){presenter.login.load(data);}
+				else{console.error('load error. content key',key,'is unknown.',data);}
+			};
+			this.error = (key,data)=>{
+				if('login' === key){presenter.login.error(data);}
+				else{console.error('error error. content key',key,'is unknown.',data);}
+			}
+			this.show = (key,data)=>{
+				if('login' === key){presenter.login.show();}
+				else{console.error('show error. content key',key,'is unknown.',data);}
+			};
+			this.hide = (key,data)=>{
+				if('login' === key){presenter.login.hide();}
+				else{console.error('hide error. content key',key,'is unknown.',data);}
+			};
+			this.toggle = (key,data)=>{
+				if('login' === key){presenter.login.toggle();}
+				else if('style' === key){presenter.style.toggle();}
+				else if('animation' === key){presenter.animation.toggle();}
+				else if('footer' === key){presenter.footer.toggle();}
+				else if('detail' === key){presenter.detail.toggle(data);}
+				else{console.error('toggle error. content key',key,'is unknown.',data);}
+			};
+			this.validate = (key,data)=>{
+				if('login' == key){presenter.login.validate();}
+				else{console.error('validate error. content key',key,'is unknown.',data);}
+			};
+		}
+		/* @job :: input listener */
+		function PageEventListener(){
+			var operator = new PagePresenterInterface();
+			var events = {
+				'got-mvp':(data) => {operator.load(data.url,data);}
+				,'got-pdf':(data) => {operator.load(data.url,data);}
+				,'got-error':(data) => {operator.error(data.url,data);}
+				,'view-toggle':(data) => {operator.toggle(data.url,data);}
+				,'view-swipe':(data) => {operator.swipe(data.url,data);}
+				,'form-validate':(data) => {operator.validate(data.url,data);}
+			}
+			this.create = function(d){
+				if(d){
+					d.onAppend({'events':Object.keys(events),'issues':Object.values(events)});
+				} else {
+					console.warning('page listener','internal dispatcher used');
+					new V13wEv3ntD1spatch3r().onDecorate({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
+				}
+			}
+		}
+		/* @job :: initialize contents */
+		var dispatcher = new V13wEv3ntD1spatch3r();
+		$(document).ready(function(){
+			var config = {
+			    apiKey:"AIzaSyDmXSkwOam-aQ37z8-3d5aH-X257lIVS34",
+			    authDomain:"vog3lm-0x1.firebaseapp.com",
+			    projectId:"vog3lm-0x1",
+			};
+			firebase.initializeApp(config);
+			new Mvp4p1Operator().create(dispatcher);
+			new PageEventListener().create(dispatcher);
+			new D3s1gn4p1Operator().create(dispatcher);
+			new F1rebas3Auth4p1Operator(firebase).create(dispatcher);
+		});
+		$(window).load(function() {
+			dispatcher.onRegister().onUnleash();
+		});
+	</script>
+	<style type="text/css">
+
+		header section#content{
+			z-index:2;
+			overflow-y:auto;
+			width:60%;
+			margin-left:20%;
+			margin-right:20%;
+		}
+		header section#content::-webkit-scrollbar{ display:none; }
+		header section#content label{
+			display:inline-block;
+			position:relative;
+			height:786px;
+			width:calc(50% - 14px);
+			margin:7px;
+			float:left;
+		}
+		header section#content label:first-of-type{
+			width:100%;
+		}
+		header section#content label img.label{
+			cursor:pointer;
+			width:100%;
+		}
+
+		header a#footer-toggle{
+			z-index:2;
+			position:absolute;
+			bottom:12px;
+			left:36%;
+			width:96px;
+			color:#363636;
+			font-size:32px;
+		}
+
+		/* content print layout *//*
+		 * screen section */
+		/* print section */
+		@media print{
+			@page {margin:1.5cm;}
+		}
+
+	</style>
+</head>
+<body>
+	<header id="zone">
+		<img id="after-effect" class="after-effect" src="" alt="head"></img>
+		<section id="content">
+			<label id="hello"><!-- -->
+				<img id="hello" class="label after-effect" src="" call="view-toggle" q="unset" url="detail" alt="hello"></img>
+			</label>
+
+			<label id="sh"><!-- 2013 -->
+				<img id="sh" class="label" src="images/labels/sh.png" call="view-toggle" q="unset" url="detail" alt="hello"></img>
+			</label>
+
+			<label id="wi"><!-- 2015-2018 -->
+				<img id="wi" class="label" src="images/labels/hs.wi.png" call="view-toggle" q="unset" url="detail" alt="hello"></img>
+			</label>
+
+			<label id="ph"><!-- 2015-2018 -->
+				<img id="ph" class="label" src="images/labels/ph.png" call="view-toggle" q="unset" url="detail" alt="hello"></img>
+			</label>
+
+
+
+
+			<label id="bachelor"><!-- 2010-2014 -->
+				<img id="bachelor" class="label" src="images/labels/hs.bachelor.png" call="view-toggle" q="unset" url="detail" alt="hello"></img>
+			</label>
+
+			<label id="zf"><!-- 2013-2014 -->
+				<img id="zf" class="label" src="images/labels/zf.intern.png" call="view-toggle" q="unset" url="detail" alt="hello"></img>
+			</label>
+
+			<label id="tutor"><!-- 2010-2014 -->
+				<img id="tutor" class="label" src="images/labels/hs.tutor.png" call="view-toggle" q="unset" url="detail" alt="hello"></img>
+			</label>
+
+
+
+
+			<label id="uni"><!-- 2009-2010 -->
+				<img id="uni" class="label" src="images/labels/uni.mathe.png" call="view-toggle" q="unset" url="detail" alt="hello"></img>
+			</label>
+
+
+
+
+			<label id="abi"><!-- 2006-2009 -->
+				<img id="abi" class="label" src="images/labels/wg.abi.png" call="view-toggle" q="unset" url="detail" alt="hello"></img>
+			</label>
+
+
+
+
+			<label id="zivi"><!-- 2004-2005 -->
+				<img id="zivi" class="label" src="images/labels/rhk.zivi.png" call="view-toggle" q="unset" url="detail" alt="hello"></img>
+			</label>
+
+			<label id="ksk"><!-- 2001-2004 -->
+				<img id="ksk" class="label" src="images/labels/ksk.bank.png" call="view-toggle" q="unset" url="detail" alt="hello"></img>
+			</label>
+
+			<label id="ihk"><!-- 2001-2003 -->
+				<img id="ihk" class="label" src="images/labels/ihk.bank.png" call="view-toggle" q="unset" url="detail" alt="hello"></img>
+			</label>
+
+
+
+
+			<label id="real"><!-- 2001-2003 -->
+				<img id="real" class="label" src="images/labels/mittlere.reife.png" call="view-toggle" q="unset" url="detail" alt="hello"></img>
+			</label>
+
+			<label id="og"><!-- 2001-2003 -->
+				<img id="og" class="label" src="images/labels/grund.schule.png" call="view-toggle" q="unset" url="detail" alt="hello"></img>
+			</label>
+
+
+
+		</section>
+		<edge class="br">
+			<a href="#" class="fa fa-wrench" call="view-toggle" url="style" title="Page Styles"></a>
+			<a href="#" class="fa fa-cog" call="view-toggle" url="animation" title="Animation Controls"></a>
+		</edge>
+		<nav id="cfg-navigation" class="hide">
+			<a href="#" class="fa fa-paint-brush" call="design-toggle" title="Switch Interface Design"></a>
+		</nav>
+		<nav id="cfg-style" class="hide">
+			<a href="/listing" class="fa fa-th-list" title="Card View"></a>
+			<a href="/animation" class="fa fa-heartbeat" title="Animation View"></a>
+		</nav>
+		<edge class="bl">
+			<user>
+				<a href="#" id="login-operator" class="fa fa-hashtag" call="view-toggle" url="login" title="Show Login"></a>
+				<card class='hide'>
+					<a href="#" id="leed-operator" class="fa fa-envelope hide" call="view-toggle" url="leed" title="Show Leed Text"></a>
+					<a href="#" id="logout-operator" class="fa fa-user" call="log-out" url="login" title="Logout"></a>
+					<id></id>
+				</card>
+				<form class="hide" call="form-validate" url="login">
+					<input type="text" id="mail" name="mail" placeholder="mail" value="" autocomplete="on">
+					<input type="password" id="pass" name="pass" placeholder="pass" value="" autocomplete="off">				
+				</form>
+			</user>
+		</edge>
+		<a href="#" id="footer-toggle" class="fa fa-chevron-up" call="view-toggle" url="footer"></a>
+	</header>
+	<footer>
+		<img id="after-effect" class="after-effect" src="" alt="foot"></img>
+	</footer>
+</body>
+</html>

@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset='utf-8'/>
+	<meta name="theme-color" content="#222222"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+	<title>smart.cv.og3lm</title>
+	<link rel="manifest" href="/manifest.json"/>
+	<link rel="stylesheet" type="text/css" href="css/font.awesome.min.css" media="screen,print"/>
+    <link rel="stylesheet" type="text/css" href="css/font.geometry.css" media="screen"/>
+    <link rel="stylesheet" type="text/css" href="css/design.geometry.css" media="screen"/>
+    <!-- PRELOAD FONTS -->
+    <link rel="preload" href="fonts/UbuntuMono-R.ttf" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="fonts/MyriadPro-Light.woff" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="fonts/MyriadPro-Semibold.woff" as="font" crossorigin="anonymous" />
+    <link rel="preload" href="fonts/MyriadPro-Bold.woff" as="font" crossorigin="anonymous" />
+    <!-- PRELOAD FONTS -->
+	<link rel="shortcut icon" href="images/logos/fox.white.png" type="image/x-icon"/>
+	<link rel="icon" 		  href="images/logos/fox.white.png" type="image/x-icon"/>
+
+	<script src="https://www.gstatic.com/firebasejs/4.9.1/firebase-app.js"></script>
+	<script src="https://www.gstatic.com/firebasejs/4.9.1/firebase-auth.js"></script>
+
+	<script type="text/javascript" src="js/jq.min.js"></script>
+	<script type="text/javascript" src="js/jm.min.js"></script>
+	<script type="text/javascript" src="js/backend.js"></script>
+	<script type="text/javascript" src="js/animate.fox.js"></script>
+	<script type="text/javascript" src="js/animate.dots.js"></script>
+	<script type="text/javascript">
+		/* @job :: dto to content adapter */
+		function PageContentAdapter(){
+			/* adapter meta.tag interface */
+			this.get = function(data){
+				var meta = data.meta;
+				if('success' === meta.state){
+					if('samples' === meta.tag){return this.samples(data.recs);}
+					else{return this.mixed(data.recs,data.id);} 
+				}
+				else if('errors' === meta.state){
+					console.log(data.errors)
+					// if('Firebase Cold Start Error' in data.errors):
+					// data['id'] = 'smart.cv.og3lm';
+					return {'title':'smart.cv.og3lm','html':''};
+				}
+				else{return {'title':'smart.cv.og3lm','html':''};}
+			}
+			/* adapt content methods */
+			this.mixed = function(records,title){
+				var adaption = '';
+				var print = {'title':'No Title','facility':'No Facility','period':'No Period','code':'No QR Code','label':'No Label','user':'No User','link':'No Link'};
+				for(var i=0; i < records.length; i++){
+					var vto = records[i];
+					if('success' == vto.meta.state){
+							 if('text' === vto.meta.type){adaption = adaption+text(vto.view);}
+						else if('table' === vto.meta.type){adaption = adaption+table(vto.view,vto.meta);}
+						else if('html' === vto.meta.type){adaption = adaption+html(vto.view,vto.meta);}
+						else if('rate' === vto.meta.type){adaption = adaption+rate(vto.view,vto.meta);}
+						else if('image' === vto.meta.type){adaption = adaption+image(vto.view,vto.meta);}
+						else if('print' === vto.meta.type){print = vto.view;}
+					}
+				};
+				return {'title':title,'html':adaption,'print':print}; 
+			}
+			this.samples = function(records){
+				var html = '<h2>Code Samples</h2>';
+				for(var i=0; i<records.length; i++){
+					var record = records[i];
+					html = html + '<a href="'+record.url+'" class="wrap">'
+								+ '<p class="fa fa-'+record.src+'"></p>'
+								+ '<p>'+record.text+'</p></a>';
+				}
+				return {'title':'Samples','html':html}; 
+			}
+			/* private helpers */
+			function text(lines){
+				var adaption = '';
+				for(var i=0; i<lines.length; i++){
+					var tmp = lines[i];
+					if(tmp.indexOf('\t') != -1){
+						tmp = tmp.split('\t');
+						tmp = '<t class="l">'+tmp[0]+'</t><t class="r">'+tmp[1]+'</t>';
+					}
+					adaption = adaption+'<p>'+tmp+'</p>';
+				};
+				return adaption;
+			}
+			function table(records,meta){
+				var adaption = '';
+				if(meta.hasOwnProperty('title')){
+					adaption = adaption+'<p><b>'+records[meta.title]+'</b></p>';
+					records.shift();
+				}
+				var width = 100/meta.cols;
+				adaption = adaption+'<table>'
+				for(var i=0; i<records.length; i=i+meta.cols){
+					adaption = adaption+'<tr>';
+					for(var j=0; j<meta.cols; j=j+1){
+						if(null != records[i+j]){
+							adaption = adaption+'<td style="width:'+width+'%"">'+records[i+j]+'</td>';
+						}
+					}
+					adaption = adaption+'</tr>';
+				};
+				return adaption+'</table><p> </p>';
+			}
+			function html(records,meta){
+				var adaption = '';
+				if(meta.hasOwnProperty('title')){
+					adaption = adaption+'<p><b>'+records[meta.title]+'</b></p>';
+					records.shift();
+				}
+				for(var i=0; i<records.length; i++){
+					adaption = adaption+records[i];
+				}
+				return adaption;
+			}
+			function image(records,meta){
+				var adaption = '';
+				if('logo' === meta.url){
+					for(var i=0; i<records.length; i++){
+						var element = records[i];
+						adaption = adaption+'<a href="'+element.link+'" id="'+meta.class+'-'+i+'" class="'+meta.class+'"><img src="images/logos/'+element.url+'"></<>';
+					}
+				}else{
+					for(var i=0; i<records.length; i++){
+						adaption = adaption+'<img id="'+meta.class+'-'+i+'" alt="portrait" class="'+meta.class+'" src="'+meta.url+records[i].url+'">';
+					};
+				}
+				return adaption;
+			}
+			function rate(records,meta){
+				var adaption = '';
+				if(meta.hasOwnProperty('title')){
+					adaption = adaption+'<p><b>'+records[meta.title]+'</b></p>';
+					records.shift();
+				}
+				var cols = meta.cols;
+				adaption = adaption+'<table>';
+				for(var m=0; m<records.length; m=m+cols*2){
+					adaption = adaption+'<tr>';
+					for(var i=m; i<m+cols*2; i=i+2){
+						if(records[i]){
+							adaption = adaption+'<td>'+records[i]+'</td><td>'
+							for(var j=0; j<records[i+1];j++){
+								adaption = adaption+'<i class="rating fa fa-star"></i>';
+							}
+							for(var j=0; j<5-records[i+1];j++){
+								adaption = adaption+'<i class="rating fa fa-star-o"></i>';
+							}
+							adaption = adaption+'</td>';
+						}
+					}
+					adaption = adaption+'</tr>';
+				};
+				return adaption+'</table><p> </p>';
+			}
+		}
+		/* @job :: content presenter */
+		function PageContentPresenter(){
+			/* content operator objects */
+			var adapter = new PageContentAdapter();
+			var popup = new P0pup4p1Operator().create(dispatcher);
+			/* global args */
+			var pageHeight = $(window).height();
+			var pageWidth = $(window).width();
+			var body = $('body');
+			/* animation view args */
+			var uiHolder = $('header nav#cfg-navigation');
+			this.animation = {
+				'toggle':() => {uiHolder.toggleClass('hide');}
+			};
+			/* page style view args */
+			this.style = {
+				'toggle':() => {$('header nav#cfg-style').toggleClass('hide');}
+			}
+			/* login view args */
+			var loginHolder = $('user');
+			var loginCard = $('user card');
+			var loginForm = $('user form');
+			var loginOperator = $('user a#login-operator');
+			var loginUser = null;
+			this.login = {
+				'load':(data) => {
+					/* clear errors */
+					loginOperator.removeClass('error');
+					loginForm.removeClass('error');
+					/* clear inputs */
+					loginHolder.find('input#mail').val('');
+					loginHolder.find('input#pass').val('');
+					/* load view */
+					if('auth-state-login' === data.id){
+						loginUser = data.user;
+						loginHolder.find('id').html(loginUser.email);
+						loginForm.addClass('hide');
+						loginCard.removeClass('hide');
+						loginOperator.removeClass('fa-circle-o-notch');
+						loginOperator.removeClass('fa-spin');
+						loginOperator.removeClass('fa-hashtag');
+						loginOperator.removeClass('fa-user');
+						loginOperator.addClass('fa-lock');
+						loginOperator.attr('call','view-toggle');
+						loginOperator.attr('url','user');
+						loginOperator.attr('title','Show User');
+					//	this.leed.show();
+					}else{
+						loginCard.addClass('hide');
+						loginForm.addClass('hide');
+						loginOperator.attr('url','login');
+						loginOperator.removeClass('fa-lock');
+						loginOperator.addClass('fa-hashtag');
+					}
+				}
+				,'show':() => {
+					loginForm.removeClass('hide');
+					loginOperator.attr('title','Hide Login');
+					loginOperator.removeClass('fa-hashtag');
+					loginOperator.addClass('fa-user');
+					loginHolder.find('input#mail').focus();
+				}
+				,'hide':() => {
+					/* clear errors */
+					loginOperator.removeClass('error');
+					loginForm.removeClass('error');
+					/*  */
+					loginForm.addClass('hide');
+					loginOperator.attr('title','Show Login');
+					loginOperator.removeClass('fa-user');
+					loginOperator.addClass('fa-hashtag');
+				}
+				,'toggle':() => {
+					if(loginForm.hasClass('hide')){this.login.show();} 
+					else{this.login.hide();}
+				}
+				,'validate':() => {
+					var user = loginForm.find('input#mail').val();
+					var pass = loginForm.find('input#pass').val();
+					/* developer access TODO delete */
+					user = 'adm1n@smart.cv.de';
+					pass = '44920420$Dollar';
+					/* developer access TODO delete */
+					var errors = [];
+					if('' === user){errors.push('no user name found');}
+					if('' === pass){errors.push('no password found');}
+					if(0 < errors.length){
+						this.login.error({'errors':errors});
+					}else{
+						loginOperator.removeClass('fa-user');
+						loginOperator.addClass('fa-circle-o-notch');
+						loginOperator.addClass('fa-spin');
+						$('body').trigger('log-in',[{'call':'log-in','id':'login-validate','url':'login','mail':user,'pass':pass}]);
+					}
+				}
+				,'error':(data) => {
+					loginOperator.removeClass('fa-circle-o-notch');
+					loginOperator.removeClass('fa-spin');
+					loginOperator.addClass('fa-user');
+					loginOperator.addClass('error');
+					loginForm.addClass('error');
+					loginForm.find('input#mail').addClass('error');
+					loginForm.find('input#pass').addClass('error');
+					// show popup ...
+				}
+				,'popup':() => {
+					var content = ''
+					if(null === loginUser){
+						content = '<p>No User Found.</p>'
+								+ '<p>Sign In First.</p>'
+					}else{
+						content = '<h2>User Details</h2>'
+							/*	+ '<img src="images/logo.png">'
+								+ '<img src="images/code.png">'
+								    width:164px;
+								    position:absolute;
+								    right:1em;
+								    top:calc(32px + 1em); */
+								+ '<p>Name: '+loginUser.name+'</p>'
+								+ '<p>Email: '+loginUser.email+'</p>'
+								+ '<p>Phone: '+ loginUser.phone+'</p>'
+								+ '<p>Platform: '+ navigator.platform+'</p>'
+								+ '<p>User Id: '+ loginUser.uid+'</p>'
+								+ '<p>User Token: '+ loginUser.token+'</p>'
+					}
+					this.popup.load({'content':content,'timeout':null,'size':'match'});
+					this.popup.show();
+				}
+			};
+			/* footer view args */
+			var footerHolder = $('footer');
+			var footerOperator = $('header a#footer-toggle');
+			var footerMessage = $('footer form textarea#message');
+			var footerSender = $('footer form input#name');
+			var footerFrom = $('footer form input#from');
+			var errorMessage = $('footer form error#message');
+			var errorSender = $('footer form error#name');
+			var errorFrom = $('footer form error#from');
+			this.footer = {
+				'show':(data) => {
+					body.scrollTop(footerHolder.height());
+					body.addClass('scroll-flag');
+					footerOperator.removeClass('fa-chevron-up');
+					footerOperator.addClass('fa-chevron-down');
+				}
+				,'hide':() => {
+					body.scrollTop(0);
+					body.removeClass('scroll-flag');
+					footerOperator.removeClass('fa-chevron-down');
+					footerOperator.addClass('fa-chevron-up');
+				}
+				,'toggle':(data) => {
+					if(!body.hasClass('scroll-flag')){this.footer.show(data);}
+					else{this.footer.hide();}
+				}
+				,'validate':() => {
+					errorSender.addClass('hide');
+					errorFrom.addClass('hide');
+					errorMessage.addClass('hide');
+					var from = footerSender.val();
+					var mail = footerFrom.val();
+					var text = footerMessage.val();
+					var errors = [];
+					if('' === from){
+						errors.push('no sender name found');
+						errorSender.removeClass('hide');
+					}
+					if('' === mail){
+						errors.push('no sender mail found');
+						errorFrom.removeClass('hide');
+					}
+					if('' === text){
+						errors.push('no message found');
+						errorMessage.removeClass('hide');
+					}
+					if(0 < errors.length){
+						this.footer.error({'errors':['input errors found'],'code':1});
+					}
+					else{body.trigger('call-msg',[{'call':'call-msg','id':'footer-validate','url':'footer','from':from,'mail':mail,'message':text}]);}
+				}
+				,'error':(data) => {
+					console.log(data);
+					// 'error '+data.code+': '+data.errors.join('<br>')
+				}
+			};
+			/* detail view args */
+			var headerOverlay = $('header overlay');
+			var headerContent = $('header section#content');
+			var printableId = null;
+			this.detail = {
+				'load':(data) => {
+					var vto = adapter.get(data);
+					var element = headerContent.find('div#'+data.id);
+					var section = element.find('section');
+					section.removeClass('loading');
+				//	section.addClass('presenting')
+					section.html(vto.html);
+					element.find('a.fa-download').attr('q',data.meta.id);
+					element.find('a.fa-print').attr('q',data.meta.id);
+					element.addClass('mvp-flag');
+				}
+				,'show':(data) => {
+					var element = headerContent.find('div#'+data.id);
+					if(element.hasClass('last-child')){
+						$('line#'+data.id).css({'margin-bottom':'7px'});
+					}
+					element.removeClass('hide');
+					if(!element.hasClass('mvp-flag')){
+						element.find('section').addClass('loading');
+						if(null === loginUser){this.detail.error({'tag':data.id,'id':data.id,'code':'0','errors':['no user logged in','log in or request permission']});}
+						else{body.trigger('call-mvp',[{'tag':data.id,'id':data.id,'url':'detail','q':$('img#'+data.id).attr('q')}]);}
+					}
+				}
+				,'hide':(data) => {
+					var element = headerContent.find('div#'+data.id);
+					if(element.hasClass('last-child')){
+						$('line#'+data.id).css({'margin-bottom':'10%'});
+					}
+					element.addClass('hide');
+					this.detail.compress();
+				}
+				,'toggle':(data) => {
+					if(headerContent.find('div#'+data.id).hasClass('hide')){this.detail.show(data);}
+					else{this.detail.hide(data);}
+				}
+				,'expand':(data) => {
+					var element = headerContent.find('div#'+data.id);
+					if(element.hasClass('mvp-flag')){headerOverlay.removeClass('loading');}
+					else{headerOverlay.addClass('loading');}
+					headerOverlay.html(element.html());
+					// register new user input interface :: print collapse close
+					var uiOps = headerOverlay.find('a.fa-expand');
+					uiOps.removeClass('fa-expand');
+					uiOps.addClass('fa-compress');
+					uiOps.attr('url','compress');
+					uiOps.attr('title','Exit Fullscreen');
+					uiOps.on('click',()=>{body.trigger('view-toggle',[{'call':'view-toggle','url':'compress','id':element.attr('id')}]);});
+					headerOverlay.find('a.fa-times').on('click',()=>{body.trigger('view-toggle',[{'call':'view-toggle','url':'detail','id':element.attr('id')}]);});
+					headerOverlay.toggleClass('hide');
+				}
+				,'compress':() => {
+					headerOverlay.addClass('hide');
+					headerOverlay.html('');
+				}
+				,'print':(data) => {
+					if('afterprint' === data.id){
+						headerContent.scrollTop($('line#'+printableId).offset().top);
+						printableId = null;
+					}
+					else{
+						printableId = data.id;
+						window.print();
+					}
+				}
+				,'error':(data) => {
+					headerContent.find('div#'+data.tag).find('p').html('error '+data.code+': '+data.errors.join('<br>'));
+				}
+			}
+		}
+		/* @job :: input operator */
+		function PagePresenterInterface(){
+			var presenter = new PageContentPresenter();
+			/* auto routing interaface methods */
+			this.load = (key,data)=>{
+				if('login' === key){presenter.login.load(data);}
+				else if('detail' === key){presenter.detail.load(data);}
+				else{console.error('load error. content key',key,'is unknown.',data);}
+			};
+			this.error = (key,data)=>{
+				if('login' === key){presenter.login.error(data);}
+				else if('detail' === key){presenter.detail.error(data);}
+				else if('error' === key){presenter.footer.error(data);}
+				else{console.error('error error. content key',key,'is unknown.',data);}
+			}
+			this.show = (key,data)=>{
+				if('login' === key){presenter.login.show();}
+				else{console.error('show error. content key',key,'is unknown.',data);}
+			};
+			this.hide = (key,data)=>{
+				if('login' === key){presenter.login.hide();}
+				else{console.error('hide error. content key',key,'is unknown.',data);}
+			};
+			this.toggle = (key,data)=>{
+				if('login' === key){presenter.login.toggle();}
+				else if('style' === key){presenter.style.toggle();}
+				else if('animation' === key){presenter.animation.toggle();}
+				else if('footer' === key){presenter.footer.toggle();}
+				else if('detail' === key){presenter.detail.toggle(data);}
+				else if('expand' === key){presenter.detail.expand(data);}
+				else if('compress' === key){presenter.detail.compress();}
+				else if('mail' === key){presenter.footer.toggle(data);}
+				else if('print' === key){presenter.detail.print(data);}
+				else{console.error('toggle error. content key',key,'is unknown.',data);}
+			};
+			this.validate = (key,data)=>{
+				if('login' == key){presenter.login.validate();}
+				else if('footer' == key){presenter.footer.validate();}
+				else{console.error('validate error. content key',key,'is unknown.',data);}
+			};
+		}
+		/* @job :: input listener */
+		function PageEventListener(){
+			var operator = new PagePresenterInterface();
+			var events = {
+				'got-mvp':(data) => {operator.load(data.url,data);}
+				,'got-pdf':(data) => {operator.load(data.url,data);}
+				,'got-error':(data) => {operator.error(data.url,data);}
+				,'view-toggle':(data) => {operator.toggle(data.url,data);}
+				,'view-swipe':(data) => {operator.swipe(data.url,data);}
+				,'form-validate':(data) => {operator.validate(data.url,data);}
+			}
+			this.create = function(d){
+				if(d){
+					d.onAppend({'events':Object.keys(events),'issues':Object.values(events)});
+				} else {
+					console.warning('page listener','internal dispatcher used');
+					new V13wEv3ntD1spatch3r().onDecorate({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
+				}
+			}
+		}
+		/* @job :: initialize contents */
+		var dispatcher = new V13wEv3ntD1spatch3r();
+		$(document).ready(function(){
+			var config = {
+			    apiKey:"AIzaSyDmXSkwOam-aQ37z8-3d5aH-X257lIVS34",
+			    authDomain:"vog3lm-0x1.firebaseapp.com",
+			    projectId:"vog3lm-0x1",
+			};
+			firebase.initializeApp(config);
+			new Mvp4p1Operator().create(dispatcher);
+			new PageEventListener().create(dispatcher);
+			new D3s1gn4p1Operator().create(dispatcher);
+			new F1rebas3Auth4p1Operator(firebase).create(dispatcher);
+			/**/
+			var animations = {'fox':{'lineColor':'#373737','lineWidth':'1px','paneParent':'zone','paneId':'fox','scaleFactor':11,'dotLeft':25,'dotBottom':5}
+							,'cv':{'lineColor':'#373737','lineWidth':7,'paneParent':'zone','paneId':'cv'}
+							,'one':{'lineColor':'#373737','lineWidth':'1px','paneParent':'zone','paneId':'one'}
+							,'two':{'lineColor':'#373737','lineWidth':'1px','paneParent':'zone','paneId':'two'}
+							,'tre':{'lineColor':'#373737','lineWidth':'1px','paneParent':'zone','paneId':'tre'}}
+			var one = new DotNetHolder().operator.decorate(animations.one).create(dispatcher).start();
+			new FoxNetHolder().operator.decorate(animations.fox).interlink(one.objects.dots).create(dispatcher).start();
+		});
+		$(window).load(function() {
+			dispatcher.onRegister().onUnleash();
+		});
+	</script>
+	<style type="text/css">
+		/* custom page styles *//* 
+		 * header animation geometry */
+		header canvas{ position:absolute; }
+		header canvas#one{ transform:rotateY(30deg) scaleX(1.15); }
+		header canvas#two{ transform:rotateY(-20deg) scaleX(1.15); }
+		/**/
+		header section#content{
+			z-index:2;
+			overflow-y:auto;
+			width:100%;
+			padding-left:20%;
+			padding-right:20%;
+		}
+		header section#content::-webkit-scrollbar{ display:none; }
+		header section#content section#wrapper{
+			width:60%;
+			font-size:2em;
+		}
+		header section#content line{
+			display:block;
+			height:196px;
+			margin-bottom:7px;
+		}
+		header section#content line:first-of-type{ margin-top:calc(25%); }
+		header section#content line:last-of-type{ margin-bottom:10%; }
+		header section#content line img{
+			cursor:pointer;
+			width:initial;
+			height:100%;
+			position:relative;
+			float:right;
+		}
+
+		header section#content div.mvp{
+			position:relative;
+			min-height:768px;
+			margin-bottom:7px;
+			background:white;
+			color:rgba(34,34,34,1);
+		}
+
+		header section#content div.mvp:last-of-type{ margin-bottom:10%; }
+		header section#content div.mvp a{ color:rgba(34,34,34,1); }
+		header section#content div.mvp section{
+			position:absolute;
+			width:100%;
+			height:100%;
+			overflow:auto;
+		}
+		header section#content div.mvp section::-webkit-scrollbar{ display:none; }
+		header section#content div.mvp section.loading img{
+			position: absolute;
+			height:25%;
+			left:50%;
+			top:50%;
+			transform:translate(-50%,-50%);
+		}
+		header section#content div.mvp section.loading p{
+			position:absolute;
+			left:50%;
+			top:65%;
+			transform:translate(-50%,0%);
+			text-align:center;
+		}
+		/* loading/error overlay content */
+		header overlay{ 
+			font-size:2em; 
+			overflow:auto;
+		}
+		header overlay a{ color:rgba(34,34,34,1); }
+		header overlay.loading img{
+			position:absolute;
+			height:25%;
+			left:50%;
+			top:50%;
+			transform:translate(-50%,-50%);
+		}
+		header overlay.loading p{
+			position:absolute;
+			left:50%;
+			top:65%;
+			transform:translate(-50%,0%);
+			text-align:center;
+		}
+
+
+		header a#footer-toggle{
+			z-index:2;
+			position:absolute;
+			bottom:12px;
+			left:36%;
+			width:96px;
+			color:#363636;
+			font-size:32px;
+		}
+
+
+
+		/* content print layout *//*
+		 * screen section */
+		/* print section */
+		@media print{
+			@page {margin:1.5cm;}
+		}
+
+		footer form{
+			position:relative;
+			display:inline-block;
+			top:50%;
+			left:50%;
+			width:40%;
+			transform:translate(-50%,-50%);
+			z-index:3;
+		}
+		footer form input,
+		footer form textarea{
+			width:100%;
+
+			font-size:2em;
+			color:black;
+		
+			background:transparent;
+		}
+		footer form input:nth-of-type(2){
+			margin-top:7px;
+			outline:none;
+		}
+		footer form textarea{
+			margin-top:21px;
+			resize:none;
+			border:0px solid black;
+			outline:none;
+		}
+		footer form error {
+			color:red;
+			display: inline-block;
+		}
+		footer form error:last-of-type{
+			line-height: 32px;
+			height: 32px;
+			vertical-align: middle;
+		}
+	</style>
+</head>
+<body>
+	<header id="zone">
+		<img id="after-effect" class="after-effect" src="" alt="head"></img>
+		<section id="content">
+			<section id="wrapper">
+				<line id="hello"><!-- -->
+					<img id="hello" class="label after-effect" src="" call="view-toggle" q="6PW2gsYzD" url="detail" alt="hello"></img>
+				</line>
+				<div id="hello" class="mvp hide">
+					<edge class="hr">
+						<a href="#" id="hello" class="fa fa-print" call="view-toggle" q="6PW2gsYzD" url="print" title="Print"></a>
+						<a href="#" id="hello" class="fa fa-expand" call="view-toggle" q="6PW2gsYzD" url="expand" title="Expand View"></a>
+						<a href="#" id="hello" class="fa fa-times" call="view-toggle" url="detail" title="Close"></a>
+					</edge>
+					<section id="hello" class="loading">
+						<img src="images/logos/fox.gray.png"></img>
+						<p>lädt personal data...</p>
+					</section>
+				</div>
+				<line id="sh"><!-- 2013 -->
+					<img id="sh" class="label" src="images/labels/sh.png" call="view-toggle" q="R59lkouIm" url="detail" alt="hello"></img>
+				</line>
+				<div id="sh" class="mvp hide">
+					<edge class="hr">
+						<a href="#" id="sh" class="fa fa-print" call="view-toggle" q="R59lkouIm" url="print" title="Print"></a>
+						<a href="#" id="sh" class="fa fa-expand" call="view-toggle" q="R59lkouIm" url="expand" title="Expand View"></a>
+						<a href="#" id="sh" class="fa fa-times" call="view-toggle" url="detail" title="Close"></a>
+					</edge>
+					<section id="sh">
+						<img src="images/logos/fox.gray.png"></img>
+						<p>lädt...</p>
+					</section>
+				</div>
+				<line id="wi"><!-- 2015-2018 -->
+					<img id="wi" class="label" src="images/labels/hs.wi.png" call="view-toggle" q="W9wNjMC7p" url="detail" alt="hello"></img>
+				</line>
+				<div id="wi" class="mvp hide">
+					<edge class="hr">
+						<a href="#" id="wi" class="fa fa-print" call="view-toggle" q="W9wNjMC7p" url="print" title="Print"></a>
+						<a href="#" id="wi" class="fa fa-expand" call="view-toggle" q="W9wNjMC7p" url="expand" title="Expand View"></a>
+						<a href="#" id="wi" class="fa fa-times" call="view-toggle" url="detail" title="Close"></a>
+					</edge>
+					<section id="wi">
+						<img src="images/logos/fox.gray.png"></img>
+						<p>lädt...</p>
+					</section>
+				</div>
+				<line id="ph"><!-- 2015-2018 -->
+					<img id="ph" class="label" src="images/labels/ph.png" call="view-toggle" q="JxR6XBz6v" url="detail" alt="hello"></img>
+				</line>
+				<div id="ph" class="mvp hide">
+					<edge class="hr">
+						<a href="#" id="ph" class="fa fa-print" call="view-toggle" q="JxR6XBz6v" url="print" title="Print"></a>
+						<a href="#" id="ph" class="fa fa-expand" call="view-toggle" q="JxR6XBz6v" url="expand" title="Expand View"></a>
+						<a href="#" id="ph" class="fa fa-times" call="view-toggle" url="detail" title="Close"></a>
+					</edge>
+					<section id="ph">
+						<img src="images/logos/fox.gray.png"></img>
+						<p>lädt...</p>
+					</section>
+				</div>
+
+
+
+				<line id="bachelor"><!-- 2010-2014 -->
+					<img id="bachelor" class="label" src="images/labels/hs.bachelor.png" call="view-toggle" q="VA0850MmS" url="detail" alt="hello"></img>
+				</line>
+				<div id="bachelor" class="mvp hide">
+					<edge class="hr">
+						<a href="#" id="bachelor" class="fa fa-print" call="view-toggle" q="VA0850MmS" url="print" title="Print"></a>
+						<a href="#" id="bachelor" class="fa fa-expand" call="view-toggle" q="VA0850MmS" url="expand" title="Expand View"></a>
+						<a href="#" id="bachelor" class="fa fa-times" call="view-toggle" url="detail" title="Close"></a>
+					</edge>
+					<section id="bachelor">
+						<img src="images/logos/fox.gray.png"></img>
+						<p>lädt...</p>
+					</section>
+				</div>
+				<line id="zf"><!-- 2013-2014 -->
+					<img id="zf" class="label" src="images/labels/zf.intern.png" call="view-toggle" q="t6a5gVVXy" url="detail" alt="hello"></img>
+				</line>
+				<div id="zf" class="mvp hide">
+					<edge class="hr">
+						<a href="#" id="zf" class="fa fa-print" call="view-toggle" q="t6a5gVVXy" url="print" title="Print"></a>
+						<a href="#" id="zf" class="fa fa-expand" call="view-toggle" q="t6a5gVVXy" url="expand" title="Expand View"></a>
+						<a href="#" id="zf" class="fa fa-times" call="view-toggle" url="detail" title="Close"></a>
+					</edge>
+					<section id="zf">
+						<img src="images/logos/fox.gray.png"></img>
+						<p>lädt...</p>
+					</section>
+				</div>
+				<line id="tutor"><!-- 2010-2014 -->
+					<img id="tutor" class="label" src="images/labels/hs.tutor.png" call="view-toggle" q="uiLT6kFBG" url="detail" alt="hello"></img>
+				</line>
+				<div id="tutor" class="mvp hide">
+					<edge class="hr">
+						<a href="#" id="tutor" class="fa fa-print" call="view-toggle" q="uiLT6kFBG" url="print" title="Print"></a>
+						<a href="#" id="tutor" class="fa fa-expand" call="view-toggle" q="uiLT6kFBG" url="expand" title="Expand View"></a>
+						<a href="#" id="tutor" class="fa fa-times" call="view-toggle" url="detail" title="Close"></a>
+					</edge>
+					<section id="tutor">
+						<img src="images/logos/fox.gray.png"></img>
+						<p>lädt...</p>
+					</section>
+				</div>
+
+
+
+				<line id="uni"><!-- 2009-2010 -->
+					<img id="uni" class="label" src="images/labels/uni.mathe.png" call="view-toggle" q="hN3EptFwt" url="detail" alt="hello"></img>
+				</line>
+				<div id="uni" class="mvp hide">
+					<edge class="hr">
+						<a href="#" id="uni" class="fa fa-print" call="view-toggle" q="hN3EptFwt" url="print" title="Print"></a>
+						<a href="#" id="uni" class="fa fa-expand" call="view-toggle" q="hN3EptFwt" url="expand" title="Expand View"></a>
+						<a href="#" id="uni" class="fa fa-times" call="view-toggle" url="detail" title="Close"></a>
+					</edge>
+					<section id="uni">
+						<img src="images/logos/fox.gray.png"></img>
+						<p>lädt...</p>
+					</section>
+				</div>
+
+
+
+				<line id="abi"><!-- 2006-2009 -->
+					<img id="abi" class="label" src="images/labels/wg.abi.png" call="view-toggle" q="lvhPjXCTi" url="detail" alt="hello"></img>
+				</line>
+				<div id="abi" class="mvp hide">
+					<edge class="hr">
+						<a href="#" id="abi" class="fa fa-print" call="view-toggle" q="lvhPjXCTi" url="print" title="Print"></a>
+						<a href="#" id="abi" class="fa fa-expand" call="view-toggle" q="lvhPjXCTi" url="expand" title="Expand View"></a>
+						<a href="#" id="abi" class="fa fa-times" call="view-toggle" url="detail" title="Close"></a>
+					</edge>
+					<section id="abi">
+						<img src="images/logos/fox.gray.png"></img>
+						<p>lädt...</p>
+					</section>
+				</div>
+
+
+
+				<line id="zivi"><!-- 2004-2005 -->
+					<img id="zivi" class="label" src="images/labels/rhk.zivi.png" call="view-toggle" q="cZ311yCvd" url="detail" alt="hello"></img>
+				</line>
+				<div id="zivi" class="mvp hide">
+					<edge class="hr">
+						<a href="#" id="zivi" class="fa fa-print" call="view-toggle" q="cZ311yCvd" url="print" title="Print"></a>
+						<a href="#" id="zivi" class="fa fa-expand" call="view-toggle" q="cZ311yCvd" url="expand" title="Expand View"></a>
+						<a href="#" id="zivi" class="fa fa-times" call="view-toggle" url="detail" title="Close"></a>
+					</edge>
+					<section id="zivi">
+						<img src="images/logos/fox.gray.png"></img>
+						<p>lädt...</p>
+					</section>
+				</div>
+				<line id="ksk"><!-- 2001-2004 -->
+					<img id="ksk" class="label" src="images/labels/ksk.bank.png" call="view-toggle" q="P6deO31J9" url="detail" alt="hello"></img>
+				</line>
+				<div id="ksk" class="mvp hide">
+					<edge class="hr">
+						<a href="#" id="ksk" class="fa fa-print" call="view-toggle" q="P6deO31J9" url="print" title="Print"></a>
+						<a href="#" id="ksk" class="fa fa-expand" call="view-toggle" q="P6deO31J9" url="expand" title="Expand View"></a>
+						<a href="#" id="ksk" class="fa fa-times" call="view-toggle" url="detail" title="Close"></a>
+					</edge>
+					<section id="ksk">
+						<img src="images/logos/fox.gray.png"></img>
+						<p>lädt...</p>
+					</section>
+				</div>
+				<line id="ihk"><!-- 2001-2003 -->
+					<img id="ihk" class="label" src="images/labels/ihk.bank.png" call="view-toggle" q="QspGcws6S" url="detail" alt="hello"></img>
+				</line>
+				<div id="ihk" class="mvp hide">
+					<edge class="hr">
+						<a href="#" id="ihk" class="fa fa-print" call="view-toggle" q="QspGcws6S" url="print" title="Print"></a>
+						<a href="#" id="ihk" class="fa fa-expand" call="view-toggle" q="QspGcws6S" url="expand" title="Expand View"></a>
+						<a href="#" id="ihk" class="fa fa-times" call="view-toggle" url="detail" title="Close"></a>
+					</edge>
+					<section id="ihk">
+						<img src="images/logos/fox.gray.png"></img>
+						<p>lädt...</p>
+					</section>
+				</div>
+
+
+
+				<line id="real"><!-- 2001-2003 -->
+					<img id="real" class="label" src="images/labels/mittlere.reife.png" call="view-toggle" q="OMHCIBQLa" url="detail" alt="hello"></img>
+				</line>
+				<div id="real" class="mvp hide">
+					<edge class="hr">
+						<a href="#" id="real" class="fa fa-print" call="view-toggle" q="OMHCIBQLa" url="print" title="Print"></a>
+						<a href="#" id="real" class="fa fa-expand" call="view-toggle" q="OMHCIBQLa" url="expand" title="Expand View"></a>
+						<a href="#" id="real" class="fa fa-times" call="view-toggle" url="detail" title="Close"></a>
+					</edge>
+					<section id="real">
+						<img src="images/logos/fox.gray.png"></img>
+						<p>lädt...</p>
+					</section>
+				</div>
+				<line id="og"><!-- 2001-2003 -->
+					<img id="og" class="label" src="images/labels/grund.schule.png" call="view-toggle" q="oa2G72Hbz" url="detail" alt="hello"></img>
+				</line>
+				<div id="og" class="mvp hide last-child">
+					<edge class="hr">
+						<a href="#" id="og" class="fa fa-print" call="view-toggle" q="oa2G72Hbz" url="print" title="Print"></a>
+						<a href="#" id="og" class="fa fa-expand" call="view-toggle" q="oa2G72Hbz" url="expand" title="Expand View"></a>
+						<a href="#" id="og" class="fa fa-times" call="view-toggle" url="detail" title="Close"></a>
+					</edge>
+					<section id="og">
+						<img src="images/logos/fox.gray.png"></img>
+						<p>lädt...</p>
+					</section>
+				</div>
+			</section>
+		</section>
+		<edge class="hr">
+			<a href="#" class="fa-stack" call="view-toggle" url="mail">
+				<i class="fa fa-circle-thin fa-stack-2x"></i>
+				<i class="fa fa-sticky-note fa-stack-1x"></i>
+			</a>
+			<a href="#" class="fa-stack" call="view-toggle" url="help">
+				<i class="fa fa-circle-thin fa-stack-2x"></i>
+				<i class="fa fa-question fa-stack-1x"></i>
+			</a>
+			<a href="#" class="fa-stack" call="view-toggle" url="dox">
+				<i class="fa fa-circle-thin fa-stack-2x"></i>
+				<i class="fa fa-exclamation fa-stack-1x"></i>
+			</a>
+			<a href="#" class="fa-stack" call="view-toggle" url="samples">
+				<i class="fa fa-circle-thin fa-stack-2x"></i>
+				<i class="fa fa-github fa-stack-1x"></i>
+			</a>
+		</edge>
+		<edge class="br">
+			<a href="#" class="fa fa-magnet" call="view-toggle" url="style" title="Page Styles"></a>
+			<a href="#" class="fa fa-cog" call="view-toggle" url="animation" title="Animation Controls"></a>
+		</edge>
+		<nav id="cfg-navigation" class="hide">
+			<a href="#" class="fa fa-paint-brush" call="design-toggle" title="Switch Interface Design"></a>
+		</nav>
+		<nav id="cfg-style" class="hide">
+			<a href="/cards" class="fa fa-th-large" title="Card View"></a>
+			<a href="/animation" class="fa fa-heartbeat" title="Animation View"></a>
+		</nav>
+		<edge class="bl">
+			<user>
+				<a href="#" id="login-operator" class="fa fa-hashtag" call="view-toggle" url="login" title="Show Login"></a>
+				<card class='hide'>
+					<a href="#" id="leed-operator" class="fa fa-envelope hide" call="view-toggle" url="leed" title="Show Leed Text"></a>
+					<a href="#" id="logout-operator" class="fa fa-user" call="log-out" url="login" title="Logout"></a>
+					<id></id>
+				</card>
+				<form class="hide" call="form-validate" url="login">
+					<input type="text" id="mail" name="mail" placeholder="mail" value="" autocomplete="on">
+					<input type="password" id="pass" name="pass" placeholder="pass" value="" autocomplete="off">				
+				</form>
+			</user>
+		</edge>
+		<a href="#" id="footer-toggle" class="fa fa-chevron-up" call="view-toggle" url="footer"></a>
+		<overlay class="hide fill loading"></overlay>
+	</header>
+	<footer>
+		<img id="after-effect" class="after-effect" src="" alt="foot"></img>
+		<form>
+			<input type="text" id="name" name="name" placeholder="Enter Your Name">
+			<error id="name" class="hide">Enter your Name</error>
+			<input type="email" id="from" name="from" placeholder="Enter Your Email">
+			<error id="from" class="hide">Enter a valid Email Address</error>
+			<textarea id="message" rows="7" cols="50" placeholder="Enter Your Message"></textarea>
+			<error id="message" class="hide">Leave a message</error>
+			<edge class="br">
+				<a href="#" class="fa fa-send" call="form-validate" url="footer" title="Send Message"></a>
+			</edge>
+		</form>
+	</footer>
+</body>
+</html>

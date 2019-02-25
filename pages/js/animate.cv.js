@@ -148,11 +148,15 @@ function CvAnimationSetting(){
 function CvAnimationOperator(animation){
     var holder = animation;
     holder.operator = this;
+    /* non event access */
     this.decorate = function(opts){
         holder.setting.decorate(opts);
         return this;
     }
-    this.create = function(){
+    this.create = function(dispatcher){
+        if(dispatcher){
+            dispatcher.onAppend({'events':Object.keys(holder.listener.events),'issues':Object.values(holder.listener.events)});
+        }
     	/* main pane*/
     	holder.objects.main = holder.util.canvasCreate();
         canvas = holder.objects.main;
@@ -181,6 +185,7 @@ function CvAnimationOperator(animation){
     this.validate = function(){
         return this;
     }
+    /* hybrid access methods */
     this.start = function(){
     	holder.engine.pause();
         holder.engine.start();
@@ -203,14 +208,9 @@ function CvAnimationOperator(animation){
 }
 function CvAnimationListener(animation){
     var holder = animation;
-    var events = {
-        'cv-decorate':(data) => {holder.operator.decorate(opts);}
-       ,'cv-create':(data) => {holder.operator.create();}
-    }
-    for (var i=0; i<events.length; i++) {
-        $('body').on(events[i],function(evt,data){
-            events[i](data);
-        });
+    this.events = {
+       'label-net-resume':(data) => {holder.operator.resume();}
+       ,'label-net-pause':(data) => {holder.operator.pause();}
     }
 }
 function CvAnimationObjects(){
@@ -221,7 +221,7 @@ function CvAnimationObjects(){
 	this.labels = {};
 }
 function CvAnimationHolder(){
-    var listener = new CvAnimationListener(this);
+    this.listener = new CvAnimationListener(this);
     this.objects = new CvAnimationObjects();
     this.operator = new CvAnimationOperator(this);
 	this.engine = new CvAnimationEngine(this);

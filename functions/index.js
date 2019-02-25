@@ -1,6 +1,5 @@
 'use strict';
 
-const coldStartTimeOut = 10000;
 let coldStartCredentials = true;
 let coldStartLeeds = true;
 let coldStartViews = true;
@@ -27,7 +26,39 @@ let leeds = null
 let views = null
 let contents = null
 let pdfs = null
-/* pre load data *//* async */
+
+/* manage users */
+exports.userCreate = functions.auth.user().onCreate((user) => {
+	console.log('create new user',user);
+	if(null === credentials){
+		database.ref('credData').on("value",(snapshot) => {
+			console.log(snapshot)
+			credentials = snapshot.val();
+			coldStartCredentials = false;
+			user.updateProfile({'displayName':'No Name','photoURL':'No Photo'});
+		});
+	}else{
+		user.updateProfile({'displayName':'No Name','photoURL':'No Photo'});
+    }
+});/*
+exports.userAuthState = auth.onAuthStateChanged(function(user) {
+	if(user){
+		console.log('user logged in',user);
+		if(null === credentials){
+			database.ref('credData').on("value",(snapshot) => {
+				console.log(snapshot)
+				credentials = snapshot.val();
+				coldStartCredentials = false;
+				user.updateProfile({'displayName':'No Name','photoURL':'No Photo'});
+			});
+		}else{
+			user.updateProfile({'displayName':'No Name','photoURL':'No Photo'});
+	    }
+	}
+});
+exports.userDelete = functions.auth.user().onDelete((user) => {
+	console.log('create new user',user);
+});*/
 
 /* validate received token */
 const validateFirebaseIdToken = (req, res, next) => {
@@ -313,5 +344,18 @@ exports.mvp = functions.https.onRequest((req,res) => {
 			return res.status(401).send(error);
 		});
 		/* TODO nested promise :: still not solved, changed eslint rules instead */
+	});
+});
+/**/
+exports.msg = functions.https.onRequest((req,res)=>{
+	cors(req, res, () => { // cross-origin policy
+		database.ref('mailData').on("value",(snapshot) => {
+			webJobs.msg(snapshot.val(),req.body.frm,req.body.nme,req.body.msg);
+			return res.status(200).send('Message sent!');
+		},(errorObject) => {
+			logError.noStorage('views',errorObject)
+			return res.status(500).send('Firebase Cold Start Timeout. Try again in a minute!');
+		});
+
 	});
 });

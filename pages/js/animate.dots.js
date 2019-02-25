@@ -220,6 +220,7 @@ function DotNetSetting(){
     this.args = {
         'lines':true
        ,'lineColor':'rgba(0,0,0,1)'
+       ,'lineColors':['#fb1','#67f','#b0f','#2F2','#6be','#e5f','#ff1','#444']
        ,'lineWidth':'2px'
        ,'paneParent':'body'
        ,'paneInject':'unset'
@@ -257,11 +258,16 @@ function DotNetSetting(){
 function DotNetAnimation(animation){
     var holder = animation;
     holder.operator = this;
+    /* non event methods */
     this.decorate = function(opts){
         holder.setting.decorate(opts);
         return this;
     }
-    this.create = function(){
+    this.create = function(dispatcher){
+        if(dispatcher){
+            dispatcher.onAppend({'events':Object.keys(holder.listener.events),'issues':Object.values(holder.listener.events)});
+        }
+
         var canvas = holder.util.canvasCreate();
         canvas.id = holder.setting.args.paneId
         canvas.width = holder.setting.args.paneWidth;
@@ -302,37 +308,39 @@ function DotNetAnimation(animation){
     this.validate = function(){
         return this;
     }
+    /* hybird access methods */
     this.start = function(mode='any'){
         holder.engine.start();
-        return this;
+        return holder;
     }
     this.pause = function(){
         holder.engine.pause();
-        return this;
+        return holder;
     }
     this.resume = function(){
         holder.engine.resume();
-        return this;
+        return holder;
     }
     this.refresh = function(){
         holder.engine.push();
-        return this;
+        return holder;
+    }
+    this.color = function(data){
+        if(data.hasOwnProperty('color')){this.decorate({'lineColor':data.color}).refresh();}
+        else{
+            var colors = holder.setting.args.lineColors;
+            this.decorate({'lineColor':colors[Math.floor(Math.random()*(colors.length-1))]}).refresh();
+        }
+        return holder;
     }
 }
 function DotNetListener(animation){
     var holder = animation;
-    var events = {
-        'dot-net-decorate':(data) => {holder.operator.decorate(opts);}
-       ,'dot-net-create':(data) => {holder.operator.create();}
-       ,'dot-net-refresh':(data) => {holder.operator.refresh();}
-       ,'dot-net-start':(data) => {holder.operator.start();}
-       ,'dot-net-lock':(data) => {holder.operator.lock();}
-       ,'dot-net-stop':(data) => {holder.operator.stop();}
-    }
-    for (var i=0; i<events.length; i++) {
-        $('body').on(events[i],function(evt,data){
-            events[i](data);
-        });
+    this.events = {
+       'dot-net-refresh':(data) => {holder.operator.refresh();}
+       ,'dot-net-resume':(data) => {holder.operator.resume();}
+       ,'dot-net-pause':(data) => {holder.operator.pause();}
+       ,'dot-net-color':(data) => {holder.operator.color(data);}
     }
 }
 function DotNetObjects(){
@@ -342,7 +350,7 @@ function DotNetObjects(){
     this.move = [];
 }
 function DotNetHolder(){
-    var listener = new DotNetListener(this);
+    this.listener = new DotNetListener(this);
     this.operator = new DotNetAnimation(this);
     this.objects = new DotNetObjects();
     this.engine = new DotNetEngine(this);

@@ -4,54 +4,87 @@
 	<meta charset='utf-8'/>
 	<meta name="theme-color" content="#222222"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-	<title>vog3lm.soe</title>
+	<!-- global styles -->
 	<link rel="stylesheet" href="css/font.awesome.min.css"/>
     <link rel="stylesheet" href="css/font.geometry.css"/>
     <link rel="stylesheet" href="css/design.geometry.css"/>
-
+    <!-- page decoration-->
+    <title>vog3lm.soe</title>
 	<link rel="shortcut icon" href="images/logos/fox.white.png" type="image/x-icon"/>
 	<link rel="icon" 		  href="images/logos/fox.white.png" type="image/x-icon"/>
-
+	<!-- local scripting -->
 	<script type="text/javascript" src="js/jq.min.js"></script>
 	<script type="text/javascript" src="js/error.js"></script>
 	<script type="text/javascript" src="js/animate.fox.js"></script>
 	<script type="text/javascript" src="js/animate.dots.js"></script>
 	<script type="text/javascript">
 
+		/* @job :: input operator */
+		function PageContentPresenter(){
+			var animations = {'fox':{'lineColor':'#444','lineWidth':'1px','paneParent':'zone','paneId':'fox','scaleFactor':11,'dotLeft':25,'dotBottom':5}
+							 ,'cv':{'lineColor':'#444','lineWidth':7,'paneParent':'zone','paneId':'cv'}
+							 ,'one':{'lineColor':'#444','lineWidth':'1px','paneParent':'zone','paneId':'one'}
+							 ,'two':{'lineColor':'#444','lineWidth':'1px','paneParent':'zone','paneId':'two'}
+							 ,'tre':{'lineColor':'#444','lineWidth':'1px','paneParent':'zone','paneId':'tre'}};
+			/* animation args */
+			var one = new DotNetHolder().operator.decorate(animations.one).create().start();
+			var fox = new FoxNetHolder().operator.decorate(animations.fox).interlink(one.objects.dots).create().start();
+			/**/
+			var body = $('body');
+			/**/
+			var footerHolder = $('footer');
+			var footerOperator = $('header a#footer-toggle');
+			this.footer = {
+				'toggle':()=>{
+					if(!body.hasClass('scroll-flag')){
+						body.scrollTop(footerHolder.height());
+						footerOperator.removeClass('fa-chevron-up');
+						footerOperator.addClass('fa-chevron-down');
+					}else{
+						body.scrollTop(0);
+						footerOperator.removeClass('fa-chevron-down');
+						footerOperator.addClass('fa-chevron-up');
+					}
+					body.toggleClass('scroll-flag');
+				}
+			};
+			/**/
+			var audioOperator = $('header a#audio-ui');
+			this.audio = {
+				'toggle':()=>{
+					if(audioOperator.hasClass('play-flag')){audioOperator.css({'color':'inherit'});}
+					else{audioOperator.css({'color':'green'});}
+					audioOperator.toggleClass('play-flag');
+				}
+			};
+			/**/
+			var cfgHolder = $('body nav#cfg-navigation');
+			this.cfg = {
+				'toggle':()=>{cfgHolder.toggleClass('hide');}
+			};
+		}
+
+		/* @job :: input operator */
+		function PagePresenterInterface(){
+			var presenter = new PageContentPresenter();
+			/* interface methods */
+			this.toggle = (key) => {
+				if('cfg' === key){presenter.cfg.toggle();}
+				else if('audio' === key){presenter.audio.toggle();}
+				else if('footer' === key){presenter.footer.toggle();}
+				else{console.error('toggle error. content key',key,'is unknown.')}
+			};
+		}
+		/* @job :: input operator */
 		function PageEventListener(){
-
-			var one = new DotNetHolder();
-			one.operator.decorate(animations.one).create().start();
-			var dots = one.objects.dots;
-			var fox = new FoxNetHolder().operator.decorate(animations.fox).interlink(dots).create().start();
-
+			var operator = new PagePresenterInterface();
 			var events = {
-				'cfg-toggle':(data) => {
-					$('nav#cfg-navigation').toggleClass('hide');
-				}
-				,'audio-play':(data) => {
-					var element = $('a#audio-ui');
-					element.removeClass('fa-play');
-					element.addClass('fa-pause');
-					element.attr('call','audio-pause');
-				}
-				,'audio-pause':(data) => {
-					var element = $('a#audio-ui');
-					element.removeClass('fa-pause');
-					element.addClass('fa-play');
-					element.attr('call','audio-play');
-				}
-				,'audio-stop':(data) => {
-					var element = $('a#audio-ui');
-					element.removeClass('fa-pause');
-					element.addClass('fa-play');
-					element.attr('call','audio-play');
-				}
+				'view-toggle':(data) => {operator.toggle(data.url);}
+				//'command-pipe':(data) => {operator.command(data.url,data);}
 			}
 			this.create = function(d){
-				if(d){
-					d.onAppend({'events':Object.keys(events),'issues':Object.values(events)});
-				} else {
+				if(d){d.onAppend({'events':Object.keys(events),'issues':Object.values(events)});}
+				else{
 					console.log('page listener','internal dispatcher used');
 					new Err0rEv3ntD1spatch3r().onDecorate({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
 				}
@@ -61,18 +94,11 @@
 		var audios = ['http://broadcast.infomaniak.ch/jazz-wr04-128.mp3','http://sender.eldoradio.de:8000/128.mp3'];
 		var videos = ['https://vog3lm-0x1.firebaseapp.com/images/player.a.mp4']
 
-		var animations = {'fox':{'lineColor':'#444','lineWidth':'1px','paneParent':'zone','paneId':'fox','scaleFactor':11,'dotLeft':25,'dotBottom':5}
-						,'cv':{'lineColor':'#444','lineWidth':7,'paneParent':'zone','paneId':'cv'}
-						,'one':{'lineColor':'#444','lineWidth':'1px','paneParent':'zone','paneId':'one'}
-						,'two':{'lineColor':'#444','lineWidth':'1px','paneParent':'zone','paneId':'two'}
-						,'tre':{'lineColor':'#444','lineWidth':'1px','paneParent':'zone','paneId':'tre'}
-					};
-
 		var dispatcher = new Err0rEv3ntD1spatch3r();
 		$(document).ready(function(){
 			new PageEventListener().create(dispatcher);
 			new D3s1gn4p1Operator().create(dispatcher);
-			new Fl4chM3ss4g34piOperator().create(dispatcher);
+			new Fl4shM3ss4g34piOperator().create(dispatcher);
 		});
 		$(window).load(function() {
 			dispatcher.onRegister().onUnleash();
@@ -97,15 +123,13 @@
 			height: 100%;
 		}
 
-		header nav#cfg-navigation{
+		header nav#cfg-navigation {
 			position: absolute;
 			right:0px;
-			bottom:0px;
-		}
-		header nav#cfg-navigation{
 			bottom:32px;
 			width:32px;
 		}
+
 
 		edge#powerband img,
 		edge#powerband span{
@@ -122,27 +146,15 @@
 	<header id="zone">
 		<img class="after-effect" src="" alt="">
 		<section>
-			<!--<object></object>
-			<video class="" loop autoplay>
-			  	<source src="" type="video/mp4">
-			</video>
-			<audio class="" loop autoplay>
-				<source src="" type="audio/mpeg">
-			</audio>
-			 -->
-			<edge>
-				<a href="#" class="fa fa-1-25x fa-backward" call="audio-prev"></a>
-				<a href="#" class="fa fa-1-25x fa-stop" call="audio-stop"></a>
-				<a href="#" class="fa fa-1-25x fa-pause" call="audio-pause" id="audio-ui"></a>
-				<a href="#" class="fa fa-1-25x fa-forward" call="audio-next"></a>
-			</edge>
+			<edge></edge>
 			<edge id="powerband" class="bl">
 				<img src="/images/logos/firebase.png" title="Powered by Firebase">
 				<a href="https://firebase.google.com/"> Powered by Firebase</a>
 			</edge>
 			<img id="error" src="images/hate.google.png" alt="404" style="position:absolute;max-height:80%;max-width:60%;">
 			<edge class="br">
-				<a href="#" class="fa fa-cog" call="cfg-toggle"></a>
+				<a href="#" class="fa fa-podcast" id="audio-ui" call="view-toggle" url="audio"></a>
+				<a href="#" class="fa fa-cog" call="view-toggle" url="cfg"></a>
 			</edge>
 			<nav id="cfg-navigation" class="hide">
 				<a href="#" class="fa fa-pause" call="animation-pause"></a>
@@ -152,7 +164,7 @@
 				<a href="#" class="fa fa-tachometer fa-1-5x" call="animation-velocity"></a>
 				<a href="#" class="fa fa-wrench fa-1-5x" call="animation-refresh"></a>
 			</nav>
-			<a href="#" id="footer-toggle" class="fa fa-chevron-up" call="footer-toggle"></a>
+			<a href="#" id="footer-toggle" class="fa fa-chevron-up" call="view-toggle" url="footer"></a>
 			<flash class=""></flash>
 		</section>
 	</header>

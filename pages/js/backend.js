@@ -1,112 +1,27 @@
-
-function HtmlCancasTool(animation){ /* used in animation.X.js move ? */
-	var holder = animation;
-    this.canvasParse = (id) => {
-        return document.getElementById(id);
-    }
-    this.canvasScroll = () => {
-    	// wrap canvas to scroll container
-        var canvas = document.createElement("canvas");
-        var scroll = document.createElement("scroll");
-        scroll.appendChild(canvas);
-        if('body' === holder.setting.args.paneParent){
-        	document.body.appendChild(scroll)
-        //    document.body.appendChild(canvas);
-        } else {
-            var element = document.getElementById(holder.setting.args.paneParent);
-            element.insertBefore(scroll, element.childNodes[0])
-        //    element.insertBefore(canvas, element.childNodes[0]);
-        }
-        return canvas;
-    }
-    this.canvasCreate = () => {
-        var canvas = document.createElement("canvas");
-        if('body' === holder.setting.args.paneParent){
-            document.body.appendChild(canvas);
-        } else {
-            var element = document.getElementById(holder.setting.args.paneParent);
-            element.insertBefore(canvas, element.childNodes[4]);
-        }
-        return canvas;
-    }
-}
-
-function decorate(args,opts){
+/* @job :: someTextHere */
+function decorate(args,opts,evts){
 	for(var key in opts) {
-	    if(args.hasOwnProperty(key)) {
-	    	if('events' !== key){
-	    		args[key] = opts[key];
-	    	}
+	    if(args.hasOwnProperty(key)){
+	    	args[key] = opts[key];
 	    }
 	}
 }
 
-
+/* @job :: login/logout user */
 function F1rebas3Auth4p1Operator(firebase){
-	var base = firebase.auth();
+	var auth = firebase.auth();
 	var dispatcher = null;
 	var events = {
 		'log-in':(user) => {this.login(user);}
 	    ,'log-out':(data) => {this.logout();}
 	  /*,'log-in-custom':(token) => {base.signInWithCustomToken(token).catch(function(error){console.log(error)});}*/
-	    ,'log-decorate':(data) => {this.decorate(data.opts);}
-	    ,'log-refresh':(data) => {this.refresh();}
-	    ,'log-create':(data) => {this.create();}
-	    ,'log-state':(data) => {this.state(data);}
 	};
-	var args = {'events':events,'user':'unset','token':'unset','firebase':'unset'
-			   ,'scope':firebase.auth.Auth.Persistence.LOCAL}; // scopes LOCAL|SESSION|None
-	this.getToken = function(){return args.token;}	// mandatory
+	var args = {'user':'unset','token':'unset','firebase':'unset','scope':firebase.auth.Auth.Persistence.LOCAL}; // scopes LOCAL|SESSION|None
+	/* non event methods */
 	this.decorate = function(opts){
-		for(var key in opts) {
-		    if(args.hasOwnProperty(key)) {
-		    	if('events' !== key){
-		    		args[key] = opts[key];
-		    	}
-		    }
-		}
+		decorate(args,opts);
 		return this;
 	}
-	this.login = function(user){
-		base.setPersistence(args.scope).then(() => {
-			/* Note: Firebase Auth web sessions are single host origin 
-					 and will be persisted for a single domain only.  */
-			base.signInWithEmailAndPassword(user.mail,user.pass).catch((error) => {
-			  	console.error('login error',error);
-				args.user = 'unset';
-				args.token = 'unset';
-				$('body').trigger('logged-err',{'call':'logged-err','id':'auth-log-in','code':error.code,'message':error.message})
-			//	$('body').trigger('logged-out',{'call':'logged-out','id':'auth-log-in'})
-			});
-		}).catch((error) => {console.error(error);});
-	}
-	this.state = function(data){
-		var state = {'id':'log-state','token':args.token};
-		if('unset' !== args.user){
-			var user = args.user;
-			state['email'] = user.email;
-			state['name'] = user.displayName;
-			state['uid'] = user.uid;
-			state['domain'] = user.w;
-			state['phone'] = user.phoneNumber;
-			state['photo'] = user.photoUrl;
-			state['last'] = user.metadata.lastSignInTime;
-			state['created'] = user.metadata.creationTime;
-		}
-		if(data.hasOwnProperty('promise')){data.promise(state);}
-		return state;
-	}
-	this.refresh = function(){
-		if('unset' !== args.user){
-			var u = args.user
-			$('body').trigger('got-token',{'call':'got-token','id':'log-refresh','token':args.token});
-			$('body').trigger('logged-in',{'call':'logged-in','id':'log-refresh','name':u.displayName,'mail':u.email,'verified':u.emailVerified,'anonym':u.isAnonymous});
-		}else{
-			$('body').trigger('logged-out',{'call':'logged-out','id':'auth-state-listener'});
-			$('body').trigger('got-token',{'call':'got-token','id':'log-refresh','token':args.token});
-		}
-	}
-	this.logout = function(){base.signOut().catch((error) => {console.error('login error',error)});}
 	this.create = function(d){
 		if('unset' !== args.firebase){base = firebase.auth();}
 		switch(args.scope) {
@@ -129,51 +44,76 @@ function F1rebas3Auth4p1Operator(firebase){
 		}
 		return this;
 	}
-	base.onAuthStateChanged((u) => {
-		if(u){
-			args.user = u;
-			u.getIdToken(/* forceRefresh */true).then((userToken) => {
-				args.token = userToken;
-				$('body').trigger('got-token',{'call':'got-token','id':'auth-state-listener','token':args.token});
-			}).catch((error) => {console.error(error);});
-			$('body').trigger('logged-in',{
-				 'call':'logged-in'
-				,'id':'auth-state-listener'
-				,'name':u.displayName
-				,'mail':u.email
-				,'verified':u.emailVerified
-				,'anonym':u.isAnonymous
+	/* hybird access methods */
+	this.login = function(user){
+		auth.setPersistence(args.scope).then(() => {
+			/* Note: Firebase Auth web sessions are single host origin 
+					 and will be persisted for a single domain only. *//*
+					 Calls base.onAuthStateChange() on success */
+			auth.signInWithEmailAndPassword(user.mail,user.pass).catch((e) => {
+				args.user = 'unset';
+				args.token = 'unset';
+				error(e);
 			});
+		}).catch((e) => {error(e);});
+	}
+	this.logout = function(){
+		/* Calls base.onAuthStateChange() on success */
+		auth.signOut().catch((e) => {error(e);});
+	}
+	/* private helpers */
+	function success(){
+		var dto = {'call':'got-mvp','url':'login'};
+		if('unset' !== args.user && 'unset' !== args.token){
+			var user = {
+				 'email':args.user.email
+				,'name':args.user.displayName
+				,'uid':args.user.uid
+				,'domain':args.user.w
+				,'phone':args.user.phoneNumber
+				,'photo':args.user.photoUrl
+				,'last':args.user.metadata.lastSignInTime
+				,'token':args.token
+				,'created':args.user.metadata.creationTime}
+			dto['user']=user;
+			dto['id']='auth-state-login';
+		}else{dto['id'] = 'auth-state-logout';}
+		$('body').trigger('got-mvp',dto);
+		$('body').trigger('got-token',{'call':'got-error','id':dto.id,'url':'login','token':args.token});
+	}
+	function error(e){
+		$('body').trigger('got-error',{'call':'got-error','id':'log-in','url':'login'
+									  ,'errors':[e.code,e.message]}); // ,'code':error.code,'message':error.message
+	}
+	/* log-in/log-out listener */
+	auth.onAuthStateChanged((u) => {
+		if(u){
+			u.getIdToken(/* forceRefresh */true).then((userToken) => {
+				args.user = u;
+				args.token = userToken;
+				success();
+			}).catch((e) => {error(e)});
 		} else {
 			args.user = 'unset';
 			args.token = 'unset';
-			$('body').trigger('logged-out',{'call':'logged-out','id':'auth-state-listener'});
-			$('body').trigger('got-token',{'call':'got-token','id':'auth-state-listener','token':args.token});
+			success();
 		}
 	});
 }
-
-
-
+/* @job :: someTextHere */
 function Mvp4p1Operator(){
 	var dispatcher = null;
-	var product = 'https://us-central1-vog3lm-0x1.cloudfunctions.net'
+	var product = 'https://us-central1-vog3lm-0x1.cloudfunctions.net';
 	var args = {'url':product,'token':'unset'};
 	var events = {
-		'call-mvp':(data) => {this.call(data,'mvp');}
-		,'call-pdf':(data) => {this.call(data,'pdf');}
-	    ,'decorate-mvp':(data) => {this.decorate(data.opts);}
-	    ,'create-mvp':(data) => {this.create(data.d);}
-		,'got-token':(data) => {args.token = data.token;}
+		 'got-token':(data) => {args.token = data.token;}
+		,'call-mvp':(data) => {this.mvp(data);}
+		,'call-src':(data) => {this.src(data);}
+		,'call-msg':(data) => {this.msg(data);}
 	};
+	/* non event methods */
 	this.decorate = function(opts){
-		for(var key in opts) {
-		    if(args.hasOwnProperty(key)) {
-		    	if('events' !== key){
-		    		args[key] = opts[key];
-		    	}
-		    }
-		}
+		decorate(args,opts);
 		return this;
 	}
 	this.create = function(d){
@@ -186,104 +126,122 @@ function Mvp4p1Operator(){
 		}
 		return this;
 	}
-	this.call = function(data,api){
-		if(null == api){api = 'mvp';}
+	/* hybird access methods */
+	this.mvp = function(data){
 		var errors = [];
 		if('unset' === args.token){errors.push('no token found.');}
 		if('unset' === args.url){errors.push('no url found.');}
+		if(!data.q){errors.push('no query token found');}
+		if('unset' === data.q){errors.push('invalid query token');}
+		data['type'] = 'GET';
+		data['api'] = 'mvp';
 		if(0 < errors.length){
-			console.error('call-'+api+' error',errors);
-			$('body').trigger('fail-'+api,{'id':'fail'+api,'call':'fail'+api,'message':'call-'+api+' error','errors':errors.join(' ')});
-			return
-		}
+			data['errors'] = errors;
+			data['code'] = 1;
+			error(data);
+		}else{request(data);}
+	}
+	this.src = function(data){
+		var errors = [];
+		if('unset' === args.token){errors.push('no token found.');}
+		if('unset' === args.url){errors.push('no url found.');}
+		if(!data.q){errors.push('no query token found');}
+		if('unset' === data.q){errors.push('invalid query token');}
+		data['type'] = 'GET';
+		data['api'] = 'pdf';
+		if(0 < errors.length){
+			data['errors'] = errors;
+			data['code'] = 1;
+			error(data);
+		}else{request(data);}
+	}
+	this.msg = function(data){
 		$.ajax({
-		  	url:args.url+'/'+api+'/?q='+data.q,
-		  	crossDomain: true,
-		  	headers:{'Authorization':'CONTENT_ID_TOKEN::'+args.token},
-		  	context: document.body,
+			type:'POST',
+		  	url:args.url+'/'+'msg',
+		  	crossDomain:true,
+		  	context:document.body,
+		  	data:{'frm':data.mail,'msg':data.message,'nme':data.from}
 		}).done(function(response){
-			if(data.hasOwnProperty('promise')){
-				data.promise(response);
-			} else {
-				response['call'] = 'got-'+api;
+			if(data.hasOwnProperty('promise')){data.promise(response);} 
+			else {
+				response['call'] = 'got-'+data.api;
 				response['id'] = data.id;
 				response['type'] = 'text';
-				$('body').trigger('got-'+api,response);	
+				response['url'] = data.url;
+				$('body').trigger('got-'+data.api,response);	
 			}
 		}).fail(function(xhr,status){
-			console.error('call-'+api+' error',xhr.responseText);
-			$('body').trigger('fail-'+api,{'id':'fail'+api,'call':'fail'+api,'q':data.q,'id':data.id,'message':'call-'+api+' error','errors':xhr.responseText});
+			data.errors = [xhr.responseText];
+			data.code = 2;
+			error(data);
 		});
 	}
-
-
-	/* move to content request js... *//* unused */
-	this.header = function(view,type="GET"){
-		if('unset' !== args.token){
-			console.log('Sending request to', args.url, 'with ID token in Authorization header.');
-			var req = new XMLHttpRequest();
-			req.onload = function() {
-				console.log('receive content',req)
-				// send update content event ?!
-				//this.responseContainer.innerText = req.responseText;
-			};
-			req.onerror = function() {
-				console.error('receive error',req)
-				// send update content event ?!
-				//this.responseContainer.innerText = 'There was an error';
-			};
-			req.open(type,args.url+view,true);
-			req.setRequestHeader('Authorization', 'CONTENT_ID_TOKEN::'+args.token);
-			req.send();
-		} else {
-			console.error('No Content ID Token Found!')
-		}
-		//firebase.auth().currentUser.getIdToken().then(function(token){/* call token each request */});
+	/* private helpers *//* error codes:
+	 * 1 :: no token found 
+	 * 2 :: token expired */
+	function error(data){
+		console.error('call-'+data.api+' error',data.errors,'url:',data.url);
+		$('body').trigger('got-error',{'call':'got-error','id':'get-'+data.api,'tag':data.tag,'url':data.url,'errors':data.errors,'code':data.code});
 	}
-	this.cookie = function(view,type="GET"){
-		if('unset' !== args.token){
-			// set the __session cookie
-			document.cookie = '__session=' + args.token + ';max-age=3600';
-			console.log('Sending request to', args.url, 'with ID token in __session cookie.');
-			var req = new XMLHttpRequest();
-			req.onload = function() {
-				console.log('receive content',req)
-			};
-			req.onerror = function() {
-				console.error('receive error',req)
-			};
-			req.open(type,args.url+view,true);
-			req.send();
-		} else {
-			console.error('No Content ID Token Found!')
-		}
-		// firebase.auth().currentUser.getIdToken().then(function(token){/* call token each request */});
+	function request(data){
+		$.ajax({
+		  	url:args.url+'/'+data.api+'/?q='+data.q,
+		  	crossDomain:true,
+		  	headers:{'Authorization':'CONTENT_ID_TOKEN::'+args.token},
+		  	context:document.body,
+		}).done(function(response){
+			if(data.hasOwnProperty('promise')){data.promise(response);} 
+			else {
+				response['call'] = 'got-'+data.api;
+				response['id'] = data.id;
+				response['type'] = 'text';
+				response['url'] = data.url;
+				$('body').trigger('got-'+data.api,response);	
+			}
+		}).fail(function(xhr,status){
+			data.errors = [xhr.responseText];
+			data.code = 2;
+			error(data);
+		});
 	}
-	/* move to content request js... *//* unused */
+	function header(view,type="GET"){ /* unused */
+		console.log('Sending request to', args.url, 'with ID token in Authorization header.');
+		var req = new XMLHttpRequest();
+		req.onload = function() {
+			console.log('receive content',req)
+			// send update content event ?!
+			//this.responseContainer.innerText = req.responseText;
+		};
+		req.onerror = function() {
+			console.error('receive error',req)
+			// send update content event ?!
+			//this.responseContainer.innerText = 'There was an error';
+		};
+		req.open(type,args.url+view,true);
+		req.setRequestHeader('Authorization', 'CONTENT_ID_TOKEN::'+args.token);
+		req.send();
+	}
+	function cookie(view,type="GET"){ /* unused */
+		// set the __session cookie
+		document.cookie = '__session=' + args.token + ';max-age=3600';
+		console.log('Sending request to', args.url, 'with ID token in __session cookie.');
+		var req = new XMLHttpRequest();
+		req.onload = function() {
+			console.log('receive content',req)
+		};
+		req.onerror = function() {
+			console.error('receive error',req)
+		};
+		req.open(type,args.url+view,true);
+		req.send();
+	}
 }
-function Scr1pt4p1Operator(){
-	this.decorate = function(opts){
-		for(var key in opts) {
-		    if(args.hasOwnProperty(key)) {
-		    	if('events' !== key){
-		    		args[key] = opts[key];
-		    	}
-		    }
-		}
-		return this;
-	}
-    function jsAdd(filename){
-
-    }
-    function jsRemove(filename){
-
-    }
-}
+/* @job :: someTextHere */
 function D3s1gn4p1Operator(){
 	var dispatcher = null;
 	var src = 'unset';
-	var args = {'design':'dark','designs':['white','dark']
-			   ,'path':'css','url':'design','format':'css'}
+	var args = {'design':'dark','designs':['white','dark'],'path':'css','url':'design','format':'css','after':'default'}
 	var events = {
 		'design-call':(data) => {this.call(data);}
 		,'design-toggle':(data) => {this.toggle(data);}
@@ -295,17 +253,10 @@ function D3s1gn4p1Operator(){
 			else{args.design = args.designs[0];}
 			cssAdd(args.path+'/'+args.url+'.'+args.design+'.'+args.format);
 	    }
-	    ,'design-create':(data) => {this.create(data.opts);}
-	    ,'design-decorate':(data) => {this.create();}
 	};
+	/* non event methods */
 	this.decorate = function(opts){
-		for(var key in opts) {
-		    if(args.hasOwnProperty(key)) {
-		    	if('events' !== key){
-		    		args[key] = opts[key];
-		    	}
-		    }
-		}
+		decorate(args,opts);
 		return this;
 	}
 	this.create = function(d){
@@ -322,18 +273,18 @@ function D3s1gn4p1Operator(){
 		}catch(error){
 			console.error(error);
 		}
-		if(0 == window.orientation){ // portrait
-			$('header img#after-effect').attr('src','images/after/port.head.'+args.design+'.png');
-			$('footer img#after-effect').attr('src','images/after/port.foot.'+args.design+'.png');
-		} else {
-			$('header img#after-effect').attr('src','images/after/land.head.'+args.design+'.png');
-			$('footer img#after-effect').attr('src','images/after/land.foot.'+args.design+'.png');
-		}
-		$('header img#hello').attr('src','images/labels/hello.world.'+args.design+'.png');
+
+		var orientation = 'land'
+		if(0 == window.orientation){orientation = 'port';}
+		$('img.after-effect').each(function(index){
+			var element = $(this);
+			element.attr('src','images/after/'+orientation+'.'+element.attr('alt')+'.'+args.design+'.png');
+		});
 		return this;
 	}
 	this.design = function(){return args.design;}
-	this.call = function(){
+	/* hybrid access methods */
+	this.call = function(data){
 		cssRemove(src);
 		src = src.replace(args.design,data.design);
 		args.design = data.design;
@@ -345,24 +296,23 @@ function D3s1gn4p1Operator(){
 			src = src.replace(args.design,'dark');
 			args.design = 'dark';
 			document.querySelector('meta[name="theme-color"]').setAttribute("content",'#222222');
-			var element = $('header img#after-effect');
-			element.attr('src',element.attr('src').replace('white','dark'));
-			element = $('footer img#after-effect');
-			element.attr('src',element.attr('src').replace('white','dark'));
+			$('img.after-effect').each(function(index){
+				var element = $(this);
+				element.attr('src',element.attr('src').replace('white','dark'));
+			});
 		}
 		else{
 			src = src.replace(args.design,'white');
 			args.design = 'white';
 			document.querySelector('meta[name="theme-color"]').setAttribute("content",'#ffffff');
-			var element = $('header img#after-effect');
-			element.attr('src',element.attr('src').replace('dark','white'));
-			element = $('footer img#after-effect');
-			element.attr('src',element.attr('src').replace('dark','white'));
+			$('img.after-effect').each(function(index){
+				var element = $(this);
+				element.attr('src',element.attr('src').replace('dark','white'));
+			});
 		}
-		$('header img#hello').attr('src','images/labels/hello.world.'+args.design+'.png');
 		cssAdd(src);
 	}
-
+	/* private helpers */
     function cssAdd(filename){
 		var fileref=document.createElement("link")
 	    fileref.setAttribute("rel", "stylesheet")
@@ -383,6 +333,7 @@ function D3s1gn4p1Operator(){
 		}
     }
 }
+/* @job :: someTextHere */
 function Scro114p1Operator(){
 	var content = null;
 	var scrolled = 0;
@@ -394,13 +345,15 @@ function Scro114p1Operator(){
 			   ,'bars':true
 			   ,'orientation':'vertical'
 	};
+	var navView = ''
+	+ '<nav id="doc-navigation">'
+		+ '<a href="#" class="fa fa-chevron-circle-up hide" call="scroll-up"></a>'
+		+ '<a href="#" class="fa fa-chevron-circle-down" call="scroll-down"></a>'
+	+ '</nav>';
 	var distance = 0;
+	/* non event methods */
 	this.decorate = function(opts){
-		for (var key in opts){
-			if(args.hasOwnProperty(key)){
-				args[key] = opts[key];
-			}
-		}
+		decorate(args,opts);
 		return this;
 	}
 	this.create = function(){
@@ -454,10 +407,10 @@ function Scro114p1Operator(){
 			distance = distance - anker;
 		}
 	}
-
 	this.max = function(){scrollDelta(distance);}
 	this.min = function(){scrollDelta(-(distance-scrolled));}
 	this.delta = function(delta){scrollDelta(delta);}
+	/* private helpers */
 	function scrollDelta(delta){
 		if(scrolled <= distance && scrolled >= 0){
 			scrolled+=Math.floor((delta*args.scale))
@@ -471,14 +424,6 @@ function Scro114p1Operator(){
 	function scrollSection(sec){
 		changeScrollBarUi(content);
 	}
-
-	var navView = ''
-	+ '<nav id="doc-navigation">'
-		+ '<a href="#" class="fa fa-chevron-circle-up hide" call="scroll-up"></a>'
-		+ '<a href="#" class="fa fa-chevron-circle-down" call="scroll-down"></a>'
-	+ '</nav>';
-
-
 	function changeScrollBarUi(content){
 		var element = content.find('nav#doc-navigation');
 		element.css({'top':(scrolled)});
@@ -494,6 +439,7 @@ function Scro114p1Operator(){
 		}
 	}
 }
+/* @job :: someTextHere */
 function Swipe4p1Operator(){
 	/*	http://jquerymobile.com/download-builder/	*//*
 		jQuery Mobile event cheat sheet 			*//*
@@ -521,40 +467,265 @@ function Swipe4p1Operator(){
 		taptwo 
 		tapthree 		*/
 	var mapping = {};
+	var args = {'mapping':{},'parent':null,'id':null,'tag':'playground','start':0,'mode':'children','distance':1,'before':()=>{return true},'after':()=>{}}
 	var events = {
-		 'map-swipes':(map) => {this.create(map);}
-		,'create-swipes':() => {this.create();}
+		'next':() => {return this.next();}
+		,'prev':() => {return this.prev();}
+		,'show':() => {}
 	};
-	this.map = (map) => {
-		mapping = map;
+	var dispatcher = null;
+	/**/
+	var swipeParent = null;
+	var swipeLeft = null;
+	var swipeLight = null;
+	var swipeMax = 0;
+	var swipePages = 0;
+	/* non event methods */
+	this.decorate = function(opts){
+		decorate(args,opts);
 		return this;
 	}
-	this.create = () => {
-		if(mapping.hasOwnProperty('swipeleft')){
+	this.create = function(d){
+		/* create content user interface */
+		errors = [];
+		if(null == args.parent){errors.push('swipe presenter parent not set')}
+		if(null == args.id){errors.push('swipe presenter parent not set')}
+		if(0 < errors.length){console.error(errors);}
+		else{
+			swipeParent = args.parent;
+			swipeLeft = $('a#get-'+args.id+'-prev');
+			swipeRight = $('a#get-'+args.id+'-next');
+			swipeParent.attr('index',args.start);
+			swipePages = swipeParent.find(args.tag).length;
+			swipeMax = swipePages;
+			if('relative' === args.mode){swipeMax=swipePages-args.distance;} // swipe 3 childs 3 swipes 
+			else{swipePages=swipePages-1;} // swipe child width (3 childs 2 swipes)
+			this.show(args.start);
+		}
+		/* create user interface listener */
+		if(args.mapping.hasOwnProperty('swipeleft')){
+			events[args.mapping["swipeleft"].call] = events['next'];
+			delete events.next;
 			$(document).on("swipeleft",function(){
-				var tmp = mapping["swipeleft"];
-				$('body').trigger(tmp.call,{'call':tmp.call,'id':'swipeleft'});
+				events[args.mapping['swipeleft'].call]();
 			});
 		}
-		if(mapping.hasOwnProperty('swiperight')){
+		if(args.mapping.hasOwnProperty('swiperight')){
+			events[args.mapping["swiperight"].call] = events['prev'];
+			delete events.prev;
 			$(document).on("swiperight",function(){
-				var tmp = mapping["swiperight"];
-				$('body').trigger(tmp.call,{'call':tmp.call,'id':'swiperight'});
+				events[args.mapping['swiperight'].call]();
 			});
 		}
-		if(mapping.hasOwnProperty('orientationchange')){
+		if(args.mapping.hasOwnProperty('orientationchange')){
 			$(window).on("orientationchange",function(event){
-				var tmp = mapping["swiperight"];
-				$('body').trigger(tmp.call,{'call':tmp.call,'id':'swiperight'});
+				var tmp = args.mapping["swiperight"];
+				$('body').trigger(tmp.call,{'call':tmp.call,'id':'swiperight','url':tmp.url});
 				$('body').trigger('design-create',{'call':'design-create','id':'orientationchange'});
 			});
 		}
-	    return this;
+		if(d){
+			dispatcher = d;
+			dispatcher.onAppend({'events':Object.keys(events),'issues':Object.values(events)});
+		} else {
+			console.warn('popup api operator','internal dispatcher used');
+			dispatcher = new V13wEv3ntD1spatch3r().onDecorate({'events':Object.keys(events),'issues':Object.values(events)}).onRegister();
+		}
+		return this;
+	}
+	this.index = function(){return parseInt(swipeParent.attr('index'));}
+	/* hybird access methods */
+	this.next = function(){
+		if(!args.before()){return index;}
+		var index = parseInt(swipeParent.attr('index'));
+		if(index == swipePages){return index;}
+		index = index+1;
+		if(index == swipePages){swipeRight.addClass('hide');} 
+		else if(index == 1){swipeLeft.removeClass('hide');}
+		swipeParent.attr('index',index);
+		swipeParent.scrollLeft(distance(index));
+		args.after();
+		$('body').trigger('history-push',{'call':'got-mvp','url':'page','id':'get-next','index':index});
+		return index;
+	}
+	this.prev = function(){
+		if(!args.before()){return index;}
+		var index = parseInt(swipeParent.attr('index'));
+		if(index == 0){return index;} 
+		index = index-1;
+		if(index == 0){swipeLeft.addClass('hide');} 
+		else if(index == swipePages-1){swipeRight.removeClass('hide');}					
+		swipeParent.attr('index',index);
+		swipeParent.scrollLeft(distance(index));
+		args.after();
+		$('body').trigger('history-push',{'call':'got-mvp','url':'page','id':'get-prev','index':index});
+		return index;
+	}
+	this.show = function(index){
+		if(!args.before()){return index;}
+		if(0 > index){index = 0;}
+		else if(swipeMax < index){index = swipeMax;} 
+		if(index == 0){swipeLeft.addClass('hide');} 
+		else{swipeLeft.removeClass('hide');}
+		if(index == swipeMax){swipeRight.addClass('hide');}
+		else{swipeRight.removeClass('hide');}
+		swipeParent.attr('index',index);
+		swipeParent.scrollLeft(distance(index));
+		args.after();
+		return index;
+	}
+	/* private helper methods */
+	function distance(index){
+		if('relative' == args.mode){return index*swipeParent.width()*swipeMax/swipePages;}
+		else{
+			var scrollValue = 0;
+			for(var i=0;i<index;i++){
+				scrollValue=scrollValue+swipeParent.find(args.tag+':nth-child('+(i+1)+')').width();
+			};
+			return scrollValue;
+		}
+	}
+
+}
+/* @job :: someTextHere */
+function P0pup4p1Operator(){
+	var body = $('body');
+	/* popup view args */
+	var popupHolder = null;
+	var popupOperator = null;
+	var popupContent = null;
+	var popupTimer = null;
+	var popupTimeout = null;
+	var popupEvent = null;
+	var popupElement = '<popup class="hide"><a href="#" id="popup-close" class="fa fa-times" call="popup-hide" url="popup"></a><section></section></popup>';
+	var popupEvents = {
+		'popup-hide':() => {this.hide();}
+	}
+	this.create = function(d){
+		$('body').append(popupElement);
+		popupHolder = $('popup');
+		popupOperator = $('header').not('popup, popup *');
+		popupContent = $('popup section');
+		if(d){
+			dispatcher = d;
+			dispatcher.onAppend({'events':Object.keys(popupEvents),'issues':Object.values(popupEvents)});
+		} else {
+			console.warn('popup api operator','internal dispatcher used');
+			dispatcher = new V13wEv3ntD1spatch3r().onDecorate({'events':Object.keys(popupEvents),'issues':Object.values(popupEvents)}).onRegister();
+		}
+		return this;
+	}
+	this.load = function(data){
+		// 	var style = {};
+		//	if(data.hasOwnProperty('opacity')){style['opacity'] = data.opacity;}
+		//	if(data.hasOwnProperty('padding')){style['padding'] = data.padding;}
+		//	if(data.hasOwnProperty('size')){
+		//		var size = data.size;
+		//		if('full' === size){
+		//			style['width'] = '100%';
+		//			style['height'] = '100%';
+		//		}else if('half' === size){
+		//			style['width'] = '50%';
+		//			style['height'] = '50%';
+		//		}else if('match' === size){
+		//			if(pageWidth > pageHeight){style['width'] = '50%';}
+		//			else{style['width'] = '80%';}
+		//		}
+		//	}
+		//	popupHolder.css(style);
+
+		popupContent.html(data.content);
+		popupTimer = data.timeout;
+		if(data.hasOwnProperty('event')){popupEvent = data.event;}
+		return this;
+	}
+	this.show = function(){
+		if(popupHolder.hasClass('hide')){
+			popupHolder.removeClass('hide');
+			/* 	bind hide listener on everything but popup and 
+				children do only mouseup will close after clicked 
+			*//* TODO:not working properly. */
+			popupOperator.on("mouseup",function(e){
+				popupHolder.addClass('hide');
+				popupOperator.off("mouseup");
+				if(null !== popupEvent){body.trigger(popupEvent.call,[popupEvent]);}
+				popupEvent = null;
+			});
+			/* bind hide timer */
+			if(Number.isInteger(popupTimer)){
+				clearTimeout(popupTimeout);
+				popupTimeout = setTimeout(function(){
+					if(!popupHolder.hasClass('hide')){
+						popupHolder.addClass('hide');
+						popupOperator.off("mouseup");
+						if(null !== popupEvent){body.trigger(popupEvent.call,[popupEvent]);}
+						popupEvent = null;
+					}
+				},popupTimer);
+			}else if(null === popupTimer || false === popupTimer){
+				/**/
+			}else{/* default hide after 5000 */
+				clearTimeout(popupTimeout);
+				popupTimeout = setTimeout(function(){
+					if(!popupHolder.hasClass('hide')){
+						popupHolder.addClass('hide');
+						popupOperator.off("mouseup");
+						if(null !== popupEvent){body.trigger(popupEvent.call,[popupEvent]);}
+						popupEvent = null;
+					}
+				},5000);
+			}
+		}
+		return this;
+	}
+	this.hide = function(){
+		if(!popupHolder.hasClass('hide')){
+			popupHolder.addClass('hide');
+			popupOperator.off("mouseup");
+			$(':not(popup)').off("mousedown");
+			if(null !== popupEvent){body.trigger(popupEvent.call,[popupEvent]);}
+			popupEvent = null;
+		}
+		return this;
+	}
+	this.toggle = function(){
+		if(popupHolder.hasClass('hide')){return this.popup.show();}
+		else{return this.popup.hide();}
 	}
 }
-
-
-
+/* @job :: someTextHere */
+function HtmlCancasTool(animation){ /* used in animation.X.js move */
+	var holder = animation;
+    this.canvasParse = (id) => {
+        return document.getElementById(id);
+    }
+    this.canvasScroll = () => {
+    	// wrap canvas to scroll container
+        var canvas = document.createElement("canvas");
+        var scroll = document.createElement("scroll");
+        scroll.appendChild(canvas);
+        if('body' === holder.setting.args.paneParent){
+        	document.body.appendChild(scroll)
+        //    document.body.appendChild(canvas);
+        } else {
+            var element = document.getElementById(holder.setting.args.paneParent);
+            element.insertBefore(scroll, element.childNodes[0])
+        //    element.insertBefore(canvas, element.childNodes[0]);
+        }
+        return canvas;
+    }
+    this.canvasCreate = () => {
+        var canvas = document.createElement("canvas");
+        if('body' === holder.setting.args.paneParent){
+            document.body.appendChild(canvas);
+        } else {
+            var element = document.getElementById(holder.setting.args.paneParent);
+            element.insertBefore(canvas, element.childNodes[4]);
+        }
+        return canvas;
+    }
+}
+/* @job :: someTextHere */
 function BrowserHistorD1spatcher(){
 	var dispatcher = null;
 	var events = {
@@ -562,6 +733,7 @@ function BrowserHistorD1spatcher(){
 		,'history-push':(data) => {this.push(data);}
 	}
 	var last = null;
+	/* non event methods */
 	this.create = (d) => {
 		if(d){
 			dispatcher = d;
@@ -572,17 +744,20 @@ function BrowserHistorD1spatcher(){
 		}
 		return this;
 	}
-	this.replace = (state) => { // replace the current state
-		window.history.replaceState(state,0,location.href);
-	}
-	this.push = (state) => { // add a new state to list
-		window.history.pushState(state,0,location.href);
-	}
+	/* hybrid access methods *//*
+	 * state = {'call':'got-mvp','url':'page','id':'get-prev','index':0} *//*
+	 * window.history.method(state, title, url) */
+	this.replace = (state) => {window.history.replaceState(state,0,location.href);}
+	this.push = (state) => {window.history.pushState(state,0,location.href);}
+	/* history forward/back has been hit 
+	 * call events manually:
+	 * window.history.forward()
+	 * window.history.back()
+	 * window.history.got(+-steps) */
 	$(window).bind('popstate',(e) => {
-	    if(null != e.originalEvent.state){ // forward/back has been hit
+	    if(null != e.originalEvent.state){
 	    	var state = e.originalEvent.state;
-	    	console.log('popstate',state,last)
-	    	if(last == state.index || null == last){state.direction = 0;}
+	    	if(last === state.index || null === last){state.direction = 0;}
 	    	else if(last < state.index){state.direction = 1;}
 	    	else if(last > state.index){state.direction = -1;}
 	    	last = state.index;
@@ -591,6 +766,7 @@ function BrowserHistorD1spatcher(){
 	    }
 	});
 }
+/* @job :: someTextHere */
 function Keyboard4p1Operator(){
 	/*	key code cheat sheet *//*
 		Enter			13	Home			36
@@ -608,32 +784,26 @@ function Keyboard4p1Operator(){
 		Windows key		91	
 		Windows option key	93				*/
 	var mapping = {};
-	var events = {
-		 'map-keyboard':(map) => {this.create(map);}
-		,'create-keyboard':() => {this.create();}
-	};
+	var events = {};
+	/* non event methods */
 	this.map = (map) => {
 		mapping = map;
 		return this;
 	}
 	this.create = () => {
-	    $(document).keydown(function(e){ // need keydown, keypress no working on special keys
-	    	if(mapping.hasOwnProperty(e.which)){
-	    		e.preventDefault();
-	    		var tmp = mapping[e.which];
-	    		$('body').trigger(tmp.call,{'call':tmp.call,'id':'onKeydown'});
-	    		alert(tmp)
+	    $(document).keydown(function(e){ /* need keydown, keypress no working on special keys */
+	    	var key = e.which;
+	    	if(mapping.hasOwnProperty(key)){
+	    		// e.preventDefault();
+	    		var tmp = mapping[key];
+	    		$('body').trigger(tmp.call,{'call':tmp.call,'id':'onKeydown','url':tmp.url,'event':e});
 	    		return;
 			}
-
-	        // if(e.which == 116){ //F5
-	        // 	location.reload();
-	        // }
-	        
 	    });
 	    return this;
 	}
 }
+/* @job :: someTextHere */
 function V13wEv3ntD1spatch3r(){
     var events = [];
     var issues = [];
@@ -687,13 +857,16 @@ function V13wEv3ntD1spatch3r(){
             }
         });
         $('form').keypress(function(e) {
-            if (e.which == 13) {
+            if(e.which == 13){
                 e.preventDefault();
                 var element = $(this)               
                 if(element.attr('call')){
                     $('body').trigger(element.attr('call'),{call:element.attr('call'),id:element.attr('id'),url:element.attr('url')});
                 }
             }
+        });
+        window.addEventListener('afterprint',function(e){
+			$('body').trigger('view-toggle',[{'call':'view-toggle','id':e.type,'url':'print'}]);
         });
         return this;
     }

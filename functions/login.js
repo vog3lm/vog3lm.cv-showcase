@@ -2,13 +2,13 @@
 
 module.exports = {
 
-	'page': (script) => {
+	'page': (script,user) => {
 		return '<!DOCTYPE html><html lang="de"><head><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>smart.cv.log1n</title>'
 			 + '<link rel="shortcut icon" href="https://vog3lm-0x1.firebaseapp.com/images/logos/fox.white.png" type="image/x-icon">'
 			 + '<link rel="icon" ref="https://vog3lm-0x1.firebaseapp.com/images/logos/fox.white.png" type="image/x-icon">'+script+'</head>'
 			 + '<body>'
 			 	+ '<img src="https://vog3lm-0x1.firebaseapp.com/images/logos/fox.gray.png" alt="fox" title="Smart Print Login Page" style="position:absolute;width:10%;left:50%;top:50%;transform:translate(-50%,-50%);">'
-				+ '<a href="https://vog3lm-0x1.firebaseapp.com" style="position:absolute;left:50%;top:65%;transform:translate(-50%,-50%);font-size:2rem;font-family:monospace;text-decoration:none;color:gray;text-align:center;">Proceed Autologin.<br>You\'ll be redirected.</a>'
+				+ '<a href="https://vog3lm-0x1.firebaseapp.com" style="position:absolute;left:50%;top:65%;transform:translate(-50%,-50%);font-size:2rem;font-family:monospace;text-decoration:none;color:gray;text-align:center;">Login '+user+'.<br>You\'ll be redirected.</a>'
 			 + '</body></html>';
 	}
 	,'script': (mail,pass,leed) => {

@@ -7,23 +7,33 @@ footer input 		{ color:rgba(34,34,34,1); }
 
 input           		{ color:rgba(187,187,187,1); background:transparent; border:none; box-shadow:none; /*font-family:'mp-light', serif;*/ }
 input:focus     		{ border:none; outline:none !important; box-shadow:none; }
+input::selection 		{ background:rgb(34,34,34); }
+input::-moz-selection 	{ background:rgb(34,34,34); }
 
-::selection 		{ background:rgb(34,34,34); }
-::-moz-selection 	{ background:rgb(34,34,34); }
+.error { color:rgb(255,0,138); }
+.error ::placeholder { color:rgb(255,0,138); }
 
-body header{
-	background:rgba(34,34,34,1);
-}
-body footer{
-	background-color:rgba(255,255,255,1); 
-	color:rgba(34,34,34,1);
-}
-
-header a.fa-chevron-up,
-header a.fa-chevron-down{
-	color:rgba(187,187,187,1);
+body header { background:rgba(34,34,34,1); }
+body footer { 
+	background-color:rgba(255,255,255,1);
+	color:rgb(0,0,0);
 }
 
-body overlay {
-    background: rgba(255,255,255,0.7);
+body overlay.fill { background:rgba(255,255,255,1); }
+body overlay.semi { background:rgba(255,255,255,0.7); }
+body overlay p{
+	color:gray;
+	font-family:monospace;
+}
+
+body popup,
+body popup a.wrap,
+body popup h2{
+	background-color:rgb(255,255,255);
+	color:rgb(34,34,34);
+}
+
+body popup.flash{
+	background-color:rgb(255,0,170);
+	color:rgb(34,34,34);
 }

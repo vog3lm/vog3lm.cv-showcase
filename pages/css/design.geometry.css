@@ -10,7 +10,6 @@ a.fa-stack i { padding-top:4px; padding-bottom:4px; }
 
 .hide {display:none;}
 
-
 /* used in ? *//* CHECK AND DELETE */
 .c-1   {height:calc(100% - 0px);}
 .c-1-2 {height:calc(100% / 2 - 0px);}
@@ -29,27 +28,19 @@ a.fa-stack i { padding-top:4px; padding-bottom:4px; }
 .r-3-4 {width:calc(100% / 4 * 3 - 0px);}
 /* used in ? *//* CHECK AND DELETE */
 
-
-
-body header{
+body img.after-effect{
+	z-index:1;
+	position:absolute;
+	width:100%;
+	height:100%;
+}
+/**/
+header{
 	overflow:hidden;
 	position:relative;
 	width:100%;
 	height:100%;
 }
-header canvas{
-	position:absolute;
-}
-header img.after-effect,
-footer img.after-effect{
-	position:absolute;
-	width:100%;
-	height:100%;
-}
-
-
-
-
 header section#content{ /* main content container */
     position: absolute;
     overflow:hidden;
@@ -57,42 +48,50 @@ header section#content{ /* main content container */
     width: 100%;
     height: 100%;
 }
-
-
-
-
-header user{ /* user auth form */
+/* navigation positioning */
+nav{ z-index:2; }
+header nav:nth-of-type(1){ /* bottom right uis */
+	position:absolute;
+	right:0px;
+	bottom:32px;
+	width:32px;
+}
+header nav:nth-of-type(2){
+	position:absolute;
+	right:32px;
+	bottom:32px;
+	width:32px;
+}
+/**/
+body user{ /* user auth form */
 	display:inline-block;
 	height:32px;
 	width:100%;
 	overflow:hidden;
 }
-header user form,
-header user card{
+body user form,
+body user card{
 	width:calc(100% - 32px);
 	height:100%;
 	padding:0px;
 	float:right;
 }
-header user form input{
+body user form input{
 	height:32px;
 	width:50%;
 	line-height:32px;
 	vertical-align:middle;
 	float:left;
 }
-header user card id{
+body user card id{
 	height:32px;
 	line-height:32px;
 	vertical-align:middle;
 	float:left;
 	overflow:hidden;
 }
-
-
-
-
-header a.fa-chevron-up, /* toggle footer manually */
+/* toggle footer manually
+header a.fa-chevron-up,
 header a.fa-chevron-down{
 	position: absolute;
 	width: calc(100% - 32px - 10%);
@@ -102,9 +101,8 @@ header a.fa-chevron-down{
 	line-height:14px;
 	text-align:center;
 }
-
-
-
+*/
+/* popup stuff */
 @media screen and (orientation:landscape){
 	body popup{
 		min-width:32px;
@@ -120,8 +118,13 @@ header a.fa-chevron-down{
 	    min-height:32px;
 	    max-height:calc(70% - 1.5em);
 	}
+	body popup a.wrap,
+	body popup h2{
+		white-space:nowrap;
+		display:inline-flex;
+	}
 }
-body popup {	/* movie split to font... */
+body popup {
 	position:fixed;
     top:50%;
     left:50%;
@@ -134,25 +137,37 @@ body popup {	/* movie split to font... */
 	color:white;
     word-wrap:break-word;
 }
+body popup a#popup-close{
+    position:absolute;
+    right:0px;
+    top:0px;
 
-
-
-
-body overlay {
-	position:absolute;
-	width:100%;
-    height:100%;
+    color:black; /* move to design.light/dark */
 }
-
-
-
-
+body popup section p,
+body popup section a.wrap,
+body popup section h2{
+	word-break:break-all;
+	margin-bottom:1em;
+}
+body popup section h2{ margin-right:2em; }
+body popup section a.wrap p{
+    margin:0 1em 0 0;
+    float:left;
+    line-height:32px;
+    vertical-align:middle;
+}
+body popup section{ margin-top:1em; }
+body popup section p:last-child,
+body popup section a.wrap:last-child,
+body popup section h2:last-child{ margin-bottom:0em; }
+/**/
 body footer {
 	position:relative;
 	width:100%;
 	height:70%; /* make responsive */
 }
-footer section { /* main content container */
+footer section#content {
 	position:absolute;
 	left:50%;
 	top:50%;
@@ -163,41 +178,40 @@ footer section { /* main content container */
 	overflow-y:auto;
 	max-width:100%;
 	max-height:100%;
+	z-index:1;
 }
 @media screen and (min-width:1024px){
-	footer section {
-		width:calc(80% - 14px);
-	}
+	footer section{ width:calc(80% - 14px); }
 }
 @media screen and (min-width:1440px){
-	footer section {
-		width:calc(50% - 14px);
-	}
+	footer section{ width:calc(50% - 14px); }
 }
-footer section::-webkit-scrollbar {
-	display: none;
+footer section::-webkit-scrollbar { display:none; }
+/**/
+body overlay {
+	position:absolute;
+	width:100%;
+    height:100%;
+    z-index:3;
 }
-
-
-
-
-edge{ /* commonize with header ui */
+/**/
+body edge{ /* commonize with header ui */
 	position:absolute;
 	display:inline-block;
 	min-width:32px;
 	height:32px;
 	line-height:32px;
-	z-index:1;
+	z-index:2;
 }
-edge.hr{
+body edge.hr{
 	top:0px;
 	right:0px;
 }
-edge.bl{
+body edge.bl{
 	left:0px;
 	bottom:0px;
 }
-edge.br{
+body edge.br{
 	right:0px;
 	bottom:0px;
 }
